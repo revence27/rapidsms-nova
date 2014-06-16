@@ -259,7 +259,7 @@ def chwreg(request):
 def group_messages(request):
     """Messaging Feature."""
     request.base_template = "webapp/layout.html"
-    if get_user_location(request).user.username != 'gaju':        
+    if get_user_location(request).user.username != 'mikemi':#'gaju':        
         return render_to_response("ubuzima/404.html",{'error':"YOU ARE NOT ALLOWED TO SEND GROUP MESSAGES. PLEASE CONTACT ERIC GAJU"}, context_instance=RequestContext(request))
     hc = dst = None
     sent = []

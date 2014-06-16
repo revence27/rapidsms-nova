@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-14 10:08+0200\n"
+"POT-Creation-Date: 2014-02-20 16:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,39 +17,43 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: admin.py:56
-msgid "Export to EXCEL"
+#: admin.py:253
+msgid "Export to EXCEL 2007"
 msgstr ""
 
-#: models.py:265
+#: admin.py:255
+msgid "Export to EXCEL 2003"
+msgstr ""
+
+#: models.py:272
 #, python-format
 msgid "%s Report: "
-msgstr ""
+msgstr "%s Raporo:"
 
-#: models.py:266
+#: models.py:273
 #, python-format
 msgid "Patient=%s, "
-msgstr ""
+msgstr "Umubyeyi=%s, "
 
-#: models.py:267
+#: models.py:274
 #, python-format
 msgid "Location=%s"
-msgstr ""
+msgstr "Aherereye=%s, "
 
-#: models.py:269
+#: models.py:276
 #, python-format
 msgid " (%s)"
-msgstr ""
+msgstr " (%s)"
 
 #: handlers/anc.py:29 handlers/anc.py:48 handlers/bir.py:29 handlers/bir.py:47
 #: handlers/cbn.py:29 handlers/cbn.py:47 handlers/ccm.py:29 handlers/ccm.py:47
 #: handlers/chi.py:29 handlers/chi.py:47 handlers/cmr.py:29 handlers/cmr.py:47
-#: handlers/dep.py:29 handlers/dep.py:47 handlers/dth.py:29 handlers/dth.py:47
+#: handlers/dep.py:29 handlers/dep.py:47 handlers/dth.py:212
 #: handlers/nbc.py:29 handlers/nbc.py:47 handlers/pnc.py:29 handlers/pnc.py:47
 #: handlers/pre.py:28 handlers/pre.py:49 handlers/rar.py:29 handlers/rar.py:47
 #: handlers/red.py:29 handlers/red.py:47 handlers/ref.py:29 handlers/ref.py:47
 #: handlers/res.py:29 handlers/res.py:47 handlers/risk.py:28
-#: handlers/risk.py:47 reports/utils.py:472
+#: handlers/risk.py:47
 msgid "You need to be registered first, use the REG keyword"
 msgstr "Ugomba kubanza kwiyandikisha, koresha ijambo REG"
 
@@ -61,20 +65,37 @@ msgstr ""
 "Wagombye kwandika: ANC INDANGAMUNTU_UMUBYEBYI ITALIKI_YO_KWIPIMISHA INCURO "
 "IBIMENYETSO AHO_YASUZUMIWE IBIRO_BY_UMUBYEYI"
 
-#: handlers/anc.py:91 handlers/risk.py:85
+#: handlers/anc.py:91 handlers/bir.py:97 handlers/cbn.py:92 handlers/ccm.py:91
+#: handlers/chi.py:96 handlers/cmr.py:92 handlers/dth.py:302
+#: handlers/nbc.py:95 handlers/pnc.py:89 handlers/pre.py:111
+#: handlers/res.py:85 handlers/risk.py:85
 #, python-format
 msgid ""
 "%(key)s:%(red)s is a red alert, please see how to report a red alert and try "
 "again."
 msgstr ""
+"%(key)s:%(red)s Ubu turabona ari ubutumwa butabaza, reba uko bwoherezwa "
+"wongere ugerageze."
 
-#: handlers/anc.py:97 handlers/bir.py:99 handlers/dth.py:99
-#: handlers/pre.py:111
+#: handlers/anc.py:97 handlers/bir.py:103 handlers/cbn.py:98
+#: handlers/ccm.py:97 handlers/chi.py:102 handlers/cmr.py:98
+#: handlers/nbc.py:101 handlers/pnc.py:95 handlers/pre.py:117
+#: handlers/rar.py:96 handlers/red.py:92 handlers/res.py:91
+#: handlers/risk.py:91
+#, python-format
+msgid ""
+"%(key)s:%(dth)s is a death, please see how to report a death and try again."
+msgstr ""
+"%(key)s:%(dth)s Ubu turabona ari ubutumwa bw'ibyago by'urupfu, reba uko "
+"bwoherezwa wongere ugerageze."
+
+#: handlers/anc.py:104 handlers/bir.py:111 handlers/dth.py:308
+#: handlers/pre.py:131
 msgid ""
 "This report has been recorded, and we cannot duplicate it again. Thank you!"
 msgstr "Iyi raporo warayiduhaye, twarayibonye. Murakoze!"
 
-#: handlers/anc.py:113
+#: handlers/anc.py:120
 #, python-format
 msgid ""
 "Thank you! ANC report submitted. Please send also the pregnancy report of "
@@ -91,7 +112,7 @@ msgstr ""
 "Andika: BIR INDANGAMUNTU NUMERO ITARIKI_AVUTSE IGITSINA IBIBAZO AHO_AVUKIYE "
 "IBIJYANYE_NO_KONKA IBIRO"
 
-#: handlers/bir.py:120
+#: handlers/bir.py:132
 msgid "Thank you! Birth report submitted successfully."
 msgstr "MURAKOZE, ubutumwa bw'uwo mwana wavutse bwatugezeho, Ahiiiii!"
 
@@ -103,7 +124,7 @@ msgstr ""
 "Andika: CBN INDANGAMUNTU NUMERO_Y_UMWANA ITARIKI_YAVUTSE KONKA IBUBUREBURE "
 "UBUREMERE MUAC"
 
-#: handlers/cbn.py:108
+#: handlers/cbn.py:120
 msgid "Thank you! CBN report submitted successfully."
 msgstr "Murakoze ubutumwa ku mirire y'umwana turabubonye!"
 
@@ -115,7 +136,7 @@ msgstr ""
 "Andika: CCM INDANGAMUNTU NUMERO_Y_UMWANA ITARIKI_YAVUTSE IBIBAZO UBUTABAZI "
 "MUAC"
 
-#: handlers/ccm.py:106
+#: handlers/ccm.py:118
 msgid "Thank you! CCM report submitted successfully."
 msgstr ""
 "Murakoze ubutumwa ku butabazi bw ibanze uwo mubyeyi yari akeneye turabubonye."
@@ -128,7 +149,7 @@ msgstr ""
 "Andika: CHI INDANGAMUNTU NUMERO_Y_UMWANA ITARIKI_YAVUTSE "
 "IBIJYANYE_N_IKINGIRA IBIBAZO_AFITE AHO_AHEREREYE IBIRO MUAC"
 
-#: handlers/chi.py:115
+#: handlers/chi.py:127
 msgid "Thank you! Child Health report submitted successfully."
 msgstr "Murakoze ubutumwa ku buzima bw'umwana turabubonye."
 
@@ -140,7 +161,7 @@ msgstr ""
 "Andika: CMR INDANGAMUNTU NUMERO_Y_UMWANA ITARIKI_YAVUTSE IBIBAZO UBUTABAZI "
 "MUAC"
 
-#: handlers/cmr.py:107
+#: handlers/cmr.py:119
 msgid "Thank you! CMR report submitted successfully."
 msgstr "Murakoze ubutumwa bw uko uwo mubyeyi amerewe turabubonye."
 
@@ -148,21 +169,126 @@ msgstr "Murakoze ubutumwa bw uko uwo mubyeyi amerewe turabubonye."
 msgid ""
 "You never reported a departure. Departure are reported with the keyword DEP"
 msgstr ""
-"Ntabwo ari gutyo bohereza raporo y'abimutsea, andika DEP usige akanya "
-"wandike kunko babibabwiye."
+"Ntabwo ari gutyo bohereza raporo y'abimutse, andika DEP usige akanya wandike "
+"kunko babibabwiye."
 
 #: handlers/dep.py:87
 msgid "Thank you! Dep report submitted successfully."
 msgstr "Murakoze, raporo ku mubyeyi wimutse turayibonye."
 
-#: handlers/dth.py:53 handlers/dth.py:71
-msgid ""
-"The correct format message is: DTH MOTHER_ID CHILD_NUMBER DATE_OF_BIRTH "
-"DEATH_CODE"
-msgstr ""
-"Andika: DTH INDANGAMUNTU NUMERO_Y_UMWANA ITARIKI_Y_AMAVUKO CODI_Y_URUPFU"
+#: handlers/dth.py:48 handlers/dth.py:66 handlers/dth.py:68
+#: reports/utils.py:93 reports/utils.py:97 reports/utils.py:101
+#: reports/utils.py:400 reports/utils.py:404 reports/utils.py:408
+msgid "Invalid date format, must be in the form: DD.MM.YYYY"
+msgstr "Itariki ntabwo yanditswe neza, andika: Umunsi.Ukwezi.Umwaka"
 
-#: handlers/dth.py:119
+#: handlers/dth.py:52
+#, python-format
+msgid ""
+"Invalid year, year must be between %(year_start)d and %(year_end)d, and date "
+"in the form: DD.MM.YYYY"
+msgstr ""
+"Umwaka ntiwanditse neza, ugomba kuba hagati ya %(year_start)d and "
+"%(year_end)d, ukandika UMUNSI.UKWEZI.UMWAKA"
+
+#: handlers/dth.py:56
+msgid ""
+"Invalid month, month must be between 1 and 12, and date in the form: DD.MM."
+"YYYY"
+msgstr "Itariki ntabwo yanditswe neza, andika: Umunsi.Ukwezi.Umwaka"
+
+#: handlers/dth.py:60
+msgid ""
+"Invalid day, day must be between 1 and 31, and date in the form: DD.MM.YYYY"
+msgstr "Itariki ntabwo yanditswe neza, andika: Umunsi.Ukwezi.Umwaka"
+
+#: handlers/dth.py:101 handlers/dth.py:132
+msgid "Patient ID is missing!"
+msgstr ""
+"Indangamuntu y'umubyeyi ntayo wanditse cyangwa yanditse ahatari mu mwanya "
+"wayo."
+
+#: handlers/dth.py:107
+msgid "Child Number Is missing!"
+msgstr ""
+"Numero y'umwana ntayo wanditse cyangwa yanditse ahatari mu mwanya wayo."
+
+#: handlers/dth.py:113
+msgid "Date of delivery Is missing!"
+msgstr ""
+"Itariki yabyariyeho cyangwa umwana yavukiye ntayo wanditse cyangwa yanditse "
+"ahatari mu mwanya wayo."
+
+#: handlers/dth.py:119 handlers/dth.py:138
+msgid "Location is missing!"
+msgstr "Aho byabereye ntaho wanditse cyangwa handitse ahatari mu mwanya waho."
+
+#: handlers/dth.py:125 handlers/dth.py:144
+msgid "Death Code Is missing!"
+msgstr "Codi y'urupfu ntayo wanditse cyangwa yanditse ahatari mu mwanya wayo."
+
+#: handlers/dth.py:151
+msgid "Patient ID Is missing."
+msgstr " Indangamuntu y'umurwayi ntiyashyizweho/ntiyatanzwe "
+
+#: handlers/dth.py:153
+msgid ""
+"Patient ID must be 16 digits of national ID Or 10 digits of CHW Phone Number "
+"+ 6 digits of ddmmyy"
+msgstr ""
+" Umubare w'indangamuntu ugomba kuba imibare 16, cyangwa se imibare 10 ya "
+"telephone y'umujyanama wongeyeho imibare 6 igizwe n'imibare 2 y'uwo munsi, 2 "
+"y'uko kwezi n'imibare 2 ihera y'umwaka "
+
+#: handlers/dth.py:160
+msgid "Child Number Is missing."
+msgstr " Numero y'umwana ntayo wanditse cg yanditse ahatari mu mwanya wayo"
+
+#: handlers/dth.py:162
+msgid ""
+"Please check you have the correct child number. This number should be a 2 "
+"digit number, the first digit is always 0 and second digit varies between 1-8"
+msgstr ""
+" Genzura niba numero iranga umwana ariyo. Iyo numero igomba kuba igizwe "
+"nimibare 2 ubanza ukaba ari 0 uwukurikiye ukaba hagati ya 1-8 "
+
+#: handlers/dth.py:178
+msgid "Date of delivery should be equal to or less then current date"
+msgstr ""
+" Itariki yo kubyara igomba kuba ingana cyangwa se iri musi y'itariki "
+"yatangiweho ubutumwa"
+
+#: handlers/dth.py:187
+msgid ""
+"Location is missing! Please be sure that you have entered the appropriate "
+"Birth location. It should be HO, HP, OR or CL."
+msgstr ""
+" Genzura niba wanditse neza aho umwana yavukiye. Ikimenyetso kigomba kuba "
+"HO, HP,OR cyangwa CL "
+
+#: handlers/dth.py:197
+msgid ""
+"Maternal Death Code Is missing! It should be MD because there is no child "
+"number and date of birth in this SMS."
+msgstr ""
+"Codi y'urupfu ntabwo ariyo, yakabaye MD niba ari urupfu rw'umubyeyi kuko "
+"numero y'umwana n'itariki yavukiye ntabyo wohereje."
+
+#: handlers/dth.py:200
+msgid ""
+"Death Code Is missing! Please be sure that you have entered the appropriate "
+"Death Code. It should be MD, CD, or ND."
+msgstr ""
+"Codi y'urupfu ntayo. Rebako wakoresheje codi imwe nyayo muri izi : MD, CD, "
+"ND kandi mu mwanya wayo"
+
+#: handlers/dth.py:230
+msgid "You need to be registered first, Please contact your supervisor!"
+msgstr ""
+"Ugomba kubanza kwiyandikisha, saba ubufasha k'ushinzwe abajyanama kukigo "
+"nderabuzima"
+
+#: handlers/dth.py:334
 msgid "Thank you! Death report submitted successfully."
 msgstr "Mukomeze kwihanga! ubutumwa ku byago by urupfu mwagize turabubonye!"
 
@@ -174,7 +300,7 @@ msgstr ""
 "Andika: NBC INDANGAMUNTU NUMERO INSHURO ITARIKI_YAVUTSE IBIBAZO KONKA "
 "UBUTABAZI UKO_UMWANA_AMEZE"
 
-#: handlers/nbc.py:115
+#: handlers/nbc.py:127
 msgid "Thank you! NBC report submitted successfully."
 msgstr "Murakoze! ubutumwa ku buzima bw uruhinje twabubonye."
 
@@ -186,7 +312,7 @@ msgstr ""
 "Andika: PNC INDANGAMUNTU INSHURO ITARIKI_YAVUTSE IBIBAZO UBUTABAZI "
 "UKO_UMWANA_AMEZE"
 
-#: handlers/pnc.py:108
+#: handlers/pnc.py:120
 msgid "Thank you! PNC report submitted successfully."
 msgstr "Murakoze! ubutumwa ku buzima bw'umubyeyi twabubonye."
 
@@ -200,7 +326,15 @@ msgstr ""
 "IZAVUTSE IBIBAZO_KERA IBISHYA AHO_YAPIMIWE IBIRO UBUREBURE UMUSARANI "
 "KANDAGIRA TELEFONI"
 
-#: handlers/pre.py:142
+#: handlers/pre.py:77
+msgid "Parity cannot be greater or equal to Gravidity."
+msgstr "Inshuro yabyaye ntizishobora kuruta izo yasamye."
+
+#: handlers/pre.py:81
+msgid "Gravidity and Parity numbers are showing zero miscarriages."
+msgstr "Inshuro yabyaye nizo yasamye byerekanako atikigeze akuramo inda."
+
+#: handlers/pre.py:162
 msgid "Thank you! Pregnancy report submitted successfully."
 msgstr "Murakoze, ubutumwa bw'uwo mubyeyi utwite bwatugezeho."
 
@@ -212,7 +346,12 @@ msgstr ""
 "Andika: RAR INDANGAMUNTU IBIBAZO_BYATANZWE AHO_AHEREREYE UBUTABAZI_BWAKOZWE "
 "UKO_UMUBYEYI AMEZE UKO_UMWANA_AMEZE"
 
-#: handlers/rar.py:104
+#: handlers/rar.py:86 handlers/red.py:81
+msgid "Invalid report syntax, please check to report this case."
+msgstr ""
+"Raporo yanditse nabi. Reba uko ubwo butumwa bwandikwa wongere ugerageze."
+
+#: handlers/rar.py:115
 msgid "Thank you! Red Alert Result report submitted successfully."
 msgstr ""
 "Murakoze ubutumwa ku bisubizo by ibibazo uwo mubyeyi yari yagize turabubonye."
@@ -223,7 +362,7 @@ msgid ""
 "MOTHER_WEIGHT"
 msgstr "Andika: RED INDANGAMUNTU IBIMENYETSO_BY_IBIBAZO AHO_AHEREREYE"
 
-#: handlers/red.py:99
+#: handlers/red.py:111
 msgid "Thank you! RED Alert report submitted successfully."
 msgstr ""
 "MURAKOZE, ubutumwa ku kibazo k'umubyeyi ukeneye ubutabazi bwihuse "
@@ -248,7 +387,7 @@ msgstr ""
 "Andika: RES INDANGAMUNTU IBIBAZO_BYATANZWE AHO_AHEREREYE UBUTABAZI_BWAKOZWE "
 "UKO_UMUBYEYI AMEZE UKO_UMWANA_AMEZE"
 
-#: handlers/res.py:104
+#: handlers/res.py:116
 msgid "Thank you! Risk Result report submitted successfully."
 msgstr ""
 "Murakoze ubutumwa ku bisubizo by ibibazo uwo mubyeyi yari yagize turabubonye."
@@ -261,14 +400,9 @@ msgstr ""
 "Wagombye kwandika: RISK INDANGAMUNTU_UMUBYEBYI IBIMENYETSO AHO_AHEREREYE "
 "IBIRO"
 
-#: handlers/risk.py:106
+#: handlers/risk.py:113
 msgid "Thank you! Risk report submitted successfully."
 msgstr "MURAKOZE, ubutumwa ku kibazo k'umubyeyi bwatugezeho!"
-
-#: reports/utils.py:93 reports/utils.py:97 reports/utils.py:101
-#: reports/utils.py:362 reports/utils.py:366 reports/utils.py:370
-msgid "Invalid date format, must be in the form: DD.MM.YYYY"
-msgstr "Itariki ntabwo yanditswe neza, andika: Umunsi.Ukwezi.Umwaka"
 
 #: reports/utils.py:166
 #, python-format
@@ -285,16 +419,16 @@ msgstr "Ntushobora gutanga ahantu habiri aho byabereye."
 msgid "Error.  %(error)s"
 msgstr "Ikosa!  %(error)s"
 
-#: reports/utils.py:322
+#: reports/utils.py:321
 #, python-format
 msgid "%(phone)s: %(report)s"
 msgstr ""
 
-#: reports/utils.py:374 reports/utils.py:378
+#: reports/utils.py:412 reports/utils.py:416
 msgid "Invalid date, cannot be in the future."
 msgstr "Andika neza itariki, iyo ntiragera."
 
-#: reports/utils.py:447
+#: reports/utils.py:485
 #, python-format
 msgid ""
 "Error.  National ID must be exactly 16 digits, you sent the nid: %(nat_id)s "
@@ -302,6 +436,349 @@ msgid ""
 msgstr ""
 "Ikosa. Nomero y'irangamuntu igomba kugira imibare 16, wohereje %(nat_id)s "
 "n'imibare %(uburefu)d gusa"
+
+#: reports/utils.py:510
+msgid "You need to be registered first"
+msgstr "Ugomba kubanza kwiyandikisha"
+
+#~ msgid ""
+#~ "The sequence or order of your data/codes is not correct. Please check its "
+#~ "order and re-submit the message again."
+#~ msgstr ""
+#~ " Ubutumwa wohereje ntibwuzuye cyangwa amakuru wohereje ntakurikirana neza "
+#~ "mu mwanya wayo wabugenewe. Reba neza uko ubutumwa bwandikwa"
+
+#~ msgid "Your submitted report contains the following errors: "
+#~ msgstr "Wohereje ubutumwa burimo amakosa akurikira: "
+
+#~ msgid "The provided phone number in Patient ID does not match your number."
+#~ msgstr ""
+#~ " Numero yohereje ubutumwa, ntihura na numero ikurikirana umubyeyi ufite "
+#~ "iyi ndangamuntu "
+
+#~ msgid "The provided ddmmyy in Patient ID does not match the format."
+#~ msgstr " Amatariki yanditswe kuburyo butari butagenwe "
+
+#~ msgid ""
+#~ "Gender is missing! Please be sure that you have entered the appropriate "
+#~ "Gender Code. It should be BO or GI"
+#~ msgstr ""
+#~ " Genzura niba wanditse ikimenyetso cy'igitsana nyacyo. Cyagombye kuba BO "
+#~ "cyangwa GI "
+
+#~ msgid ""
+#~ "Current Symptoms are missing! Please check that you have the correct type "
+#~ "of current symptom or symptoms in the appropriate place in your Birth "
+#~ "Report. These can be SB, RB, NP, AF, CI, CM, IB, DB and PM. If you have "
+#~ "more than 1 they must be separated by a space. "
+#~ msgstr ""
+#~ " Genzura niba ibimenyetso by'ibibazo byanditse neza kuri raporo yo "
+#~ "kubyara. Bigomba kwandikwa murubu buryo bukurikira: SB, RB, NP, AF, CI, "
+#~ "CM, IB, DB cyangwa PM. Niba afite ikimenyetso kirenze kimwe, ugomba "
+#~ "kubitandukanya usize akanya "
+
+#~ msgid ""
+#~ "Breastfeeding Is missing! Please be sure that you have entered the "
+#~ "appropriate Breastfeeding Code. It should be BF1 or NB"
+#~ msgstr ""
+#~ " Genzura niba wanditse neza ikimenyetso cyo konsa. cyigomba kuba BF1 "
+#~ "cyangwa NB"
+
+#~ msgid ""
+#~ "Please be sure you have entered the child weight without units of KG. It "
+#~ "should be in the format of WT# or WT#.# and between 1 & 10 with having no "
+#~ "comma."
+#~ msgstr ""
+#~ " Genzura niba utanditse KG ku biro by'umwana. Ibiro byandikwa kuburyo "
+#~ "bukurikira, WT# cyangwa WT#.#. kandi ibiro bikaba hagati ya 1 & 10 nta "
+#~ "kitso gakoreshejwe"
+
+#~ msgid ""
+#~ "Child weight is missing! Please be sure you have entered the child weight "
+#~ "without units of KG. It should be in the format of WT# or WT#.# and "
+#~ "between 1 & 10 with having no comma."
+#~ msgstr ""
+#~ " Genzura niba utanditse KG ku biro by'umwana. Ibiro byandikwa kuburyo "
+#~ "bukurikira, WT# cyangwa WT#.#. kandi ibiro bikaba hagati ya 1 & 10 nta "
+#~ "kitso gakoreshejwe"
+
+#~ msgid ""
+#~ "Breastfeeding Is missing! Please be sure that you have entered the "
+#~ "appropriate Breastfeeding Code. It should be EBF, NB or CBF"
+#~ msgstr ""
+#~ " Genzura niba wujuje ikimenyetso kimwe rukumbi cyo konsa nyacyo. Kigomba "
+#~ "kuba EBF,NB cyangwa CBF"
+
+#~ msgid ""
+#~ "Please be sure you have entered the Height without units of Cm. It should "
+#~ "be in the format of HT## or HT##. # and between 1 & 150 with having no "
+#~ "comma."
+#~ msgstr ""
+#~ " Genzura niba utanditse Cm ku burebure bw'umwana. uburebure bwandikwa "
+#~ "kuburyo bukurikira; HT# cyangwa HT#.# hagati  1 na 150 ntakitso "
+#~ "gakoreshejwe"
+
+#~ msgid ""
+#~ "Child height Is missing! Please be sure you have entered the Height "
+#~ "without units of Cm. It should be in the format of HT## or HT##. # and "
+#~ "between 1 & 150 with having no comma."
+#~ msgstr ""
+#~ " Genzura niba utanditse Cm ku burebure bw'umwana. uburebure bwandikwa "
+#~ "kuburyo bukurikira; HT# cyangwa HT#.# hagati  1 na 150 ntakitso "
+#~ "gakoreshejwe"
+
+#~ msgid ""
+#~ "Please be sure you have entered the child weight without units of KG. It "
+#~ "should be in the format of WT## or WT##.# and between 1 & 25 with having "
+#~ "no comma."
+#~ msgstr ""
+#~ " Genzura niba utanditse KG ku burebure bw'umwana. ibiro bwandikwa kuburyo "
+#~ "bukurikira; WT# cyangwa WT#.# hagati  1 na 25 ntakitso gakoreshejwe"
+
+#~ msgid ""
+#~ "Child weight is missing! Please be sure you have entered the child weight "
+#~ "without units of KG. It should be in the format of WT## or WT##.# and "
+#~ "between 1 & 25 with having no comma."
+#~ msgstr ""
+#~ " Genzura niba utanditse KG ku burebure bw'umwana. ibiro byandikwa kuburyo "
+#~ "bukurikira; WT# cyangwa WT#.# hagati  1 na 25 ntakitso gakoreshejwe"
+
+#~ msgid ""
+#~ "Please be sure you have entered the MUAC without units of Cm. It should "
+#~ "be in the format of MUAC## or MUAC##.# and between 01 & 15 with having no "
+#~ "comma."
+#~ msgstr ""
+#~ " Genzura niba utanditse Cm kuri MUAC. yandikwa kuburyo bukurikira MUAC## "
+#~ "cyangwa MUAC##.# hagati  01 na 15 ntakitso gakoreshejwe"
+
+#~ msgid ""
+#~ "MUAC is missing! Please be sure you have entered the MUAC without units "
+#~ "of Cm. It should be in the format of MUAC## or MUAC##.# and between 01 & "
+#~ "15 with having no comma."
+#~ msgstr ""
+#~ " Genzura niba utanditse Cm kuri MUAC. yandikwa kuburyo bukurikira MUAC## "
+#~ "cyangwa MUAC##.# hagati  01 na 15 ntakitso gakoreshejwe"
+
+#~ msgid ""
+#~ "This Child # does not have any BIR report and CBN can only be submitted "
+#~ "for a registered child."
+#~ msgstr ""
+#~ " Raporo y'imikurire n'imirire y'abana mu mudugudu itangwa k'umwana "
+#~ "watangiwe raporo yo kuvuka"
+
+#~ msgid ""
+#~ "Vaccination series received Is missing! Please be sure that you have "
+#~ "entered the appropriate Vaccination Series Code. It should be V1, V2, V3, "
+#~ "V4, V5 or V6."
+#~ msgstr ""
+#~ " Genzura niba wakoresheje ibinyetso nyabyo bigaragaza inkingo. Bigomba "
+#~ "kuba: V1, V2, V3, V4, V5 cyangwa V6"
+
+#~ msgid ""
+#~ "Vaccination series status Is missing! Please be sure that you have "
+#~ "entered the appropriate Vaccination Completion Status Code. It should be "
+#~ "VC, VI or NV."
+#~ msgstr ""
+#~ " Genzura niba wakoresheje kode nyayo yerekana iherezo ry'inkingo. zigomba "
+#~ "kuba :VC, VI or NV"
+
+#~ msgid ""
+#~ "Current Symptoms are missing! Please check that you have the correct type "
+#~ "of current symptom or symptoms in the appropriate place in your NBC "
+#~ "Report. These can be SB, RB, NP, AF, CI, CM, IB, DB and PM. If you have "
+#~ "more than 1 they must be separated by a space."
+#~ msgstr ""
+#~ " Genzura niba ibimenyetso by'ibibazo kuri raporo ya NBC byanditse aho "
+#~ "bigomba kwandikwa. Ibyo bimenyetso bigomba kuba SB, RB, NP, AF, CI, CM, "
+#~ "IB, DB na PM niba birenze 1 bitandukanye usiga akanya"
+
+#~ msgid ""
+#~ "Location is missing! Please be sure that you have entered the appropriate "
+#~ "Child Health Report location. It should be HO, HP or CL."
+#~ msgstr ""
+#~ " Genzura niba wakoresheje neza code nyayo y'aho aherereye. Igomba kuba "
+#~ "HO, HP cyangwa CL"
+
+#~ msgid ""
+#~ "Birth Report is not yet sent. Please make sure you have reported birth "
+#~ "before sending any report of this child."
+#~ msgstr ""
+#~ " Raporo y'imikurire n'imirire y'abana mu mudugudu itangwa k'umwana "
+#~ "watangiwe raporo yo kuvuka"
+
+#~ msgid ""
+#~ "Body Mass Index cannot be calculated. Please check if weight and height "
+#~ "of the mother are not missing."
+#~ msgstr " Itariki ya nyuma y'imihango ntayo cyangwa yanditse nabi"
+
+#~ msgid ""
+#~ "Expected date of delivery cannot be calculated. Please check if last "
+#~ "menstrual date is not missing."
+#~ msgstr " Itariki ya nyuma y'imihango ntayo cyangwa yanditse nabi"
+
+#~ msgid ""
+#~ "ANC visit dates cannot be calculated. Please check if last menstrual date "
+#~ "is not missing."
+#~ msgstr " Itariki ya nyuma y'imihango ntayo cyangwa yanditse nabi"
+
+#~ msgid "Last menstrual period should be in this format dd.mm.yyyy."
+#~ msgstr ""
+#~ " Itariki ya nyuma y'imihango igomba kuba yanditse gutya UMUNSI.UKWEZI."
+#~ "UMWAKA"
+
+#~ msgid ""
+#~ "Last menstrual period date should be equal to or less then current date."
+#~ msgstr ""
+#~ " Itariki ya nyuma y'imihango wanditse ntiturayigeraho. Kosora wandika "
+#~ "itariki nyayo."
+
+#~ msgid ""
+#~ "The last menstrual period can't be earlier than Current date-9 months, "
+#~ "Kindly check the date again and resubmit it."
+#~ msgstr ""
+#~ " Itariki ya nyuma y'imihango wanditse irengeje amazi icyenda ashize."
+
+#~ msgid ""
+#~ "Please provide Second ANC Appointment Date in this format dd.mm.yyyy."
+#~ msgstr ""
+#~ " Tanga itariki yahawe yo gusubira kubonana na Muganga, andika UMUNSI."
+#~ "UKWEZI.UMWAKA"
+
+#~ msgid "Second ANC Date should be greater than Last Menstrual Period"
+#~ msgstr ""
+#~ " Itariki yo gusubira kubonana na muganga ntigomba kuba mbere y'itariki ya "
+#~ "nyuma y'imihango."
+
+#~ msgid ""
+#~ "Difference between Second ANC Date-last menstrual period should not be "
+#~ "more than 9 months, Kindly check the date again and resubmit it"
+#~ msgstr ""
+#~ " Itariki yo gusubira kubonana na muganga n'itariki ya nyuma y'imihango "
+#~ "biruta amezi icyenda. Bikosore wongere ugerageza"
+
+#~ msgid ""
+#~ "Gravidity Is missing. Only numbers are allowed to be provided in "
+#~ "Gravidity."
+#~ msgstr ""
+#~ " Inshuro yasamye ntazo wanditse. Umubare niwo wemewe mu mwanya wabugenewe."
+
+#~ msgid "Gravidity should be between 1 and 30."
+#~ msgstr " Inshuro yasamye zigomba kuba hagati ya 1 na 30"
+
+#~ msgid "Parity Is missing. Only numbers are allowed to be provided in Parity"
+#~ msgstr ""
+#~ " Inshuro yabashije kubyara ntazo wanditse. Umubare niwo wemewe mu mwanya "
+#~ "wabugenewe."
+
+#~ msgid ""
+#~ "Parity should be equal to or greater than zero And less than gravidity "
+#~ "number."
+#~ msgstr ""
+#~ " Inshuro yabashije kubyara ntizigomba kuba 0 cyangwa ngo zirute inshuro "
+#~ "yasamye"
+
+#~ msgid "NR should be reported as Previous Symptom if Gravidity is 1"
+#~ msgstr ""
+#~ " Niba ari ubwa mbere asamye, tanga codi ya NR mu mwanya b'ibibazo yagize "
+#~ "mbere."
+
+#~ msgid "RM can only be reported for women with at least x miscarriages"
+#~ msgstr ""
+#~ " Codi RM itangwa gusa iyo yigeze akuramo inda. Reba niba wanditse neza "
+#~ "inshuro yasamye n'izo yabashije kubyara"
+
+#~ msgid ""
+#~ "If NR is reported then other codes can't be reported as Previous Symptoms"
+#~ msgstr ""
+#~ " Niba wanditse codi NR, nta bibazo b'indi ushobora gutanga mu mwanya "
+#~ "w'ibibazo yagize mbere"
+
+#~ msgid ""
+#~ "Previous pregnancy symptom Is missing. These can be GS, MU, HD, RM, OL, "
+#~ "YG, NR, KX, YJ, LZ and if you have more than 1 they must be separated by "
+#~ "a space."
+#~ msgstr ""
+#~ " Reba neza niba wanditse neza ibibazo yagize mbere. Codi zishoboka muri "
+#~ "uyu mwanya ni GS, MU, HD, RM, OL, YG, NR, KX, YJ, LZ"
+
+#~ msgid ""
+#~ "if NP is reported then other codes can't be reported as Current Symptoms"
+#~ msgstr ""
+#~ " Niba wanditse codi NR, nta bibazo b'indi ushobora gutanga mu mwanya "
+#~ "w'ibibazo afite ubu"
+
+#~ msgid ""
+#~ "Current pregnancy symptom Is missing. These can be VO, PC, OE, NS, MA, "
+#~ "JA, FP, FE, DS, DI, SA, RB, NP, HY, CH, AF and if you have more than 1 "
+#~ "they must be separated by a space."
+#~ msgstr ""
+#~ " Reba neza niba wanditse neza ibibazo afite ubu. Codi zishoboka muri uyu "
+#~ "mwanya ni VO, PC, OE, NS, MA, JA, FP, FE, DS, DI, SA, RB, NP, HY, CH, AF"
+
+#~ msgid ""
+#~ "Location is missing! Please be sure that you have entered the appropriate "
+#~ "PRE location. It should be HP or CL."
+#~ msgstr ""
+#~ " Aho bemereje ugusama ntaho wanditse. Rebako wakoresheje codi imwe nyayo "
+#~ "muri izi : HP, CL kandi mu mwanya wayo."
+
+#~ msgid ""
+#~ "Please be sure you have entered the weight without units of KG. It should "
+#~ "be in the format of WT## or WT##.# and between 25 & 150 with having no "
+#~ "comma."
+#~ msgstr ""
+#~ " Genzura niba utanditse KG ku biro by'umubyeyi. ibiro byandikwa kuburyo "
+#~ "bukurikira; WT# cyangwa WT#.# hagati  25 na 150 ntakitso gakoreshejwe"
+
+#~ msgid ""
+#~ "Mother weight Is missing! Please be sure you have entered the weight "
+#~ "without units of KG. It should be in the format of WT## or WT##.# and "
+#~ "between 25 & 150 with having no comma."
+#~ msgstr ""
+#~ " Ibiro by'umubyeyi ntabyo wanditse. ibiro byandikwa kuburyo bukurikira; "
+#~ "WT# cyangwa WT#.# hagati  25 na 150 ntakitso gakoreshejwe"
+
+#~ msgid ""
+#~ "Please be sure you have entered the Height without units of Cm. It should "
+#~ "be in the format of HT## or HT##.# and between 50 & 250 with having no "
+#~ "comma."
+#~ msgstr ""
+#~ " Genzura niba utanditse Cm ku burebure bw'umubyeyi. uburebure bwandikwa "
+#~ "kuburyo bukurikira; HT# cyangwa HT#.# hagati  50 na 250 ntakitso "
+#~ "gakoreshejwe"
+
+#~ msgid ""
+#~ "Mother height Is missing! Please be sure you have entered the Height "
+#~ "without units of Cm. It should be in the format of HT## or HT##.# and "
+#~ "between 50 & 250 with having no comma."
+#~ msgstr ""
+#~ " Uburebure bw'umubyeyi ntabwo wanditse. uburebure bwandikwa kuburyo "
+#~ "bukurikira; HT# cyangwa HT#.# hagati  50 na 250 ntakitso gakoreshejwe"
+
+#~ msgid ""
+#~ "Toilet code Is missing! Please be sure that you have entered the "
+#~ "appropriate Toilet code. It should be TO or NT."
+#~ msgstr ""
+#~ " Codi yerekanako afite umusarani ntayo. Rebako wakoresheje codi imwe "
+#~ "nyayo muri izi : TO, NT kandi mu mwanya wayo"
+
+#~ msgid ""
+#~ "Hand wash code Is missing! Please be sure that you have entered the "
+#~ "appropriate Hand wash code. It should be HW or NH."
+#~ msgstr ""
+#~ " Codi yerekanako afite kandagirukarabe ntayo. Rebako wakoresheje codi "
+#~ "imwe nyayo muri izi : HW, NH kandi mu mwanya wayo"
+
+#~ msgid "You need to be registered first, please contact your supervisor!"
+#~ msgstr ""
+#~ " Ugomba kubanza kwiyandikisha, saba ubufasha k'ushinzwe abajyanama kukigo "
+#~ "nderabuzima"
+
+#~ msgid ""
+#~ "The correct format message is: DTH MOTHER_ID CHILD_NUMBER DATE_OF_BIRTH "
+#~ "DEATH_CODE"
+#~ msgstr ""
+#~ "Andika: DTH INDANGAMUNTU NUMERO_Y_UMWANA ITARIKI_Y_AMAVUKO CODI_Y_URUPFU"
 
 #~ msgid ""
 #~ "The correct format message is: ANC MOTHER_ID VISIT_DATE ANC_ROUND "

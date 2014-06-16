@@ -2,6 +2,10 @@
 import os
 import sys
 
+
+# activate_this = '/usr/local/venv/rapidsmsrw1000/bin/activate_this.py'
+# execfile(activate_this, dict(__file__=activate_this))
+
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "rapidsmsrw1000.settings")
 

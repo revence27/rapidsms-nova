@@ -10,6 +10,7 @@ from django.contrib.admin import util as admin_util
 import xlsxwriter
 import cStringIO as StringIO
 from django.http import HttpResponse
+import time
 
 
 def export_reports_to_xlsx_in_http(reports):
@@ -109,7 +110,7 @@ def export_reports_to_xlsx_on_disk(reports):
     sheet_name = "%s" % ( reports.model.__name__.lower(), )
     filename = "%s.xlsx" % sheet_name
 
-    workbook = xlsxwriter.Workbook(filename)
+    workbook = xlsxwriter.Workbook(filename, {'constant_memory': True})
     sheet = workbook.add_worksheet(sheet_name)
     ##DATE FORMAT
     date_format = workbook.add_format({'num_format': 'mmmm dd yyyy'})
@@ -124,59 +125,77 @@ def export_reports_to_xlsx_on_disk(reports):
         col = col + 1
 
     row = row + 1
-    for obj in reports:
-        col = 0
-        for field in field_list:
-            field_obj, attr, value = admin_util.lookup_field(field, obj, ReportAdmin)
 
+    reports = reports.order_by('id')
+
+    segments = []
+    sg_i = 0
+    sg_l = reports.count()
+    while (sg_i+10000) < sg_l:
+        segments.append(reports[sg_i: sg_i+10000])
+        sg_i += 10000 
+    p = segments[len(segments) - 1][9999].pk
+    s = reports.filter(pk__gt = p)
+    segments.append(s)
+    seg = 0
+    for segment in segments:
+        time.sleep(5)
+        print "SEGMENT %d of %d" % (seg, len(segments))
+        seg += 1
+        for obj in segment:
+            #print row
+            col = 0
+            for field in field_list:
+                field_obj, attr, value = admin_util.lookup_field(field, obj, ReportAdmin)
+
+                try:
+                    if field in has_name_fields:  sheet.write(row, col, value.name)
+                    elif field in is_date_fields: 
+                        try:    sheet.write_datetime(row, col, value, date_format)
+                        except: sheet.write_datetime(row, col, value.date(), date_format)
+                    elif field in is_person_fields: sheet.write(row, col, "%s" % (value.national_id))
+                    else:   sheet.write(row, col, value)
+                                            
+                except Exception, e:
+                    try:    sheet.write(row, col, value)
+                    except: sheet.write(row, col, "NULL")
+                col = col + 1
+            
+            details = obj.fields.all()
+            #print row,col, "BEFORE"
             try:
-                if field in has_name_fields:  sheet.write(row, col, value.name)
-                elif field in is_date_fields: 
-                    try:    sheet.write_datetime(row, col, value, date_format)
-                    except: sheet.write_datetime(row, col, value.date(), date_format)
-                elif field in is_person_fields: sheet.write(row, col, "%s" % (value.national_id))
-                else:   sheet.write(row, col, value)
-                                        
-            except Exception, e:
-                try:    sheet.write(row, col, value)
-                except: sheet.write(row, col, "NULL")
-            col = col + 1
-        
-        details = obj.fields.all()
-        #print row,col, "BEFORE"
-        try:
-            if details:
-                for d in details:
-                    lc = [lc for lc in last_col if lc['name'] == d.type.key]
-                    mcol = col
-                    if lc:
-                        mcol = lc[0]['index']#;print mcol,d
-                        if d.type.has_value:
-                            sheet.write(row,mcol, d.value)
+                if details:
+                    for d in details:
+                        lc = [lc for lc in last_col if lc['name'] == d.type.key]
+                        mcol = col
+                        if lc:
+                            mcol = lc[0]['index']#;print mcol,d
+                            if d.type.has_value:
+                                sheet.write(row,mcol, d.value)
+                            else:
+                                sheet.write(row,mcol, d.type.description)
+                            
                         else:
-                            sheet.write(row,mcol, d.type.description)
-                        
-                    else:
-                        li = [lc for lc in last_col if lc['index'] == col]
-                        
-                        if li:
-                            mcol = last_col[len(last_col)-1]['index']+1
+                            li = [lc for lc in last_col if lc['index'] == col]
+                            
+                            if li:
+                                mcol = last_col[len(last_col)-1]['index']+1
 
-                        #print mcol, d 
-                        last_col.append({'name': d.type.key, 'index': mcol}) 
-                        sheet.write(0, mcol, d.type.key)  
-                        if d.type.has_value:
-                            sheet.write_number(row,mcol, d.value)
-                        else:
-                            sheet.write(row,mcol, d.type.description)
-        
-                    col = col+1
-        except Exception, e:
-            print e
-            continue
-        #print last_col
-        #print row,col, "AFTER"
-        row = row + 1
+                            #print mcol, d 
+                            last_col.append({'name': d.type.key, 'index': mcol}) 
+                            sheet.write(0, mcol, d.type.key)  
+                            if d.type.has_value:
+                                sheet.write_number(row,mcol, d.value)
+                            else:
+                                sheet.write(row,mcol, d.type.description)
+            
+                        col = col+1
+            except Exception, e:
+                print e
+                continue
+            #print last_col
+            #print row,col, "AFTER"
+            row = row + 1
 
     workbook.close()
 

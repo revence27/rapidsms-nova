@@ -11,4 +11,4 @@ class MessageAdmin(admin.ModelAdmin):
     list_filter = ("direction", "date")
 
 
-admin.site.register(Message, MessageAdmin)
+#admin.site.register(Message, MessageAdmin)

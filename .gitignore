@@ -21,3 +21,4 @@ rem.json
 public/static/
 public/media/
 *.xls*
+logs

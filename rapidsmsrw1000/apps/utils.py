@@ -18,6 +18,7 @@ import json
 from django.utils.safestring import SafeString
 from dateutil import rrule
 from random import randint
+import xlsxwriter
 
 #wbk = xlwt.Workbook()
 #sheet.write(0,0,"ReportID")
@@ -495,8 +496,8 @@ def paginated(req, data):
 
     return data
 
-
-@permission_required('ubuzima.can_view')
+#Commented because of RHEA group rights
+#@permission_required('ubuzima.can_view')
 def get_user_location(req):
     req.base_template = "webapp/layout.html"
     uloc = get_object_or_404(UserLocation, user=req.user)
@@ -719,4 +720,193 @@ def excel_supervisors(chws):
     response['Content-Disposition'] = 'attachment; filename = reporters.xls'
     workbook.save(response)
     return response
+
+
+def write(data, filename):
+    with open(filename, 'w') as output:
+        json.dump(data, output)
+        return True
+
+def load(filename):
+    with open(filename, 'r') as input:
+        data = json.load(input)
+        return data
+
+def ValuesQuerySetToDict(vqs):
+    return [item for item in vqs]
+
+def valFromListOneDIMDict(ld):
+    return [item.values()[0] for item in ld]
+
+
+def my_area(req):
+    rez = {}
+    pst = {}
+    level = get_level(req)
+    try:
+        loc = int(req.REQUEST['location'])
+        rez['location'] = loc
+    except KeyError:
+        try:
+            dst=int(req.REQUEST['district'])
+            rez['district'] = dst
+        except KeyError:
+            try:
+                prv=int(req.REQUEST['province'])
+                rez['province'] = prv
+            except KeyError:    pass
+
+    if level['level'] == 'Nation':  pst['nation'] = level['uloc'].nation.id
+    elif level['level'] == 'Province':  pst['province'] = level['uloc'].province.id
+    elif level['level'] == 'District':  pst['district'] = level['uloc'].district.id
+    elif level['level'] == 'HealthCentre':  pst['location'] = level['uloc'].health_centre.id
+
+    return [rez,pst]
+
+
+
+def heading_child(child):
+    heads = ['ID', 'MOTHER', 'CHW', 'NATION', 'PROVINCE', 'DISTRICT', 'SECTOR', 'CELL', 'VILLAGE', 'HEALTH_CENTRE', 'REFERRAL_HOSPITAL', 'DATE_OF_BIRTH', 'CHILD_NUMBER', 'GENDER', 'BIRTH_SYMPTOMS', 'BIRTH_LOCATION', 'BIRTH_BREASTFEEDING', 'BIRTH_WEIGHT', 'IS_PREMATURE', 'IS_DEAD', 'STATUS']
+
+    id = mother = chw = nation = province = district = sector = cell = village = health_centre = referral_hospital = date_of_birth = child_number = gender = birth_symptoms = birth_location = birth_breastfeeding = birth_weight = is_premature = is_dead = status = ""
+
+    try: id = child.pk
+    except: pass
+    try: mother = child.mother.national_id
+    except: pass
+    try: chw = child.chw.telephone_moh
+    except: pass
+    try: nation = child.chw.nation.name
+    except: pass
+    try: province = child.chw.province.name
+    except: pass
+    try: district = child.chw.district.name
+    except: pass
+    try: sector = child.chw.sector.name
+    except: pass
+    try: cell = child.chw.cell.name
+    except: pass
+    try: village = child.chw.village.name
+    except: pass
+    try: health_centre = child.chw.health_centre.name
+    except: pass
+    try: referral_hospital = child.chw.referral_hospital.name
+    except: pass
+    try: date_of_birth = child.date_of_birth
+    except: pass
+    try: child_number = child.child_number
+    except: pass
+    try: gender = child.gender
+    except: pass
+    try: birth_symptoms = child.birth_symptoms
+    except: pass
+    try: birth_location = child.birth_location
+    except: pass
+    try: birth_breastfeeding = child.birth_breatfeeding
+    except: pass
+    try: birth_weight = child.birth_weight
+    except: pass
+    try: is_premature = child.is_premature
+    except: pass
+    try: is_dead = child.is_dead
+    except: pass
+    try: status = child.status
+    except: pass
+
+
+    content = [id , mother , chw , nation , province , district , sector , cell , village , health_centre , referral_hospital , date_of_birth , child_number , gender , birth_symptoms , birth_location , birth_breastfeeding , birth_weight , is_premature , is_dead , status]
+
+    return {'heads' : heads, 'content' : content}
+
+
+def child_to_excel(children):
+    maquis = heading_child(children[1])
+    workbook = create_workbook()
+    sheet = create_worksheet(workbook, "children")
+    sheet = create_heads(sheet, maquis['heads'])
+    row   = 1
+    for child in children:
+        sheet  = create_content(sheet, row, heading_child(child)['content'])
+
+        row = row + 1
+
+    response = HttpResponse(mimetype = "application/ms-excel")
+    response['Content-Disposition'] = 'attachment; filename = children.xls'
+    workbook.save(response)
+    return response
+
+def child_to_excel_disk(children):
+    maquis = heading_child(children[1])
+    workbook = create_workbook()
+    sheet = create_worksheet(workbook, "children")
+    sheet = create_heads(sheet, maquis['heads'])
+    row   = 1
+    for child in children:
+        sheet  = create_content(sheet, row, heading_child(child)['content'])
+
+        row = row + 1
+
+    workbook.save('children.xlsx')
+    return workbook
+
+
+def export_child_to_xlsx_on_disk(childs):
+    
+    from rapidsmsrw1000.apps.api.nutrition.admin import Child, ChildAdmin
+    from django.contrib.admin import util as admin_util
+
+    # Create a workbook and add a worksheet.
+    has_name_fields = ['village', 'cell', 'sector', 'health_centre', 'referral_hospital', 'district', 'province', 'nation']
+    is_date_fields = ['date_of_birth',]
+
+    is_person_fields = ['mother']
+    has_telephone = ['chw'] 
+
+    sheet_name = "%s" % ("child")
+    filename = "%s.xlsx" % sheet_name
+
+    workbook = xlsxwriter.Workbook(filename)
+    sheet = workbook.add_worksheet(sheet_name)
+    ##DATE FORMAT
+    date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+
+
+    field_list = [f.name for f in Child._meta.fields]
+    #print field_list
+    row = col = 0
+    last_col = []
+    for f in field_list:
+        sheet.write(row , col, f.upper())
+        col = col + 1
+
+    row = row + 1
+    for obj in childs:
+        col = 0
+        for field in field_list:
+            field_obj, attr, value = admin_util.lookup_field(field, obj, ChildAdmin)
+
+            try:
+                #print field
+                if field in has_name_fields:  sheet.write(row, col, value.name)
+                elif field in is_date_fields: 
+                    try:    sheet.write_datetime(row, col, value, date_format)
+                    except: sheet.write_datetime(row, col, value.date(), date_format)
+                elif field in is_person_fields: sheet.write(row, col, "%s" % (value.national_id))
+                elif field in has_telephone: sheet.write(row, col, "%s" % (value.telephone_moh))
+                else:   sheet.write(row, col, value)
+                                        
+            except Exception, e:
+                try:    sheet.write(row, col, value)
+                except: sheet.write(row, col, "NULL")
+            col = col + 1
+        
+       
+        #print last_col
+        #print row,col, "AFTER"
+        row = row + 1
+
+    workbook.close()
+
+    return True
+
 

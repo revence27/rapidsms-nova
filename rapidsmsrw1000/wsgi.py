@@ -16,17 +16,16 @@ framework.
 import os
 import sys
 
-try:
-    # set up python path and virtualenv
-    activate_this = '/home/zigama/projects/python/virtualenvs/rapidsmsrw1000-env/bin/activate_this.py'
-    execfile(activate_this, dict(__file__=activate_this))
+# set up python path and virtualenv
+# activate_this = '/usr/local/venv/rapidsmsrw1000/bin/activate_this.py'
+# execfile(activate_this, dict(__file__=activate_this))
+# Don't be such a ... thingy.
 
-    filedir = os.path.dirname(__file__)
+filedir = os.path.dirname(__file__)
 
-    rootpath = os.path.join(filedir, "..")
-    sys.path.append(os.path.join(rootpath))
-except:
-    pass
+rootpath = os.path.join(filedir, "..")
+sys.path.append(os.path.join(rootpath))
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "rapidsmsrw1000.settings")
 

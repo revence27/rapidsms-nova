@@ -869,6 +869,10 @@ def ensure_report_correct(sender, **kwargs):
         report.nation = report.reporter.nation
         report.save()
 
+        ##Mark reporter as active if he was inactive
+        report.reporter.is_active = True
+        report.reporter.save()
+
 
         if report:    return True
         else:   return False
@@ -901,6 +905,11 @@ def ensure_refusal_correct(sender, **kwargs):
         refusal.nation = reporter.nation
         refusal.save()
 
+        ##Mark reporter as active if he was inactive
+        refusal.reporter.is_active = True
+        refusal.reporter.save()
+
+
 def ensure_reminder_correct(sender, **kwargs):
     if kwargs.get('created', False):
         reminder = kwargs.get('instance')
@@ -915,6 +924,7 @@ def ensure_reminder_correct(sender, **kwargs):
         reminder.nation = reporter.nation
         reminder.save()
 
+
 def ensure_departure_correct(sender, **kwargs):
     if kwargs.get('created', False):
         dep = kwargs.get('instance')
@@ -928,6 +938,10 @@ def ensure_departure_correct(sender, **kwargs):
         dep.province = reporter.province
         dep.nation = reporter.nation
         dep.save()
+
+        ##Mark reporter as active if he was inactive
+        dep.reporter.is_active = True
+        dep.reporter.save()
 
 
 def send_alert_mails(sender, **kwargs):
