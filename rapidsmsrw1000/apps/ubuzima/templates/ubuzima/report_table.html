@@ -16,30 +16,21 @@
         </tr>
     </thead>
     <tbody>
-    	{% for report in reports.object_list %}
-            <tr>
-            	<td {%if report.is_red %} class="lagging"{% else %}{%if report.is_risky %} class ='risky'{% else %}
-			{% if report.is_death %}class ='death'{% endif %} {%endif%}{%endif%}><a href="/ubuzima/report/{{report.pk}}?{%if postqn%}&{{postqn}}{%endif%}">{{report.pk}}</a></td>
-                <td>{{report.created|date:"d.m.Y"}}</td>
-                <td><a href="/ubuzima/location/{{report.location.pk}}?{%if postqn%}&{{postqn}}{%endif%}">{{report.location.name}}--{{report.location.district.name}}</a></td>
-                <td><a href="/ubuzima/type/{{report.type.pk}}?{%if postqn%}&{{postqn}}{%endif%}">{{report.type.name}}</a></td>
-                <td><a href="/ubuzima/reporter/{{report.reporter.pk}}?{%if postqn%}&{{postqn}}{%endif%}">{{report.reporter.national_id}}</a></td>
-                <td><a href="/ubuzima/patient/{{report.patient.pk}}?{%if postqn%}&{{postqn}}{%endif%}">{{report.patient.national_id}}</a></td>
-                <td>{{report.summary}}</td>
-		<!-- {%for f in report.fields.all %}<td>{{f.value}}</td>{%endfor%} -->
-            </tr>
-        {% endfor %}
+    	{% for report in reports.rows() %}
+        <tr>
+          <td>{{report}}</td>
+        </tr>
+      {% endfor %}
     </tbody>
-    
     <tfoot>
 			<tr>
 				<td colspan="10">
-					{% paginator reports %}
+          {{ reports }}
 				</td>
 			</tr>
 			<tr>
 				<td colspan="10">
-				Matching Reports: {{ reports.paginator.count }}
+				  Matching Reports: {{ reports.paginator.count }}
 				</td>
 			</tr>
 	</tfoot>

@@ -12,7 +12,10 @@ from django.shortcuts import get_object_or_404
 
 from rapidsmsrw1000.apps.chws.models import *
 from rapidsmsrw1000.apps.ubuzima.models import *
+from rapidsmsrw1000.apps.thoureport.reports import *
 from rapidsmsrw1000.apps.enum import *
+# from rapidsmsrw1000.settings import THE_DATABASE as postgres
+from rapidsmsrw1000.settings import __DEFAULTS
 import calendar
 import json
 from django.utils.safestring import SafeString
@@ -266,6 +269,8 @@ def read_date(date):
 
 
 def matching_reports(req, diced, alllocs = False):
+    # TODO: Revolution!
+    return new_style_reports(req, diced)
     rez = {}
     pst = {}
     level = get_level(req)
@@ -274,13 +279,9 @@ def matching_reports(req, diced, alllocs = False):
         rez['created__lte'] = diced['period']['end']+timedelta(1)
     except KeyError:
         pass
-
-
-
     try:
         loc = int(req.REQUEST['location'])
         rez['location__id'] = loc
-
     except KeyError:
         try:
             dst=int(req.REQUEST['district'])
@@ -290,7 +291,6 @@ def matching_reports(req, diced, alllocs = False):
                 dst=int(req.REQUEST['province'])
                 rez['province__id'] = dst
             except KeyError:    pass
-
     if level['level'] == 'Nation':  pst['nation__id'] = level['uloc'].nation.id
     elif level['level'] == 'Province':  pst['province__id'] = level['uloc'].province.id
     elif level['level'] == 'District':  pst['district__id'] = level['uloc'].district.id
@@ -301,6 +301,53 @@ def matching_reports(req, diced, alllocs = False):
     else:
        ans = Report.objects.all().order_by("-created")
 
+    if pst:
+        ans = ans.filter(**pst).order_by("-created")
+    return ans
+
+# TODO:
+# Import ThouReport stuff.
+# Fashion each row as a Report-like object.
+# Wrap in QuerySet-like object?
+# Non-relational DB API.
+# def fetch_new_reports(self, rez, pst):
+def fetch_new_reports(self, *args):
+  tht = ThouTable(*ThouReport.query(args, __DEFAULTS['REPORTS']))
+  return tht
+
+def new_style_reports(req, diced):
+    rez = {}
+    pst = {}
+    level = get_level(req)
+    try:
+        rez['created__gte'] = diced['period']['start']
+        rez['created__lte'] = diced['period']['end']+timedelta(1)
+    except KeyError:
+        pass
+    try:
+        loc = int(req.REQUEST['location'])
+        rez['location__id'] = loc
+    except KeyError:
+        try:
+            dst=int(req.REQUEST['district'])
+            rez['district__id'] = dst
+        except KeyError:
+            try:
+                dst=int(req.REQUEST['province'])
+                rez['province__id'] = dst
+            except KeyError:    pass
+    if level['level'] == 'Nation':  pst['nation__id'] = level['uloc'].nation.id
+    elif level['level'] == 'Province':  pst['province__id'] = level['uloc'].province.id
+    elif level['level'] == 'District':  pst['district__id'] = level['uloc'].district.id
+    elif level['level'] == 'HealthCentre':  pst['location__id'] = level['uloc'].health_centre.id
+
+    return fetch_new_reports(rez, pst)
+    rez = None
+    pst = None
+    if rez:
+        ans = Report.objects.filter(**rez).order_by("-created")
+    else:
+       ans = Report.objects.all().order_by("-created")
     if pst:
         ans = ans.filter(**pst).order_by("-created")
     return ans

@@ -92,13 +92,13 @@ def index(req,**flts):
     if req.REQUEST.has_key('location') and req.REQUEST['location'] != '0':
         lox = int(req.REQUEST['location'])
         lxn = HealthCentre.objects.get(id = lox)
-        lxn=lxn.name+' '+"Health Centre"+', '+lxn.district.name+' '+"District"+', '+lxn.province.name+' '
+        lxn = lxn.name + ' ' + "Health Centre" + ', ' + lxn.district.name + ' ' + "District" + ', ' + lxn.province.name + ' '
     if req.REQUEST.has_key('csv'):
         heads = ['ReportID','Date','Facility', 'District', 'Province','Type','Reporter','Patient', 'LMP', 'EDD', 'DOB', 'VisitDate',' ANCVisit','NBCVisit','PNCVisit','MotherWeight','MotherHeight','ChildWeight','ChildHeight','MUAC', 'ChilNumber','Gender', 'Gravidity','Parity', 'VaccinationReceived' , 'VaccinationCompletion','Breastfeeding', 'Intevention', 'Status','Toilet','Handwash' , 'Located','Symptoms']
         htp = HttpResponse()
         htp['Content-Type'] = 'text/csv; encoding=%s' % (getdefaultencoding(),)
         wrt = csv.writer(htp, dialect = 'excel-tab')
-        seq=[]
+        seq = []
         for r in reports:
             try:
                 seq.append([r.id, r.created,r.location,r.type,r.reporter.national_id,r.patient.national_id, r.summary()])
@@ -115,6 +115,9 @@ def index(req,**flts):
         red_alerts_reports = reports.filter(type__name__iexact='red alert')#;print red_alerts_reports.count(),filters['district']
         #red_alerts = json.dumps(get_red_alert_data())
         red_alerts = json.dumps(get_red_alert_data(reports = red_alerts_reports, filters=filters))
+        return render_to_response("ubuzima/index.html", {"reports": paginated(req, reports),'usrloc':uloc,'start_date': date.strftime(filters['period']['start'], '%d.%m.%Y'),
+            'end_date': date.strftime(filters['period']['end'], '%d.%m.%Y'),'filters':filters,'locationname':lxn,'postqn':(req.get_full_path().split('?', 2) + [''])[1], 'red_alerts': red_alerts,
+        }, context_instance=RequestContext(req))
         return render_to_response("ubuzima/index.html", {"reports": paginated(req, reports),'usrloc':UserLocation.objects.get(user=req.user),'start_date': date.strftime(filters['period']['start'], '%d.%m.%Y'),
             'end_date': date.strftime(filters['period']['end'], '%d.%m.%Y'),'filters':filters,'locationname':lxn,'postqn':(req.get_full_path().split('?', 2) + [''])[1], 'red_alerts': red_alerts,
         }, context_instance=RequestContext(req))
