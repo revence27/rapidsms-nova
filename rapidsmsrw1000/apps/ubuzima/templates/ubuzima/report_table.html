@@ -16,8 +16,14 @@
         </tr>
     </thead>
     <tbody>
-    	{% for report in reports.rows() %}
+    	{% for report in reports %}
         <tr>
+          <td>{{report.indexcol}}</td>
+          <td>{{report.created_at}}</td>
+          <td>{{report.textfield_revence}}</td>
+          <td>{{report.textfield_kato}}</td>
+          <td>{{report.textfield_kalibwani}}</td>
+          <td>{{report.modified_at}}</td>
           <td>{{report}}</td>
         </tr>
       {% endfor %}

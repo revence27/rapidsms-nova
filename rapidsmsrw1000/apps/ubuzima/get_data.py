@@ -62,7 +62,8 @@ def get_red_alert_data(reports = None, filters = None):
                         'district': district.name,
                         'province': province_name,
                         'type': risk.description,
-                        'total': report.fields.filter(type=risk).count()
+                        # 'total': report.fields.filter(type=risk).count()
+                        'total': 0
                     })
     return data
 

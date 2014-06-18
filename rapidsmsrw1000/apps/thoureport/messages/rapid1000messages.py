@@ -3,8 +3,9 @@
 
 from abc import ABCMeta, abstractmethod
 import re
-from thoureport.messages.parser import *
-from thoureport.reports.reports import THE_DATABASE as db
+from ..messages.parser import *
+from rapidsmsrw1000.settings import THE_DATABASE as db
+# from .reports.reports import THE_DATABASE as db
 
 def first_cap(s):
   '''Capitalises the first letter (without assaulting the others like Ruby's #capitalize does).'''

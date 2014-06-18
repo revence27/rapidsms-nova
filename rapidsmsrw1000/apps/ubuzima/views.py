@@ -43,14 +43,15 @@ def paginated(req, data):
     req.base_template = "webapp/layout.html"
     paginator = Paginator(data, 20)
 
-    try: page = int(req.GET.get("page", '1'))
-    except ValueError: page = 1
+    try:
+      page = int(req.GET.get("page", '1'))
+    except ValueError:
+      page = 1
 
     try:
         data = paginator.page(page)
     except (InvalidPage, EmptyPage):
         data = paginator.page(paginator.num_pages)
-
     return data
 
 @permission_required('ubuzima.can_view')
@@ -109,18 +110,17 @@ def index(req,**flts):
     elif req.REQUEST.has_key('excel'):
         return reports_to_excel(reports.order_by("-id"))
     else:
-
-        # TODO start date and end date
-        ### INSTEAD GET RED ARELTS REPORTRS FROM MATCHING ONES
-        red_alerts_reports = reports.filter(type__name__iexact='red alert')#;print red_alerts_reports.count(),filters['district']
-        #red_alerts = json.dumps(get_red_alert_data())
-        red_alerts = json.dumps(get_red_alert_data(reports = red_alerts_reports, filters=filters))
+        # red_alerts_reports = reports.filter(type__name__iexact='red alert')
+        # red_alerts = json.dumps(get_red_alert_data(reports = red_alerts_reports, filters=filters))
+        red_alerts = []
         return render_to_response("ubuzima/index.html", {"reports": paginated(req, reports),'usrloc':uloc,'start_date': date.strftime(filters['period']['start'], '%d.%m.%Y'),
             'end_date': date.strftime(filters['period']['end'], '%d.%m.%Y'),'filters':filters,'locationname':lxn,'postqn':(req.get_full_path().split('?', 2) + [''])[1], 'red_alerts': red_alerts,
         }, context_instance=RequestContext(req))
+        raise Exception, str(reports)
         return render_to_response("ubuzima/index.html", {"reports": paginated(req, reports),'usrloc':UserLocation.objects.get(user=req.user),'start_date': date.strftime(filters['period']['start'], '%d.%m.%Y'),
             'end_date': date.strftime(filters['period']['end'], '%d.%m.%Y'),'filters':filters,'locationname':lxn,'postqn':(req.get_full_path().split('?', 2) + [''])[1], 'red_alerts': red_alerts,
         }, context_instance=RequestContext(req))
+        raise Exception, str(reports)
 
 
 

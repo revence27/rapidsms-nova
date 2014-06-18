@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 
 from rapidsmsrw1000.apps.chws.models import *
 from rapidsmsrw1000.apps.ubuzima.models import *
-from rapidsmsrw1000.apps.thoureport.reports import *
+from rapidsmsrw1000.apps.thoureport.reports.reports import *
 from rapidsmsrw1000.apps.enum import *
 # from rapidsmsrw1000.settings import THE_DATABASE as postgres
 from rapidsmsrw1000.settings import __DEFAULTS
@@ -269,7 +269,6 @@ def read_date(date):
 
 
 def matching_reports(req, diced, alllocs = False):
-    # TODO: Revolution!
     return new_style_reports(req, diced)
     rez = {}
     pst = {}
@@ -311,8 +310,9 @@ def matching_reports(req, diced, alllocs = False):
 # Wrap in QuerySet-like object?
 # Non-relational DB API.
 # def fetch_new_reports(self, rez, pst):
-def fetch_new_reports(self, *args):
-  tht = ThouTable(*ThouReport.query(args, __DEFAULTS['REPORTS']))
+def fetch_new_reports(self, args):
+  # tht = ThouTable(*ThouReport.query(args, __DEFAULTS['REPORTS']))
+  tht = ThouTable(*ThouReport.query(args, 'weird_testing_table'))
   return tht
 
 def new_style_reports(req, diced):
