@@ -1,6 +1,8 @@
 # encoding: utf-8
 # vim: expandtab ts=2
 
+from datetime import datetime, date, time
+from decimal import Decimal
 from ..messages.parser import *
 from ....settings import __DEFAULTS, THE_DATABASE as postgres
 import psycopg2
@@ -81,6 +83,41 @@ It is not idempotent at this level; further constraints should be added by inher
     postgres.commit()
     return (cols, ans)
 
+  @classmethod
+  def find_matching_type(self, val, ctyp, cn = None):
+    try:
+      return {
+        str:       ctyp,
+        unicode:   ctyp,
+        int:       'INTEGER /*NOT NULL*/',
+        long:      'INTEGER /*NOT NULL*/',
+        float:     'FLOAT /*NOT NULL*/',
+        bool:      'BOOLEAN /*NOT NULL*/',
+        Decimal:   'FLOAT /*NOT NULL*/',
+        datetime:  'TIMESTAMP',
+        date:      'TIMESTAMP WITHOUT TIME ZONE',
+        time:      'TIMESTAMP'
+      }[type(val)]
+    except KeyError:
+      raise Exception, ('Supply type for column %s (has a %s, %s)?' % (cn, str(type(val)), str(val)))
+
+  @classmethod
+  def decide_type(self, vl, cn = None):
+    ctyp  = 'TEXT DEFAULT NULL'
+    dval  = vl
+    if type(vl) == type((None, 'INTEGER DEFAULT NULL')):
+      ctyp  = vl[1]
+      dval  = vl[0]
+    elif type(vl) == type({'type':'INTEGER', 'null':False, 'default':'', 'value':None}):
+      dval  = vl.get('value')
+      ddef  = vl.get('default')
+      dstr  = '%s %s%s' % (vl.get('type') or self.find_matching_type(dval, ctyp, cn), '' if vl.get('null') else 'NOT NULL', (' DEFAULT ' + ddef if ddef else ''))
+      return self.decide_type((dval, dstr), cn)
+    else:
+      ctyp  = self.find_matching_type(vl, ctyp, cn)
+      return self.decide_type((dval, ctyp), cn)
+    return ctyp, dval
+
   seen_columns  = set()
   @classmethod
   def store(self, dat, tn = None):
@@ -98,16 +135,7 @@ It is not idempotent at this level; further constraints should be added by inher
       if not col in self.seen_columns:
         curz.execute('SELECT TRUE FROM information_schema.columns WHERE table_name = %s AND column_name = %s', (tbl, col))
         if not curz.fetchone():
-          ctyp  = 'TEXT DEFAULT NULL'
-          try:
-            if type(dval) == type((None, '')):
-              ctyp  = dval[1]
-              dval  = dval[0]
-            else:
-              # TODO: make ctyp reflect the postgres DB column creation data, including type, if none is supplied.
-              pass
-          except Exception:
-            pass
+          ctyp, dval  = self.decide_type(dval, col)
           curz.execute('ALTER TABLE %s ADD COLUMN %s %s;' % (tbl, col, ctyp))
           self.seen_columns.add(col)
       elval = curz.mogrify('%s', (dval, ))
@@ -192,6 +220,7 @@ class ThouTable:
   def rows(self, *args):
     return self.query
 
+  # XXX: Can this be a good generator?
   def __getitem__(self, them):
     dem = []
     try:

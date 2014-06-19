@@ -312,7 +312,7 @@ def matching_reports(req, diced, alllocs = False):
 # def fetch_new_reports(self, rez, pst):
 def fetch_new_reports(self, args):
   # tht = ThouTable(*ThouReport.query(args, __DEFAULTS['REPORTS']))
-  tht = ThouTable(*ThouReport.query(args, 'weird_testing_table'))
+  tht = ThouTable(*ThouReport.query(args, 'testing_report_transfers'))
   return tht
 
 def new_style_reports(req, diced):
