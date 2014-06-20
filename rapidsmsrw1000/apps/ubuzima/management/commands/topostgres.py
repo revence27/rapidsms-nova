@@ -12,37 +12,6 @@ from optparse import make_option
 from rapidsmsrw1000.apps.thoureport.reports.reports import *
 from rapidsmsrw1000.settings import THE_DATABASE as postgres, __DEFAULTS
 
-class BasicConverter:
-  def __init__(self):
-    self.types  = ReportType.objects.all()
-    self.thash  = self.__type_hash()
-
-  def __type_hash(self):
-    ans = {}
-    for t in self.types:
-      ans[t.pk] = {
-        'ANC':'ANC',
-        'Birth':'BIR',
-        'Case Management Response':'CMR',
-        'Child Health':'CHI',
-        'Community Based Nutrition':'CBN',
-        'Community Case Management':'CCM',
-        'Death':'DTH',
-        'Departure':'DEP',
-        'Newborn Care':'NBC',
-        'PNC':'PNC',
-        'Pregnancy':'PRE',
-        'Red Alert':'RED',
-        'Red Alert Result':'RAR',
-        'Refusal':'REF',
-        'Risk':'RISK',
-        'Risk Result':'RES'
-      }[t.name]
-    return ans
-
-  def __getitem__(self, k):
-    return self.thash[k]
-
 class OldStyleReport:
   def __init__(self, rep, cur, cvr):
     self.autos  = rep
@@ -144,6 +113,7 @@ class OldStyleReport:
     thr = ThouReport.store(dat, 'testing_report_transfers')
     return thr
 
+  # TODO: either fetch the message from the DB, or re-construct it. How silly of RapidSMS to not relate the report and its message!
   def __str__(self):
     return '%s TESTER' % (self.conver[self.autos.type.pk],)
 

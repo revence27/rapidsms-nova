@@ -312,10 +312,8 @@ def matching_reports(req, diced, alllocs = False):
 # def fetch_new_reports(self, rez, pst):
 # Call query-optimising functions.
 def fetch_new_reports(self, args):
-  # tht = ThouTable(*ThouReport.query(args, __DEFAULTS['REPORTS']))
-  qry = ThouReport.query(args, 'testing_report_transfers')
-  tht = qry.table()
-  return tht
+  # __DEFAULTS['REPORTS']
+  return ThouReport.query('testing_report_transfers', args)
 
 def new_style_reports(req, diced):
     rez = {}

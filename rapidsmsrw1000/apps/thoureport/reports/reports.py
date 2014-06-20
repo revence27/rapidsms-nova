@@ -1,6 +1,7 @@
 # encoding: utf-8
 # vim: expandtab ts=2
 
+import copy
 from datetime import datetime, date, time
 from decimal import Decimal
 from ..messages.parser import *
@@ -10,24 +11,78 @@ import re
 from sys import stderr
 
 class ThouQuery:
-  def active_columns(self, qid):
-    return ThouReport.active_columns(qid)
-
-  def assemble_conditions(self, conds):
-    return ThouReport.assemble_conditions(conds)
-
   def __init__(self, djconds, tn, **kwargs):
     self.djconds = djconds
     self.tablenm = kwargs.get('table', tn)
     self.kwargs  = kwargs
     self.cursor  = None
+    self.names   = kwargs.get('cols', [])
 
-  def table(self):
+  def set_names(self, dat):
+    self.names  = dat.keys()
+    self.cols   = dat
+
+  def active_columns(self, qid):
+    return self.names or ThouReport.active_columns(qid)
+
+  def assemble_conditions(self, conds):
+    return ThouReport.assemble_conditions(conds)
+
+  def filter(self, **kwargs):
+    nova  = copy.copy(self)
+    for k in kwargs:
+      nova.djconds[k] = kwargs[k]
+    return nova
+
+  def order_by(self, cue):
+    raise Exception, ('TODO %s' % (cue,))
+    return self
+
+  def count(self):
     if not self.cursor:
-      self.cols, self.cursor  = self.__execute()
-      return self.table()
-    return ThouTable(self, self.cols, self.cursor)
+      self.execute()
+    return max(0, self.cursor.rowcount)
 
+  def execute(self):
+    if not self.cursor:
+      self.names, self.cursor = self.__execute()
+      self.cols               = self.__set_names()
+    return self
+
+  def __getitem__(self, them):
+    if not self.cursor:
+      self.execute()
+      return self[them]
+    dem = []
+    try:
+      for ent in self.cursor.fetchmany(them.stop - them.start):
+        ans = {}
+        for nom in self.names:
+          got       = ent[self.cols[nom]]
+          if got:
+            ans[nom] = got
+        dem.append(ans)
+    except IndexError:
+      pass
+    return dem
+
+  def old__getitem__(self, them):
+    if type(them) != slice:
+      raise ValueError, ('Should be a slice [column-name:row], not a %s (%s)' % (type(them), str(them)))
+    try:
+      return them.stop[self.names[them.start]]
+    except ValueError:
+      raise NameError, ('No column called "%s" (has: %s).' % (colnm, ', '.join(cols)))
+
+  def __set_names(self):
+    self.cols   = {}
+    notI        = 0
+    for x in self.names:
+      self.cols[x]  = notI
+      notI          = notI + 1
+    return self.cols
+
+  # TODO: Work with views to ensure closing of cursors.
   def __execute(self):
     qry   = self.query
     # TODO: remove this.
@@ -35,9 +90,6 @@ class ThouQuery:
     curz        = postgres.cursor()
     curz.execute(qry)
     cols  = [x.name for x in curz.description]
-    # ans   = curz.fetchall()
-    # curz.close()
-    # postgres.commit()
     return (cols, curz)
 
   def close(self):
@@ -109,14 +161,26 @@ It is not idempotent at this level; further constraints should be added by inher
     return ans
 
   @classmethod
+  def alter_condition(self, conds, ok):
+    if not ok in conds:
+      return ok, None
+    idem    = lambda x: x
+    newks   = {
+      'type'        : ('report_type = %s', lambda x: x.name),
+      'nation__id'  : ('nation_pk = %s', idem)
+}
+    nk, nv  = newks[ok]
+    return (nk, nv(conds[ok]) if type(nv) == type(idem) else nv)
+
+  # TODO: map old filters to new DB structure.
+  @classmethod
   def assemble_conditions(self, conds):
     # TODO: review condition-handling.
-    conds = {}
     curz  = postgres.cursor()
     ans   = []
     for cond in conds:
-      it  = conds[cond]
-      ans.append(curz.mogrify(cond, it))
+      nk, nv  = self.alter_condition(conds, cond)
+      ans.append(curz.mogrify(nk, (nv,)))
     curz.close()
     return (' WHERE ' if conds else '') + ' AND '.join(ans)
 
@@ -152,8 +216,8 @@ It is not idempotent at this level; further constraints should be added by inher
     return (cols, ans)
 
   @classmethod
-  def query(self, djconds, tn, **kwargs):
-    if not tn: return self.query(djconds, kwargs.get('table', __DEFAULTS['REPORTS']))
+  def query(self, tn, djconds, **kwargs):
+    if not tn: return self.query(kwargs.get('table', __DEFAULTS['REPORTS']), djconds, **kwargs)
     tbl = self.ensure_table(tn)
     return ThouQuery(djconds, tn, **kwargs)
 
@@ -268,56 +332,138 @@ It is not idempotent at this level; further constraints should be added by inher
     with ThouMessage.parse(msgtxt) as msg:
       return self(msg)
 
-# TODO: Work with views to ensure closing of cursors.
-class ThouTable:
-  def __init__(self, qry, cols, cursor):
-    self.names  = cols
-    self.qobj   = qry
-    self.__set_names()
-    self.cursor = cursor
+class BasicConverter:
+  def __init__(self):
+    self.types  = ReportType.objects.all()
+    self.thash  = self.__type_hash()
 
-  def close(self):
-    return self.qobj.close()
+  def __type_hash(self):
+    ans = {}
+    for t in self.types:
+      ans[t.pk] = {
+        'ANC':'ANC',
+        'Birth':'BIR',
+        'Case Management Response':'CMR',
+        'Child Health':'CHI',
+        'Community Based Nutrition':'CBN',
+        'Community Case Management':'CCM',
+        'Death':'DTH',
+        'Departure':'DEP',
+        'Newborn Care':'NBC',
+        'PNC':'PNC',
+        'Pregnancy':'PRE',
+        'Red Alert':'RED',
+        'Red Alert Result':'RAR',
+        'Refusal':'REF',
+        'Risk':'RISK',
+        'Risk Result':'RES'
+      }[t.name]
+    return ans
 
-  def __set_names(self):
-    self.cols   = {}
-    notI        = 0
-    for x in self.names:
-      self.cols[x]  = notI
-      notI          = notI + 1
+  def __getitem__(self, k):
+    return self.thash[k]
 
-  # TODO: filter kind-a like QuerySet.
-  def filter(self, **kwargs):
-    raise Exception, str(kwargs)
-    return self
+class OldStyleReport:
+  def __init__(self, rep, cur, cvr):
+    self.autos  = rep
+    self.conver = cvr
+    self.cursor = cur
+    self.ftypes = self.__type_hash()
 
-  def order_by(self, cue):
-    return self
+  def __type_hash(self):
+    ans = {}
+    for fdt in FieldType.objects.all():
+      it = {'category_pk': fdt.category.pk, 'key': fdt.key}
+      ans[fdt.pk] = it
+    return ans
 
-  def count(self):
-    return len(self.query)
+  def __getitem__(self, k):
+    return self.ftypes[k]
 
-  def rows(self, *args):
-    return self.query
+  @property
+  def db_prepend(self):
+    return self.conver[self.autos.type.pk].lower()
 
-  # TODO: Implement laziness!
-  # XXX: Can this be a good generator?
-  def __getitem__(self, them):
-    dem = []
-    try:
-      for ent in self.query[them.start:them.stop]:
-        ans = {}
-        for nom in self.names:
-          ans[nom] = ent[self.cols[nom]]
-        dem.append(ans)
-    except IndexError:
-      pass
-    return dem
+  @property
+  def report_type(self):
+    return self.conver[self.autos.type.pk]
 
-  def old__getitem__(self, them):
-    if type(them) != slice:
-      raise ValueError, ('Should be a slice [column-name:row], not a %s (%s)' % (type(them), str(them)))
-    try:
-      return them.stop[self.names[them.start]]
-    except ValueError:
-      raise NameError, ('No column called "%s" (has: %s).' % (colnm, ', '.join(cols)))
+  @property
+  def message(self):
+    return str(self)
+
+  @property
+  def reporter(self):
+    return self.autos.reporter
+
+  @property
+  def patient(self):
+    return self.autos.patient
+
+  @property
+  def hc(self):
+    return self.autos.location
+
+  @property
+  def district(self):
+    return self.autos.location.district
+
+  @property
+  def province(self):
+    return self.autos.location.province
+
+  @property
+  def nation(self):
+    return self.autos.location.nation
+
+  # TODO:
+  # 1.  The reports. With types. With fields.
+  # 2.  Facilities.
+  # 3.  Health workers
+  # 4.  Locations
+  # 5.  Reports.
+  # 6.  Messages
+  # 7.  Patients
+  def __gather_fields(self, hsh):
+    fds = Field.objects.filter(report = self.autos)
+    prp = self.db_prepend
+    for fd in fds:
+      ftype     = fd.type
+      cle       = ftype.key
+      typedata  = self[ftype.pk]
+      typedata[self.__val_name(fd)] = fd.value if ftype.has_value else (fd.value and True or False)
+      for td in typedata:
+        nom       = '%s_%s_%s' % (prp, cle, td)
+        hsh[nom]  = typedata[td]
+    return hsh
+
+  def __val_name(self, fd):
+    mid = 'bool'
+    if fd.type.has_value:
+      mid = ThouReport.find_matching_type(fd.value, mid, None)
+    return re.split(r'\s+', mid, 2)[0].lower()
+
+  def __as_hash(self):
+    ans = {}
+    ans['report_type']        = self.report_type
+    ans['former_pk']          = self.autos.pk
+    ans['reconstructed_msg']  = self.message
+    ans['reporter_pk']        = self.reporter.pk
+    ans['reporter_phone']     = self.reporter.telephone_moh
+    ans['patient_id']         = self.patient.national_id
+    ans['patient_pk']         = self.patient.pk
+    ans['report_date']        = self.autos.created
+    ans['health_center_pk']   = self.hc.pk
+    ans['province_pk']        = self.province.pk
+    ans['district_pk']        = self.district.pk
+    ans['nation_pk']          = self.nation.pk
+    return self.__gather_fields(ans)
+
+  def convert(self):
+    dat = self.__as_hash()
+    thr = ThouReport.store(dat, 'testing_report_transfers')
+    return thr
+
+  # TODO: either fetch the message from the DB, or re-construct it. How silly of RapidSMS to not relate the report and its message!
+  def __str__(self):
+    return '%s TESTER' % (self.conver[self.autos.type.pk],)
