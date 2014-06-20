@@ -132,7 +132,7 @@ class OldStyleReport:
     ans['reporter_phone']     = self.reporter.telephone_moh
     ans['patient_id']         = self.patient.national_id
     ans['patient_pk']         = self.patient.pk
-    ans['report_date']        = self.autos.date
+    ans['report_date']        = self.autos.created
     ans['health_center_pk']   = self.hc.pk
     ans['province_pk']        = self.province.pk
     ans['district_pk']        = self.district.pk
@@ -152,7 +152,7 @@ class Command(BaseCommand):
 
     def handle(self, **options):
       curz  = postgres.cursor()
-      reps  = Report.objects.order_by('-date')[0:200]
+      reps  = Report.objects.order_by('-date')[0:20000]
       convr = BasicConverter()
       print 'Starting conversion ...'
       cpt   = float(reps.count())

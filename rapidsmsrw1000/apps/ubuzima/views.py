@@ -122,8 +122,6 @@ def index(req,**flts):
         }, context_instance=RequestContext(req))
         raise Exception, str(reports)
 
-
-
 @permission_required('ubuzima.can_view')
 @require_http_methods(["GET"])
 def by_patient(req, pk):

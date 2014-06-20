@@ -7,6 +7,56 @@ from ..messages.parser import *
 from ....settings import __DEFAULTS, THE_DATABASE as postgres
 import psycopg2
 import re
+from sys import stderr
+
+class ThouQuery:
+  def active_columns(self, qid):
+    return ThouReport.active_columns(qid)
+
+  def assemble_conditions(self, conds):
+    return ThouReport.assemble_conditions(conds)
+
+  def __init__(self, djconds, tn, **kwargs):
+    self.djconds = djconds
+    self.tablenm = kwargs.get('table', tn)
+    self.kwargs  = kwargs
+    self.cursor  = None
+
+  def table(self):
+    if not self.cursor:
+      self.cols, self.cursor  = self.__execute()
+      return self.table()
+    return ThouTable(self, self.cols, self.cursor)
+
+  def __execute(self):
+    qry   = self.query
+    # TODO: remove this.
+    stderr.write('%s\r\n' % (qry,))
+    curz        = postgres.cursor()
+    curz.execute(qry)
+    cols  = [x.name for x in curz.description]
+    # ans   = curz.fetchall()
+    # curz.close()
+    # postgres.commit()
+    return (cols, curz)
+
+  def close(self):
+    if not self.cursor: return
+    return self.cursor.close()
+
+  def __enter__(self):
+    pass  # For now.
+
+  def __exit__(self, *args):
+    self.close()
+
+  @property
+  def query(self):
+    qry = u'SELECT %s FROM %s %s' % (', '.join(self.kwargs.get('cols', self.active_columns(self.kwargs.get('qid')) or ['*'])), self.tablenm, self.assemble_conditions(self.djconds))
+    return qry
+
+  def __unicode__(self):
+    return self.query
 
 # TODO:
 # Load the report(s).
@@ -60,7 +110,7 @@ It is not idempotent at this level; further constraints should be added by inher
 
   @classmethod
   def assemble_conditions(self, conds):
-    # TODO: skip conditions, for now.
+    # TODO: review condition-handling.
     conds = {}
     curz  = postgres.cursor()
     ans   = []
@@ -70,18 +120,42 @@ It is not idempotent at this level; further constraints should be added by inher
     curz.close()
     return (' WHERE ' if conds else '') + ' AND '.join(ans)
 
+  seen_actives  = {}
   @classmethod
-  def query(self, djconds, tn = None):
-    if not tn: return self.query(djconds, __DEFAULTS['REPORTS'])
+  def active_columns(self, qid = None):
+    if not qid: return qid
+    if not qid in self.seen_actives: return None
+    return seen_actives[qid]
+
+  @classmethod
+  def record_activity(self, qid, qnom):
+    if not qid in self.seen_actives:
+      self.seen_actives[qid] = set()
+      return self.record_activity(qid, qnom)
+    us  = self.seen_actives[qid]
+    us.add(qnom)
+    return us
+
+  @classmethod
+  def old_query(self, djconds, tn = None, **kwargs):
+    if not tn: return self.query(djconds, kwargs.get('table', __DEFAULTS['REPORTS']))
     tbl = self.ensure_table(tn)
-    qry = 'SELECT * FROM %s %s' % (tbl, self.assemble_conditions(djconds))
+    qry = 'SELECT %s FROM %s %s' % (', '.join(kwargs.get('cols', self.active_columns(kwargs.get('qid')) or ['*'])), tbl, self.assemble_conditions(djconds))
     curz  = postgres.cursor()
+    # TODO: remove this.
+    stderr.write('%s\r\n' % (qry,))
     curz.execute(qry)
     cols  = [x.name for x in curz.description]
     ans   = curz.fetchall()
     curz.close()
     postgres.commit()
     return (cols, ans)
+
+  @classmethod
+  def query(self, djconds, tn, **kwargs):
+    if not tn: return self.query(djconds, kwargs.get('table', __DEFAULTS['REPORTS']))
+    tbl = self.ensure_table(tn)
+    return ThouQuery(djconds, tn, **kwargs)
 
   @classmethod
   def find_matching_type(self, val, ctyp, cn = None):
@@ -194,11 +268,16 @@ It is not idempotent at this level; further constraints should be added by inher
     with ThouMessage.parse(msgtxt) as msg:
       return self(msg)
 
+# TODO: Work with views to ensure closing of cursors.
 class ThouTable:
-  def __init__(self, cols, rows = None):
+  def __init__(self, qry, cols, cursor):
     self.names  = cols
+    self.qobj   = qry
     self.__set_names()
-    self.query  = rows
+    self.cursor = cursor
+
+  def close(self):
+    return self.qobj.close()
 
   def __set_names(self):
     self.cols   = {}
@@ -209,6 +288,7 @@ class ThouTable:
 
   # TODO: filter kind-a like QuerySet.
   def filter(self, **kwargs):
+    raise Exception, str(kwargs)
     return self
 
   def order_by(self, cue):
@@ -220,6 +300,7 @@ class ThouTable:
   def rows(self, *args):
     return self.query
 
+  # TODO: Implement laziness!
   # XXX: Can this be a good generator?
   def __getitem__(self, them):
     dem = []
