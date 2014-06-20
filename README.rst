@@ -1,5 +1,32 @@
+RapidSMS Nova
+=============
+
+The new RapidSMS, for Rwanda.
+
+- Compatible with Django 1.6.5
+- Alternative ORM, with default PostgreSQL adapter.
+- Sparse matrix storage for reports, with non-naïve implementation of the relational calculus.
+- Extensible data-transfer script, for large volumes (e.g., ≅ 13,000,000 entries) with dynamic feedback.
+- Available as a RapidSMS installable application.
+- Additional SMS processor
+- Declarative lexical analyser for parsing SMS message formats, à la lex(1) and yacc(1).
+- Token-based error messaging, with idempotent persistence. Error code tokens have informative names, have a default message, need not be defined before being used to communicate to the user, and can be generated dynamically (with code names specialised for language, <i>et cetera</i>).
+- The error code tokens can be re-defined by application-level code. Replacement text embeds codes which are processed and replaced by application-context data.
+- Online reference for response codes, auto-generated from the configuration files.
+
+TODO:
+----
+- ORM backward-compatible with Django ORM.
+- Speed test and proof.
+- Lazy querying.
+- Total data transfer.
+- All pages load (1).
+- Interject our message-handler.
+- Online technical documentation and tutorial (HTML and PDF).
+- Data-generation.
+
 Rapidsmsrw1000
-========================
+--------------
 
 Below you will find basic setup instructions for the rapidsmsrw1000
 project. To begin you should have the following applications installed on your
