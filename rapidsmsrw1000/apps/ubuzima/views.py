@@ -1242,7 +1242,7 @@ def risk_report(req):
     resp['reports'] = reports
     qryset = reports.filter(type__name = "Risk")#(fields__in = Field.objects.filter(type__in = Field.get_risk_fieldtypes()))
     results = reports.filter(type__name = "Risk Result")
-    allpatients = Patient.objects.filter( id__in = reports.values('patient'))
+    allpatients = Patient.objects.filter( id__in = reports.values('patient', new = ['patient_id']))
     end = resp['filters']['period']['end']
     start = resp['filters']['period']['start']
     annot = resp['annot_l']
@@ -1250,9 +1250,9 @@ def risk_report(req):
     ans_l, ans_m = {},{}
     if qryset.exists():
 
-        patients = allpatients.filter( id__in = qryset.values('patient'))
-        patients_with_results = patients.filter( id__in = results.values('patient') )
-        patients_with_pr = patients.filter(id__in = qryset.filter(fields__type__key__in = ['gs','mu','hd','rm']).values('patient'))
+        patients = allpatients.filter( id__in = qryset.values('patient', new = ['patient_id']))
+        patients_with_results = patients.filter( id__in = results.values('patient', new = ['patient_id']) )
+        patients_with_pr = patients.filter(id__in = qryset.filter(fields__type__key__in = ['gs','mu','hd','rm']).values('patient', new = ['patient_id']))
         patients_with_cr = patients.exclude(id__in = patients_with_pr.values_list('id'))
         
         #alerts = qryset.filter( id__in = TriggeredAlert.objects.filter( report__in = qryset).values('report'))
@@ -1313,7 +1313,7 @@ def red_alert_report(req):
     qryset = reports.filter(type__name = "Red Alert")#(fields__in = Field.objects.filter(type__in = Field.get_risk_fieldtypes()))
     results = reports.filter(type__name = "Red Alert Result")
     patients, po_alerts = [], []
-    allpatients = Patient.objects.filter( id__in = reports.values('patient'))
+    allpatients = Patient.objects.filter( id__in = reports.values('patient', new = ['patient_id']))
     end = resp['filters']['period']['end']
     start = resp['filters']['period']['start']
     annot = resp['annot_l']
@@ -1321,8 +1321,8 @@ def red_alert_report(req):
     ans_l, ans_m = {},{}
     if qryset.exists():
 
-        patients = allpatients.filter( id__in = qryset.values('patient'))
-        red_patients = patients.filter( id__in = qryset.values('patient'))
+        patients = allpatients.filter( id__in = qryset.values('patient', new = ['patient_id']))
+        red_patients = patients.filter( id__in = qryset.values('patient', new = ['patient_id']))
         po_alerts = results.filter(id__in = Field.objects.filter(type__key__in  = ['mw','cw']).values('report'))
 
         patients_l, alerts_l, red_patients_l, yes_alerts_l, po_alerts_l = patients.values(annot.split(',')[0],annot.split(',')[1]).annotate(number=Count('id')).order_by(annot.split(',')[0]), qryset.values(annot.split(',')[0],annot.split(',')[1]).annotate(number=Count('id')).order_by(annot.split(',')[0]), red_patients.values(annot.split(',')[0],annot.split(',')[1]).annotate(number=Count('id')).order_by(annot.split(',')[0]), results.values(annot.split(',')[0],annot.split(',')[1]).annotate(number=Count('id')).order_by(annot.split(',')[0]), po_alerts.values(annot.split(',')[0],annot.split(',')[1]).annotate(number=Count('id')).order_by(annot.split(',')[0])
@@ -1869,10 +1869,10 @@ def emergency_room(req):
     pst = my_report_filters(req, resp['filters'])
 
     red = Report.objects.filter(type__name = 'Red Alert', **pst).order_by('-id')
-    red_res = Report.objects.filter(type__name = 'Red Alert Result', patient__in = red.values('patient'), **pst)
+    red_res = Report.objects.filter(type__name = 'Red Alert Result', patient__in = red.values('patient', new = ['patient_id']), **pst)
     red_res_po = red_res.exclude( fields__type__key__in = ['ms','cs'])
     red_res_ne = red_res.exclude(  fields__type__key__in = ['mw','cw'])
-    red_unres = red.exclude( patient__in = red_res.values('patient'))
+    red_unres = red.exclude( patient__in = red_res.values('patient', new = ['patient_id']))
 
     
     resp['data'] = red.values('location__name','location__pk').annotate(total = Count('id')).order_by('location__name')

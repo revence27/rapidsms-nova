@@ -17,6 +17,8 @@ class ThouQuery:
     self.kwargs  = kwargs
     self.cursor  = None
     self.names   = kwargs.get('cols', [])
+    self.flat    = False
+    self.sort    = None
 
   def set_names(self, dat):
     self.names  = dat.keys()
@@ -24,6 +26,9 @@ class ThouQuery:
 
   def active_columns(self, qid):
     return self.names or ThouReport.active_columns(qid)
+
+  def assemble_sort(self, asc):
+    return ThouReport.assemble_sort(asc)
 
   def assemble_conditions(self, conds):
     return ThouReport.assemble_conditions(conds)
@@ -34,9 +39,43 @@ class ThouQuery:
       nova.djconds[k] = kwargs[k]
     return nova
 
-  def order_by(self, cue):
-    raise Exception, ('TODO %s' % (cue,))
+  # TODO: Make sure this works, if it is necessary in our current DB design.
+  def distinct(self, *args, **kwargs):
     return self
+    raise Exception, str((args, kwargs))
+    pass
+
+  # TODO: Use the flatness in the next call.
+  # TODO: This doesn’t work yet.
+  def values(self, *vals, **kwargs):
+    it        = copy.copy(self)
+    it.names  = kwargs.get('new', ['orig_%s' % (x,) for x in vals])
+    # dem       = it.fetchall()
+    # return dem
+    # raise Exception, str((it.query, it.cursor.rowcount, it.cursor.query))
+    return it
+
+  # TODO.
+  def extra(self, **kwargs):
+    return self
+
+  def exists(self):
+    self.execute()
+    return max(self.cursor.rowcount, 0) < 1
+
+  def annotate(self, **kwargs):
+    # TODO.
+    return self
+
+  def order_by(self, _, cue = ''):
+    if len(cue) < 1: return self
+    asc, gd, etc = False, cue[0], cue[1:]
+    if gd != '-':
+      asc = True
+      etc = cue
+    ans       = copy.copy(self)
+    ans.sort  = (etc, asc)
+    return ans
 
   def count(self):
     if not self.cursor:
@@ -49,10 +88,24 @@ class ThouQuery:
       self.cols               = self.__set_names()
     return self
 
+  def fetchall(self):
+    if not self.cursor:
+      self.execute()
+      return self.cursor.fetchall()
+    return self.cursor.fetchall()
+
+  def fetch(self):
+    if not self.cursor:
+      self.execute()
+      return self.fetch()
+    return self.fetchone()
+
   def __getitem__(self, them):
     if not self.cursor:
       self.execute()
       return self[them]
+    if type(them) == type(0):
+      return self[them : them + 1][0]
     dem = []
     try:
       for ent in self.cursor.fetchmany(them.stop - them.start):
@@ -104,7 +157,7 @@ class ThouQuery:
 
   @property
   def query(self):
-    qry = u'SELECT %s FROM %s %s' % (', '.join(self.kwargs.get('cols', self.active_columns(self.kwargs.get('qid')) or ['*'])), self.tablenm, self.assemble_conditions(self.djconds))
+    qry = u'SELECT %s FROM %s %s%s' % (', '.join(self.kwargs.get('cols', self.active_columns(self.kwargs.get('qid')) or ['*'])), self.tablenm, self.assemble_conditions(self.djconds), self.assemble_sort(self.sort))
     return qry
 
   def __unicode__(self):
@@ -166,11 +219,18 @@ It is not idempotent at this level; further constraints should be added by inher
       return ok, None
     idem    = lambda x: x
     newks   = {
-      'type'        : ('report_type = %s', lambda x: x.name),
-      'nation__id'  : ('nation_pk = %s', idem)
-}
-    nk, nv  = newks[ok]
-    return (nk, nv(conds[ok]) if type(nv) == type(idem) else nv)
+      'type': ('report_type = %s', lambda x: NAME_MATCHING[x.name]),
+      'type__name': ('report_type = %s', lambda x: NAME_MATCHING[x]),
+      'nation__id': ('nation_pk = %s', idem),
+      'created__lte': ('created_at <= %s', idem),
+      'created__gte': ('created_at >= %s', idem),
+      'type__name__in': ('report_type IN (%s)', lambda dem: ', '.join([NAME_MATCHING[x] for x in (dem or [''])])),
+    }
+    try:
+      nk, nv  = newks[ok]
+      return (nk, nv(conds[ok]) if type(nv) == type(idem) else nv)
+    except KeyError:
+      raise Exception, ('Specify adapter for %s (%s)' % (ok, set([mn.pk for mn in conds[ok]])))
 
   # TODO: map old filters to new DB structure.
   @classmethod
@@ -183,6 +243,12 @@ It is not idempotent at this level; further constraints should be added by inher
       ans.append(curz.mogrify(nk, (nv,)))
     curz.close()
     return (' WHERE ' if conds else '') + ' AND '.join(ans)
+
+  @classmethod
+  def assemble_sort(self, dem):
+    if not dem: return ''
+    cn, dr = dem
+    return ' ORDER BY %s %sENDING' % (cn, 'ASC' if dr else 'DESC')
 
   seen_actives  = {}
   @classmethod
@@ -332,15 +398,7 @@ It is not idempotent at this level; further constraints should be added by inher
     with ThouMessage.parse(msgtxt) as msg:
       return self(msg)
 
-class BasicConverter:
-  def __init__(self):
-    self.types  = ReportType.objects.all()
-    self.thash  = self.__type_hash()
-
-  def __type_hash(self):
-    ans = {}
-    for t in self.types:
-      ans[t.pk] = {
+NAME_MATCHING = {
         'ANC':'ANC',
         'Birth':'BIR',
         'Case Management Response':'CMR',
@@ -357,7 +415,17 @@ class BasicConverter:
         'Refusal':'REF',
         'Risk':'RISK',
         'Risk Result':'RES'
-      }[t.name]
+      }
+
+class BasicConverter:
+  def __init__(self):
+    self.types  = ReportType.objects.all()
+    self.thash  = self.__type_hash()
+
+  def __type_hash(self):
+    ans = {}
+    for t in self.types:
+      ans[t.pk] = NAME_MATCHING[t.name]
     return ans
 
   def __getitem__(self, k):

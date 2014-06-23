@@ -19,7 +19,7 @@
     	{% for report in reports %}
         <tr>
           <td>{{report.indexcol}}</td>
-          <td>{{report.report_date.date}}</td>
+          <td>{{report.report_date}}</td>
           <td>PROV: {{report.province_pk}}, DIST: {{report.district_pk}}, HC: {{report.health_center_pk}}</td>
           <td>{{report.report_type}}</td>
           <td>{{report.reporter_pk}}</td>
