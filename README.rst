@@ -27,6 +27,7 @@ TODO:
 - Dynamic query optimisation (narrowing the SELECT based on automatic analysis of named queries).
 - Ensure that ThouTable implements full relational algebra (5 primitives).
 - Ensure that ThouTable implements full monoid algebra.
+- Auto-created report-type-specific views over reports table.
 - Ensure that ThouTable implements co-extensive functor algebra.
 - Ensure that ThouTable implements traditional functional morphisms.
 - grep -r TODO .
