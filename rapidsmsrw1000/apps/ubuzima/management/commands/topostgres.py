@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, **options):
       curz  = postgres.cursor()
-      reps  = Report.objects.order_by('-date')[0:20000]
+      reps  = Report.objects.order_by('-date')[0:5000]
       convr = BasicConverter()
       print 'Starting conversion ...'
       cpt   = float(reps.count())

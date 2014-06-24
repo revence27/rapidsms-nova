@@ -4,11 +4,37 @@
 import copy
 from datetime import datetime, date, time
 from decimal import Decimal
+from rapidsmsrw1000.apps.ubuzima.models import *
 from ..messages.parser import *
 from ....settings import __DEFAULTS, THE_DATABASE as postgres
 import psycopg2
 import re
 from sys import stderr
+
+class ThouRow:
+  def __init__(self, query, value = None, **kwargs):
+    self.query  = query
+    self.hooks  = kwargs.get('hooks', {})
+    self.kwargs = kwargs
+    self.value  = value
+
+  def set_row(self, r):
+    self.value  = r
+
+  def __setitem__(self, k, v):
+    raise Exception, 'Read-only, man. :-p'
+
+  def __getitem__(self, k):
+    try:
+      return self.value[self.query.cols[k]]
+    except KeyError:
+      hk  = self.hooks[k]
+      hkt = type(hk)
+      if hkt == type({}):
+        return self.query.specialise(hk)
+      if callable(hk):
+        return hk(self, k)
+      return hk
 
 class ThouQuery:
   def __init__(self, djconds, tn, **kwargs):
@@ -17,8 +43,13 @@ class ThouQuery:
     self.kwargs  = kwargs
     self.cursor  = None
     self.names   = kwargs.get('cols', [])
+    self.annots  = kwargs.get('annotate', {})
     self.flat    = False
     self.sort    = None
+
+  def where(self, k, v):
+    self.djconds[k] = v
+    return self
 
   def set_names(self, dat):
     self.names  = dat.keys()
@@ -33,10 +64,18 @@ class ThouQuery:
   def assemble_conditions(self, conds):
     return ThouReport.assemble_conditions(conds)
 
-  def filter(self, **kwargs):
-    nova  = copy.copy(self)
+  def specialise(self, kwargs):
+    nova          = copy.copy(self)
+    nova.djconds  = copy.copy(self.djconds)
     for k in kwargs:
       nova.djconds[k] = kwargs[k]
+    return nova
+
+  def filter(self, **kwargs):
+    nova          = copy.copy(self)
+    nova.djconds  = copy.copy(self.djconds)
+    for k in kwargs:
+      nova.djconds[k] = ThouReport.alter_condition(kwargs, k)
     return nova
 
   # TODO: Make sure this works, if it is necessary in our current DB design.
@@ -105,16 +144,17 @@ class ThouQuery:
       self.execute()
       return self[them]
     if type(them) == type(0):
-      return self[them : them + 1][0]
+      try:
+        self.cursor.scroll(them, mode = 'absolute')
+      except Exception:
+        return None
+      return ThouRow(self, self.cursor.fetchone(), **self.kwargs)
     dem = []
     try:
-      for ent in self.cursor.fetchmany(them.stop - them.start):
-        ans = {}
-        for nom in self.names:
-          got       = ent[self.cols[nom]]
-          if got:
-            ans[nom] = got
-        dem.append(ans)
+      self.cursor.scroll(them.start, mode = 'absolute')
+      curz  = self.cursor.fetchmany(them.stop - them.start)
+      for ent in curz:
+        dem.append(ThouRow(self, ent, **self.kwargs))
     except IndexError:
       pass
     return dem
@@ -157,8 +197,12 @@ class ThouQuery:
 
   @property
   def query(self):
-    qry = u'SELECT %s FROM %s %s%s' % (', '.join(self.kwargs.get('cols', self.active_columns(self.kwargs.get('qid')) or ['*'])), self.tablenm, self.assemble_conditions(self.djconds), self.assemble_sort(self.sort))
-    return qry
+    qry   = u' FROM %s%s%s' % (self.tablenm, self.assemble_conditions(self.djconds), self.assemble_sort(self.sort))
+    cols  = ', '.join(self.kwargs.get('cols', self.active_columns(self.kwargs.get('qid')) or ['*']))
+    annot = ['(SELECT %s%s) AS %s' % (self.annots[k], qry, k) for k in self.annots]
+    annot.append('%s%s' % (cols, qry))
+    qry = ', '.join(annot)
+    return ' '.join(['SELECT', qry])
 
   def __unicode__(self):
     return self.query
@@ -230,7 +274,7 @@ It is not idempotent at this level; further constraints should be added by inher
       nk, nv  = newks[ok]
       return (nk, nv(conds[ok]) if type(nv) == type(idem) else nv)
     except KeyError:
-      raise Exception, ('Specify adapter for %s (%s)' % (ok, set([mn.pk for mn in conds[ok]])))
+      raise Exception, ('Specify adapter for %s (%s)' % (ok, conds[ok]))
 
   # TODO: map old filters to new DB structure.
   @classmethod
@@ -239,8 +283,9 @@ It is not idempotent at this level; further constraints should be added by inher
     curz  = postgres.cursor()
     ans   = []
     for cond in conds:
-      nk, nv  = self.alter_condition(conds, cond)
-      ans.append(curz.mogrify(nk, (nv,)))
+      # nk, nv  = self.alter_condition(conds, cond)
+      rez = conds[cond]
+      ans.append(curz.mogrify(cond, rez if type(rez) == type((1, 2)) else (rez,)))
     curz.close()
     return (' WHERE ' if conds else '') + ' AND '.join(ans)
 
@@ -270,7 +315,7 @@ It is not idempotent at this level; further constraints should be added by inher
   def old_query(self, djconds, tn = None, **kwargs):
     if not tn: return self.query(djconds, kwargs.get('table', __DEFAULTS['REPORTS']))
     tbl = self.ensure_table(tn)
-    qry = 'SELECT %s FROM %s %s' % (', '.join(kwargs.get('cols', self.active_columns(kwargs.get('qid')) or ['*'])), tbl, self.assemble_conditions(djconds))
+    qry = 'SELECT %s FROM %s%s' % (', '.join(kwargs.get('cols', self.active_columns(kwargs.get('qid')) or ['*'])), tbl, self.assemble_conditions(djconds))
     curz  = postgres.cursor()
     # TODO: remove this.
     stderr.write('%s\r\n' % (qry,))
@@ -298,9 +343,9 @@ It is not idempotent at this level; further constraints should be added by inher
         float:     'FLOAT /*NOT NULL*/',
         bool:      'BOOLEAN /*NOT NULL*/',
         Decimal:   'FLOAT /*NOT NULL*/',
-        datetime:  'TIMESTAMP',
-        date:      'TIMESTAMP WITHOUT TIME ZONE',
-        time:      'TIMESTAMP'
+        datetime.datetime:  'TIMESTAMP',
+        datetime.date:      'TIMESTAMP WITHOUT TIME ZONE',
+        datetime.time:      'TIMESTAMP'
       }[type(val)]
     except KeyError:
       raise Exception, ('Supply type for column %s (has a %s, %s)?' % (cn, str(type(val)), str(val)))
@@ -513,18 +558,29 @@ class OldStyleReport:
 
   def __as_hash(self):
     ans = {}
+    him = self.autos
     ans['report_type']        = self.report_type
-    ans['former_pk']          = self.autos.pk
+    ans['former_pk']          = him.pk
     ans['reconstructed_msg']  = self.message
     ans['reporter_pk']        = self.reporter.pk
     ans['reporter_phone']     = self.reporter.telephone_moh
     ans['patient_id']         = self.patient.national_id
     ans['patient_pk']         = self.patient.pk
-    ans['report_date']        = self.autos.created
+    ans['report_date']        = him.created
+    if him.village:
+      ans['village_pk']         = him.village.pk
     ans['health_center_pk']   = self.hc.pk
-    ans['province_pk']        = self.province.pk
     ans['district_pk']        = self.district.pk
+    ans['sector_pk']          = him.sector.pk
+    ans['province_pk']        = self.province.pk
+    if him.cell:
+      ans['cell_pk']         = him.cell.pk
     ans['nation_pk']          = self.nation.pk
+    if him.date:
+      ans['lmp']  = him.date
+    # TODO: gather reminders
+    # TODO: gather alerts
+    # birth, bmi_anc1, childhealth, childnutrition, edd_anc2_date, edd_anc3_date, edd_anc4_date, edd_date, edd_pnc1_date, edd_pnc2_date, edd_pnc3_date
     return self.__gather_fields(ans)
 
   def convert(self):

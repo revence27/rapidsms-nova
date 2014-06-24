@@ -80,15 +80,20 @@ def index(req,**flts):
 
     req.session['track']=[
        {'label':'Pregnancy',          'id':'allpreg',
-       'number':reports.filter(type=ReportType.objects.get(name = 'Pregnancy')).count()},
+       #  'number':reports.filter(type=ReportType.objects.get(name = 'Pregnancy')).count()},
+       'number': reports.specialise({"report_type = 'PRE'": ''}).count()},
        {'label':'Birth',            'id':'bir',
-       'number':reports.filter(type=ReportType.objects.get(name = 'Birth')).count()},
+       #  'number':reports.filter(type=ReportType.objects.get(name = 'Birth')).count()},
+       'number': reports.specialise({"report_type = 'BIR'": ''}).count()},
         {'label':'ANC',            'id':'anc',
-       'number':reports.filter(type=ReportType.objects.get(name = 'ANC')).count()},
+       #  'number':reports.filter(type=ReportType.objects.get(name = 'ANC')).count()},
+       'number': reports.specialise({"report_type = 'ANC'": ''}).count()},
        {'label':'Risk', 'id':'risk',
-       'number':reports.filter(type=ReportType.objects.get(name = 'Risk')).count()},
+       #  'number':reports.filter(type=ReportType.objects.get(name = 'Risk')).count()},
+       'number': reports.specialise({"report_type = 'RIS'": ''}).count()},
        {'label':'Child Health',           'id':'chihe',
-       'number':reports.filter(type=ReportType.objects.get(name = 'Child Health')).count()},]
+       #  'number':reports.filter(type=ReportType.objects.get(name = 'Child Health')).count()},]
+       'number': reports.specialise({"report_type = 'CHI'": ''}).count()}]
     lox, lxn = 0, location_name(req)
     if req.REQUEST.has_key('location') and req.REQUEST['location'] != '0':
         lox = int(req.REQUEST['location'])
@@ -299,7 +304,7 @@ def child_locs(loc,filters):
     elif type(loc) == HealthCentre: return filters['location'] if filters['location'] else HealthCentre.objects.filter(id = loc.id).order_by('name')
 
 @permission_required('ubuzima.can_view')
-def pull_req_with_filters(req):
+def old_pull_req_with_filters(req):
     try:
         p = get_user_location(req)
         sel,prv,dst,lxn=None,None,None,None
@@ -329,12 +334,18 @@ def pull_req_with_filters(req):
         return render_to_response("404.html",{'error':e}, context_instance=RequestContext(req))
 
 def annot_val(loc):
-    if type(loc) == Nation: return "nation__name,nation__pk"
-    elif type(loc) == Province: return "province__name,province__pk"
-    elif type(loc) == District: return "district__name,district__pk"
-    else: return "location__name,location__pk"
+    if type(loc) == Nation: return 'nation_pk'
+    elif type(loc) == Province: return 'province_pk'
+    elif type(loc) == District: return 'district_pk'
+    else: return 'health_center_pk'
 
 def annot_locs_val(loc):
+    if type(loc) == Nation: return 'province_pk'
+    elif type(loc) == Province: return 'district_pk'
+    elif type(loc) == District: return 'health_center_pk'
+    else: return 'health_center_pk'
+
+def old_annot_locs_val(loc):
     if type(loc) == Nation: return "province__name,province__pk"
     elif type(loc) == Province: return "district__name,district__pk"
     elif type(loc) == District: return "location__name,location__pk"
@@ -385,7 +396,8 @@ def fetch_edd_info(qryset, start, end):
     dem  = Report.objects.filter(type = ReportType.objects.get(name = 'Pregnancy'), date__gte =
             edd_start, date__lte = edd_end,location__in=qryset.values('location')).select_related('patient')
     return dem
-def fetch_edd(start, end):
+
+def old_fetch_edd(start, end):
     #edd_start,edd_end=Report.calculate_last_menses(start),Report.calculate_last_menses(end)
     #dem  = Report.objects.filter(type = ReportType.objects.get(name = 'Pregnancy'), date__gte =
             #edd_start, date__lte = edd_end).select_related('patient')
@@ -569,10 +581,134 @@ def flash_report(req):
            resp, context_instance=RequestContext(req))
 ##END OF FLASH REPORT
 
+@permission_required('ubuzima.can_view')
+def pull_req_with_filters(req, **kwargs):
+    idem  = lambda x, y: x
+    try:
+        p = get_user_location(req)
+        sel,prv,dst,lxn=None,None,None,None
+        period  = default_period(req)
+        filters = {'period':period,
+          'location':kwargs.get('location', idem)(default_location(req), period),
+          'province':kwargs.get('province', idem)(default_province(req), period),
+          'district':kwargs.get('district', idem)(default_district(req), period)}
+        try:    sel,lxn=HealthCentre.objects.get(pk=int(req.REQUEST['location'])),HealthCentre.objects.get(pk=int(req.REQUEST['location']))
+        except KeyError:
+            try:    sel,dst=District.objects.get(pk=int(req.REQUEST['district'])),District.objects.get(pk=int(req.REQUEST['district']))
+            except KeyError:
+                try:    sel,prv=Province.objects.get(pk=int(req.REQUEST['province'])),Province.objects.get(pk=int(req.REQUEST['province']))
+                except KeyError:    pass
+        #print type(sel), dst, prv
+        if not sel: sel = p.health_centre or p.district or p.province or p.nation
+        locs = child_locs(sel,filters)
+        if p.nation:    locs = locs.filter(nation = p.nation)
+        if p.province:  locs = locs.filter(province = p.province)
+        if p.district:  locs = locs.filter(district = p.district)
+        if p.health_centre: locs = locs.filter(id = p.health_centre.id)
+        return {'usrloc':UserLocation.objects.get(user=req.user),'locs':locs,'annot':annot_val(sel),'annot_l':annot_locs_val(sel),'start_date':date.strftime(filters['period']['start'], '%d.%m.%Y'),
+             'end_date':date.strftime(filters['period']['end'], '%d.%m.%Y'),'filters':filters,'sel':sel,'prv':prv,'dst':dst,'lxn':lxn,'postqn':(req.get_full_path().split('?', 2) + [''])[1]}
+    except UserLocation.DoesNotExist,e:
+        return render_to_response("404.html",{'error':e}, context_instance=RequestContext(req))
+
+
+def fetch_edd(start, end):
+    sel = {
+      'report_type = %s': 'PRE',
+      '''(lmp + '9 MONTHS' :: INTERVAL) >= %s''': start,
+      '''(lmp + '9 MONTHS' :: INTERVAL) <= %s''': end,
+    }
+    # edd_date__gte =start, edd_date__lte = end  # .select_related('patient')  # TODO. Why that extra?
+    return ThouReport.query('testing_report_transfers', sel)
+
+class ReactiveLocation:
+  def __init__(self, loc, prd):
+    self.location = loc
+    self.period   = prd
+
+  def registered_pregnancies(self):
+    return ThouReport.query('testing_report_transfers', {'''report_type = 'PRE' AND province_pk = %s''': self.location.pk})
+
+  def as_high_risk(self, qry):
+    return qry.specialise({
+      '''NOT pre_rm_bool OR pre_gs_bool /*OR TODO: pre_ol_bool OR pre_yg_bool OR pre_mu_bool*/''': ''
+    })
+
+  def high_risk_pregnancies(self):
+    return self.as_high_risk(self.registered_pregnancies())
+
+  def expected_deliveries(self):
+    start = self.period['start']
+    end   = self.period['end']
+    return self.registered_pregnancies().specialise({
+      '''(lmp + '9 MONTHS' :: INTERVAL) >= %s''': start,
+      '''(lmp + '9 MONTHS' :: INTERVAL) <= %s''': end
+      })
+
+  def expected_high_risk(self):
+    return self.as_high_risk(self.expected_deliveries())
+
+  def delivering_on_end(self):
+    end   = self.period['end']
+    return self.registered_pregnancies().specialise({
+      '''(%s - lmp) < '1 WEEK'::INTERVAL''': end # Is this what they want?
+    })
+
+  def deliver_in_2_weeks(self):
+    return self.registered_pregnancies().specialise({
+      '''(NOW() - (lmp + '9 MONTHS' :: INTERVAL)) < '2 WEEKS' :: INTERVAL''':''
+    })
+
+  def deliver_soon_high_risk(self):
+    return self.as_high_risk(self.deliver_in_2_weeks())
+
+  def __getitem__(self, k):
+    if hasattr(self.location, k):
+      got = getattr(self.location, k)
+      return (apply if callable(got) else (lambda x: x))(got)
+    try:
+      return self.location[k]
+    except:
+      if hasattr(self, k):
+        return getattr(self, k)()
+    return 'ReactiveLocation: %s' % (k,)
+
+class ReactiveLocations:
+  def __init__(self, lox, period):
+    self.locations =  lox
+    self.period    =  period
+
+  def __getitem__(self, ix):
+    return ReactiveLocation(self.locations[ix], self.period)
+
+@permission_required('ubuzima.can_view')
+def preg_report(req):
+    resp  = pull_req_with_filters(req,
+      province = ReactiveLocations
+    )
+    precs = [
+      'patient_id AS indanga_muntu'
+    ]
+    preg  = matching_reports(req, resp['filters'], {'report_type = %s':'PRE', 'province_pk = ANY(%s)': [l.pk for l in resp['locs']]}) #, cols = precs)
+    prgw  = ThouReport.query('testing_report_transfers', {'''lmp >= (%s - '9 MONTHS'::INTERVAL)'''})
+    end   = resp['filters']['period']['end']
+    start = resp['filters']['period']['start']
+    edd   = preg.specialise({
+      'report_type = %s': 'PRE',
+      '''(lmp + '9 MONTHS' :: INTERVAL) >= %s''': start,
+      '''(lmp + '9 MONTHS' :: INTERVAL) <= %s''': end,
+    })
+    resp['report_type'] = ReportType.objects.get(name = 'Pregnancy')
+    if req.REQUEST.has_key('csv') or req.REQUEST.has_key('excel'):
+      return reports_to_excel(preg)  
+    else:
+      # resp['reports'] = paginated(req, preg)
+      return render_to_response('novatemplates/preg_report.jinja', resp, context_instance = RequestContext(req))
+
+##END OF PREGNANCY TABLES, CHARTS, MAP
 
 ##START OF PREGNANCY TABLES, CHARTS, MAP
 @permission_required('ubuzima.can_view')
-def preg_report(req):
+def old_preg_report(req):
     
     resp=pull_req_with_filters(req)
     resp['reports']=matching_reports(req,resp['filters'])

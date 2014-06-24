@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% load i18n %}
+{% load region-tags %}
+
+{% load webapp-tags %}
+<html>
+
+<head src="style/irwanda.png">
+  <title>{% block title %}{% endblock %}{% block title_suffix %} Emergency Room - RapidSMS{% endblock %}</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta http-equiv="refresh" content="60">
+		{% block stylesheets %}
+		<!-- stylesheets -->
+		<link href="/static/webapp/stylesheets/default.css" rel="stylesheet" type="text/css" media="screen" />
+		<link type="text/css" rel="stylesheet" href="/static/webapp/stylesheets/menu.css" />
+		<link type="text/css" rel="stylesheet" href="/static/webapp/stylesheets/modules.css" />
+		<link rel="stylesheet" type="text/css" href="/static/webapp/stylesheets/style.css" title="style" />
+
+		{% block page_stylesheets %}{% endblock %}
+		{% endblock %}
+		<!-- javascripts (global, app, page) -->
+		<!--<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=true" type="text/javascript"></script>-->
+		<script type="text/javascript" src="/static/webapp/javascripts/jquery.js"></script>
+
+                <script type="text/javascript" src="/static/webapp/javascripts/menu-new.js"></script>
+		<script type="text/javascript" src="/static/webapp/javascripts/jquery-1.3.2.min.js"></script>{% for js in javascripts %}
+		<script type="text/javascript" src="{{ js }}"></script>{% endfor %}
+		{% block javascripts %}
+
+		<script language="javascript" type="text/javascript" src="/static/webapp/javascripts/jquery-1.4.1.min.js"></script>
+		<script language="javascript" type="text/javascript" src="/static/webapp/javascripts/jquery.table2csv.0.1.1.min.js"></script>
+		<!--[if IE]><script type="text/javascript" src="/static/webapp/javascripts/excanvas.pack.js"></script>
+		<![endif]-->
+		
+		<script type="text/javascript"   src="/static/webapp/javascripts/stats.js"></script>
+
+		<link rel="stylesheet" type="text/css"  href="/static/webapp/stylesheets/stats.css" />
+		<link type="text/css" rel="stylesheet" href="/static/webapp/javascripts/calendar/dhtmlgoodies_calendar.css"></link>
+		<script type="text/javascript" src="/static/webapp/javascripts/calendar/dhtmlgoodies_calendar.js"></script>
+		<script type="text/javascript">
+			function deroulement(form)
+				  {
+					path=document.URL	
+
+				if ((form.province.value=="") || (form.district.value=="") || (form.location.value==""))
+					{
+						if (path.indexOf("?") < 0 && path.indexOf("start_date") <0 ){ 
+									window.location=path+'?start_date='+form.start_date.value+'&end_date='+form.end_date.value;
+					}
+		
+						else {
+							path=path.replace(/(start_date=)[^\&]+/, '$1' + form.start_date.value);
+							path=path.replace(/(end_date=)[^\&]+/, '$1' + form.end_date.value);
+							window.location=path;
+							}
+				       }
+
+				else {
+					form.submit();	
+					}
+
+				 }
+		</script>
+		{% endblock %}
+
+		  <meta name="description" content="website description" />
+		  <meta name="keywords" content="website keywords, website keywords" />
+		  <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
+		  
+		  
+  
+</head>
+
+<body>
+  <div id="main">
+
+    <div id="new-header">
+      <div id = "header_image"><img src="/static/webapp/images/header.png"> </div>
+      </div>
+    </div>
+
+	
+
+
+    <div id="header">
+  
+      <div id="menubar">
+        <!-- start menu -->
+      
+	<!-- end menu -->
+      </div>
+   </div>
+<!-- site content -->
+    <div id="site_content">
+      {% block content %}
+      
+	<div>
+    <form class="topstrip">
+        <h2 class = "lagging"><span style = 'text-align:center;'>red alerts --- emergency room</span></h2>
+        <table width="100%">
+            <thead>
+                <tr><th colspan="2">Period</th><th>Location</th><th></th><th></th><th></th><th></th></tr>
+                <tr><th>Start</th><th>End</th><th>Province</th><th>District</th><th>Health
+                        Centre</th><th></th><th></th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+            <input style="background-color: white"  type="text" id="pickstartdate" value="{{ filters.period.start|date:'d.m.Y' }}"  name="start_date" 					readonly="readonly"  onFocus="displayCalendar(form.start_date,'dd.mm.yyyy',this)" size = "10"/></td>
+        <td><input style="background-color: white" type="text" id="pickenddate" value="{{ filters.period.end|date:'d.m.Y' }}"  name="end_date" 					readonly="readonly"  onFocus="displayCalendar(form.end_date,'dd.mm.yyyy',this)" size = "10" />
+                    </td>
+                    <td>
+            <select name="province" id="provchoose"><option></option>
+                {%  for loc in filters.province %}<option value="{{ loc.id }}" {% if loc.selected and request.GET.province %} selected="selected"{% endif %}>{{ loc.name }}</option>{%  endfor %}
+            </select>
+                    </td>
+                    <td>
+            <select name="district" id="distchoose"><option></option>
+                {%  for loc in filters.district %}<option value="{{ loc.id }}"{% if loc.selected and request.GET.district %} selected="selected"{% endif %}>{{ loc.name }}</option>{%  endfor %}
+            </select>
+                    </td>
+                    <td>
+            <select name="location" id="locchoose"><option></option>
+                {%  for loc in filters.location %}<option value="{{ loc.id }}"{% if loc.selected and request.GET.location %} selected="selected"{% endif %}>{{ loc.name }}</option>{%  endfor %}
+            </select>
+                    </td>
+                    <td>
+            <input type="button" value="Update Filters"  onClick="return deroulement(this.form);"/>
+                    </td><td></td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+    <div class="clear-hack"></div>
+	
+
+	<table width="100%">
+            <thead>
+                <tr>{%if last%}<th colspan="6" class = "lagging"><marquee style="font-size:8pt;color:black	
+;font-weight:bold;" behavior="alternate" direction="left" scrollamount="1" WIDTH=100%>RECENT RED ALERT  BY REPORTER {{last.reporter.telephone_moh}} PATIENT  {{last.patient.national_id}} -- <blink>{{last.red_signs}}</blink> FROM {{last.district.name}} - {{last.location.name}} - {{last.sector.name}} - {{last.cell.name}} - {{last.village.name}}</marquee>{%endif%}</tr>
+                <tr><th>LOCATION</th><th>REGISTERED RED ALERTS</th><th colspan = "3" style = 'text-align:center;'>RESPONDED RED ALERTS</th><th><font color = 'red'><blink>NON-RESPONDED RED ALERTS</blink></font></th></tr>
+		<tr><th></th><th></th><th style = 'text-align:center;'>RESPONDED RED ALERTS WITH POSITVE OUTCOME</th><th style = 'text-align:center;'>Vs</th><th style = 'text-align:center;'>RESPONDED RED ALERTS WITH NEGATIVE OUTCOME</th><th></th></tr>
+            </thead>
+            <tbody >
+		{% for dat in data %}
+                <tr >
+                    <td>{{dat.location__name}}</td><td>{{dat.total}}</td><td style = 'text-align:center;'><font color = 'green'>{{dat.red_res_po}}</font></td><td></td><td style = 'text-align:center;'>{{dat.red_res_ne}}</td><td ><font color = 'red'><blink>{{dat.red_unres}}</blink></font></td>
+                </tr>
+		{% endfor %}
+
+		<tr ><td colspan="6" class = "lagging"><marquee behavior="alternate" direction="up" width = "100%"scrollamount="1">{% for r in unres%} BY :{{r.reporter.telephone_moh}} -- FROM {{r.district.name}} - {{r.location.name}} - {{r.sector.name}} - {{last.report.cell.name}} - {{r.village.name}}, PATIENT: {{last.patient.national_id}}, PROBLEM(S): {{r.red_signs}}</br></br>{%endfor%}</marquee></td></tr>
+            </tbody>
+        </table>
+</div>
+
+
+	{% endblock %}
+       <div style="clear: both;">&nbsp;</div>
+    </div>
+    
+    
+  </div>
+    <div id="footer">
+		<p> &copy; 2012 The RapidSMS RWANDA, All rights reserved.&nbsp;</p>
+    </div>
+</body>
+</html>
+
+

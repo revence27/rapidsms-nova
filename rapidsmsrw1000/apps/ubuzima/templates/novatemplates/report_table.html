@@ -1,0 +1,43 @@
+{% load pagination-tags %}
+
+
+
+<table width="100%"> 
+    <thead>
+	<tr><th colspan = "3"><a href={{request.url}}?csv{%if postqn%}&{{postqn}}{%endif%}>Export Reports Log -- CSV</a></th><th colspan = "2"><a href={{request.url}}?excel{%if postqn%}&{{postqn}}{%endif%}>Export Reports Log -- EXCEL</a></th><th colspan = "2"></th></tr>
+        <tr>
+        	<th>Id</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Type</th>
+            <th>Reporter</th>
+            <th>Patient</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+    	{% for report in reports %}
+        <tr>
+          <td>{{report.indexcol}}</td>
+          <td>{{report.report_date}}</td>
+          <td>PROV: {{report.province_pk}}, DIST: {{report.district_pk}}, HC: {{report.health_center_pk}}</td>
+          <td>{{report.report_type}}</td>
+          <td>{{report.reporter_pk}}</td>
+          <td>{{report.patient_id}}</td>
+          <td>{{report.reconstructed_msg}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+			<tr>
+				<td colspan="10">
+          {{ reports }}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="10">
+				  Matching Reports: {{ reports.paginator.count }}
+				</td>
+			</tr>
+	</tfoot>
+</table>

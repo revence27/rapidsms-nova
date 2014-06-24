@@ -1,0 +1,33 @@
+{% extends request.base_template %}
+{% block title %}Pregnancy Report{% endblock %}
+
+{% block content %}
+<table>
+  <thead>
+    <tr>
+      <th>Province</th>
+      <th># of Registered Pregnancies</th>
+      <th>High-Risk Pregnancies</th>
+      <th>Expected Deliveries</th>
+      <th>High-Risk Expected Deliveries</th>
+      <th>Pregnant Women on {{  filters.period.end  }}</th>
+      <th>To Deliver With 2 Weeks</th>
+      <th>High-Risk due to Deliver With 2 Weeks</th>
+    </tr>
+  </thead>
+  <tbody>
+    {%  for prv in filters.province %}
+    <tr>
+      <td>{{  prv.name }}</td>
+      <td>{{  prv.specialise }}</td>
+      <td>{{  prv }}</td>
+      <td>{{  prv }}</td>
+      <td>{{  prv }}</td>
+      <td>{{  prv }}</td>
+      <td>{{  prv }}</td>
+      <td>{{  prv }}</td>
+    </tr>
+    {%  endfor  %}
+  </tbody>
+</table>
+{% endblock %}

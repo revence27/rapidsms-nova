@@ -268,7 +268,38 @@ def read_date(date):
     except: return ""
 
 
-def matching_reports(req, diced, alllocs = False):
+def new_matching_reports(req, diced, newcs, alllocs = False, **kwargs):
+    rez   = {}
+    level = get_level(req)
+    try:
+        # rez['created__gte'] = diced['period']['start']
+        newcs['created_at >= %s'] = diced['period']['start']
+        newcs['created_at <= %s'] = diced['period']['end']+timedelta(1)
+    except KeyError:
+        pass
+    try:
+        loc = int(req.REQUEST['location'])
+        newcs['health_center_pk = %s'] = loc
+    except KeyError:
+        try:
+            dst=int(req.REQUEST['district'])
+            newcs['district_pk = %s'] = dst
+        except KeyError:
+            try:
+                dst=int(req.REQUEST['province'])
+                newcs['province_pk = %s'] = dst
+            except KeyError:    pass
+    if level['level'] == 'Nation':  newcs['nation_pk = %s'] = level['uloc'].nation.id
+    elif level['level'] == 'Province':  newcs['province_pk = %s'] = level['uloc'].province.id
+    elif level['level'] == 'District':  newcs['district_pk = %s'] = level['uloc'].district.id
+    elif level['level'] == 'HealthCentre':  rez['health_center_pk = %s'] = level['uloc'].health_centre.id
+    ans = ThouReport.query('testing_report_transfers', newcs, **kwargs)
+    if rez:
+      ans = ans.filter(**rez)
+    return ans
+
+def matching_reports(req, diced, newcs = {}, alllocs = False, **kwargs):
+    return new_matching_reports(req, diced, newcs, **kwargs)
     return new_style_reports(req, diced)
     rez = {}
     pst = {}
