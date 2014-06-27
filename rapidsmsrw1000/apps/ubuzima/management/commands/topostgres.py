@@ -14,15 +14,25 @@ from rapidsmsrw1000.settings import THE_DATABASE as postgres, __DEFAULTS
 
 class Command(BaseCommand):
     help = 'Copy the messages (and reports), with all supporting data (locations, facilities ...), over to the Postgres DB.'
+    option_list = BaseCommand.option_list + (
+        make_option('-n', '--number',
+                    # action='store_true',
+                    dest='number',
+                    default=5000,
+                    help='Number of reports to transfer.'),
+        )
 
-    def handle(self, **options):
+
+    def handle(self, *args, **options):
       curz  = postgres.cursor()
-      reps  = Report.objects.order_by('-date')[0:5000]
+      cpt   = int(options.get('number', 5000))
+      reps  = Report.objects.order_by('-date')[0:cpt]
       convr = BasicConverter()
-      print 'Starting conversion ...'
+      print ('Starting conversion (%d) ...' % (cpt,))
       cpt   = float(reps.count())
       pos   = 0
       maxw  = 80
+      stbs  = set()
       for rep in reps:
         fps = float(pos + 1)
         pct = (fps / cpt) * 100.0
@@ -32,11 +42,17 @@ class Command(BaseCommand):
         rsp = ('%d %s%3.1f%%%s' % (pos + 1, gap, pct, pad))
         sys.stdout.write('\r' + rsp[0:maxw])
         sys.stdout.flush()
-        if not osp.convert():
-          raise Exception, str(osp)
+        gat             = osp.convert()
+        suc, thid, tbn  = gat
+        if not any([suc, thid]):
+          raise Exception, str(gat)
+        stbs.add(tbn)
         pos = pos + 1
         postgres.commit()
       print 'Done converting ...'
+      print 'List of secondary tables:'
+      for tbn in stbs:
+        print tbn
       curz.close()
       postgres.commit()
       postgres.close()

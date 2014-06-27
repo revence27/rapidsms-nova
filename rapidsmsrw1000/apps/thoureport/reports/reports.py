@@ -369,12 +369,11 @@ It is not idempotent at this level; further constraints should be added by inher
       return self.decide_type((dval, ctyp), cn)
     return ctyp, dval
 
-  seen_columns  = set()
+  seen_columns  = {}
   @classmethod
-  def store(self, dat, tn = None):
-    if not tn: return self.store(dat, __DEFAULTS['REPORTS'])
+  def store(self, tn, dat):
     if type(dat) == type([]):
-      return [self.store(cv, tn) for cv in dat]
+      return [self.store(tn, cv) for cv in dat]
     if not dat: return None
     cols  = dat.keys()
     vals  = []
@@ -383,12 +382,14 @@ It is not idempotent at this level; further constraints should be added by inher
     ans   = dat.get('indexcol')
     for col in cols:
       dval  = dat[col]
-      if not col in self.seen_columns:
+      sncs  = self.seen_columns.get(tn, set())
+      if not col in sncs:
         curz.execute('SELECT TRUE FROM information_schema.columns WHERE table_name = %s AND column_name = %s', (tbl, col))
         if not curz.fetchone():
           ctyp, dval  = self.decide_type(dval, col)
           curz.execute('ALTER TABLE %s ADD COLUMN %s %s;' % (tbl, col, ctyp))
-          self.seen_columns.add(col)
+          sncs.add(col)
+      self.seen_columns[tn] = sncs
       elval = curz.mogrify('%s', (dval, ))
       if ans:
         dat[col]  = elval
@@ -574,7 +575,8 @@ class OldStyleReport:
       ans['village_pk']       = him.village.pk
     ans['health_center_pk']   = self.hc.pk
     ans['district_pk']        = self.district.pk
-    ans['sector_pk']          = him.sector.pk
+    if him.sector:
+      ans['sector_pk']        = him.sector.pk
     ans['province_pk']        = self.province.pk
     if him.cell:
       ans['cell_pk']          = him.cell.pk
@@ -589,10 +591,10 @@ class OldStyleReport:
 
   def convert(self):
     tbn, cls, dat = self.__as_hash()
-    thr           = ThouReport.store(cls, 'report_logs')
+    thr           = ThouReport.store('report_logs', cls)
     dat['log_id'] = thr
-    ThouReport.store(dat, tbn)
-    return thr
+    suc           = ThouReport.store(tbn, dat)
+    return (suc, thr, tbn)
 
   # TODO: either fetch the message from the DB, or re-construct it. How silly of RapidSMS to not relate the report and its message!
   def __str__(self):

@@ -647,12 +647,12 @@ def pull_req_with_filters(req, **kwargs):
 
 def fetch_edd(start, end):
     sel = {
-      'report_type = %s': 'PRE',
+      # 'report_type = %s': 'PRE',
       '''(lmp + '9 MONTHS' :: INTERVAL) >= %s''': start,
       '''(lmp + '9 MONTHS' :: INTERVAL) <= %s''': end,
     }
     # edd_date__gte =start, edd_date__lte = end  # .select_related('patient')  # TODO. Why that extra?
-    return ThouReport.query('testing_report_transfers', sel)
+    return ThouReport.query('pre_table', sel)
 
 class ReactiveLocation:
   def __init__(self, req, loc, prd):
@@ -679,11 +679,12 @@ class ReactiveLocation:
 
   def registered_pregnancies(self):
     k, v = self.guides()
-    return ThouReport.query('testing_report_transfers', {('''report_type = 'PRE' AND ''' + k): v})
+    # return ThouReport.query('pre_table', {('''report_type = 'PRE' AND ''' + k): v})
+    return ThouReport.query('pre_table', {k: v})
 
   def as_high_risk(self, qry):
     return qry.specialise({
-      '''NOT (pre_rm_bool OR pre_gs_bool /*OR TODO: pre_ol_bool OR pre_yg_bool OR pre_mu_bool*/)''': ''
+      '''NOT (rm_bool OR gs_bool /*OR TODO: ol_bool OR yg_bool OR mu_bool*/)''': ''
     })
 
   def high_risk_pregnancies(self):
