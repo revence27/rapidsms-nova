@@ -35,6 +35,8 @@ class Command(BaseCommand):
         if not osp.convert():
           raise Exception, str(osp)
         pos = pos + 1
+        postgres.commit()
       print 'Done converting ...'
       curz.close()
       postgres.commit()
+      postgres.close()

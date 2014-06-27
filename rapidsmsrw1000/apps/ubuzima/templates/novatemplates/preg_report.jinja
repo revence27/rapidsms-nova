@@ -1,31 +1,88 @@
 {% extends request.base_template %}
 {% block title %}Pregnancy Report{% endblock %}
-
+{%  block page_stylesheets  %}
+  <link rel="stylesheet" href="/static/webapp/stylesheets/thoureports.css" />
+{%  endblock  %}
+{%  block jslibs  %}
+  <script src="/static/webapp/javascripts/jquery-1.11.1.min.js"></script>
+{%  endblock %}
+{%  block javascripts %}
+  <script src="/static/webapp/javascripts/thoureports.js"></script>
+{%  endblock  %}
 {% block content %}
-<table>
+<table id="disptable">
   <thead>
     <tr>
-      <th>Province</th>
+      <th>
+        <a href="{{ request.path  }}">Rwanda</a>
+      </th>
+      <th>
+			  {% if dst %}
+          <a href="{{request.path}}?province={{dst.province.id}}&start_date={{start_date}}&end_date={{end_date}}">{{ dst.province.name }}</a> 
+			  {% endif %}
+		    {% if prv %}
+		      <a href="{{request.path}}?province={{prv.id}}&start_date={{start_date}}&end_date={{end_date}}">{{ prv.name }}</a>
+		    {% endif %}
+      </th>
+      <th colspan="2">
+			  {% if lxn %}
+          <a href="{{request.path}}?district={{lxn.district.id}}&start_date={{start_date}}&end_date={{end_date}}">{{ lxn.district.name }} Health Centre</a>
+        {% endif %}
+			  {% if dst %}
+          <a href="{{request.path}}?district={{dst.id}}&start_date={{start_date}}&end_date={{end_date}}">{{ dst.name }} District</a> 
+			  {% endif %}
+      </th>
+      <th>
+			  {% if lxn %}
+          <a href="{{request.path}}?location={{lxn.province.id}}&start_date={{start_date}}&end_date={{end_date}}">{{ lxn.name }} Health Centre</a>
+        {% endif %}
+      </th>
+      <th>
+        <input value="{{  date1 }}" id="startdate" type="date" />
+      </th>
+      <th>
+        <input value="{{  date2 }}" id="enddate" type="date" />
+      </th>
+      <th>
+        <input id="run" type="button" value="Update" />
+      </th>
+    </tr>
+    <tr>
+      {%  if dst  %}
+        <th>Health Centre</th>
+      {%  else  %}
+        {%  if prv  %}
+          <th>District</th>
+        {%  else  %}
+          {%  if lxn  %}
+            <th>Patient</th><!--  Won't happen, I think. -->
+          {%  else  %}
+            <th>Province</th>
+          {%  endif %}
+        {%  endif %}
+      {%  endif %}
       <th># of Registered Pregnancies</th>
       <th>High-Risk Pregnancies</th>
       <th>Expected Deliveries</th>
       <th>High-Risk Expected Deliveries</th>
       <th>Due on {{  filters.period.end  }}</th>
-      <th>To Deliver With 2 Weeks</th>
+      <th>To Deliver Within 2 Weeks</th>
       <th>High-Risk due to Deliver Within 2 Weeks</th>
     </tr>
   </thead>
   <tbody>
-    {%  for prv in filters.province %}
+    {%  for area in filters.child_areas %}
     <tr>
-      <td>{{  prv.name }}</td>
-      <td>{{  prv.registered_pregnancies }}</td>
-      <td>{{  prv.high_risk_pregnancies }}</td>
-      <td>{{  prv.expected_deliveries }}</td>
-      <td>{{  prv.expected_high_risk }}</td>
-      <td>{{  prv.delivering_on_end }}</td>
-      <td>{{  prv.deliver_in_2_weeks }}</td>
-      <td>{{  prv.deliver_soon_high_risk }}</td>
+      <td>
+        <a href="{{ area.own_link}}">{{  area.name  }}</a>
+      </td>
+      <td>{{  area.registered_pregnancies.count }}</td>
+      <td>{{  area.high_risk_pregnancies.count }}</td>
+      <td>{{  area.expected_deliveries.count }}</td>
+      <td>{{  area.expected_high_risk.count }}</td>
+      <td>{{  area.delivering_on_end.count }}</td>
+      <td>{{  area.deliver_in_2_weeks.count }}</td>
+      <td>{{  area.deliver_soon_high_risk.count }}</td>
     </tr>
     {%  endfor  %}
   </tbody>

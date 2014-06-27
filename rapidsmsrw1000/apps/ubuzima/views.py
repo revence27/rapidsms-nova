@@ -299,6 +299,13 @@ def by_location(req, pk, **flts):
 def child_locs(loc,filters):
     #print filters['province'], filters['district'], filters['location']
     if type(loc) == Nation: return Province.objects.filter(nation = loc)
+    elif type(loc) == Province: return filters['district'].locations if filters['district'] else HealthCentre.objects.filter(province = loc).order_by('name')
+    elif type(loc) == District: return filters['location'] if filters['location'] else HealthCentre.objects.filter(district = loc).order_by('name')
+    elif type(loc) == HealthCentre: return filters['location'] if filters['location'] else HealthCentre.objects.filter(id = loc.id).order_by('name')
+
+def old_child_locs(loc,filters):
+    #print filters['province'], filters['district'], filters['location']
+    if type(loc) == Nation: return Province.objects.filter(nation = loc)
     elif type(loc) == Province: return filters['district'] if filters['district'] else HealthCentre.objects.filter(province = loc).order_by('name')
     elif type(loc) == District: return filters['location'] if filters['location'] else HealthCentre.objects.filter(district = loc).order_by('name')
     elif type(loc) == HealthCentre: return filters['location'] if filters['location'] else HealthCentre.objects.filter(id = loc.id).order_by('name')
@@ -581,17 +588,44 @@ def flash_report(req):
            resp, context_instance=RequestContext(req))
 ##END OF FLASH REPORT
 
+class ReactiveFilters:
+  def __init__(self, req, prd, hsh):
+    self.plain    = hsh
+    self.request  = req
+    self.times    = prd
+    self.params   = req.REQUEST
+
+  def child_areas(self):
+    dst = self.params.get('district')
+    prv = self.params.get('province')
+    return self.plain[
+      'location' if dst else \
+      ('district' if prv else 'province')
+    ]
+
+  def __getitem__(self, k):
+    try:
+      return apply(getattr(self, k))
+    except TypeError, e:
+      raise Exception, str('%s: %s' % (k, getattr(self, k)))
+    except AttributeError:
+      return self.plain[k]
+
 @permission_required('ubuzima.can_view')
 def pull_req_with_filters(req, **kwargs):
-    idem  = lambda x, y: x
+    idem  = lambda _, x, y: x
     try:
-        p = get_user_location(req)
-        sel,prv,dst,lxn=None,None,None,None
+        sel, prv, dst, lxn = None, None, None, None
+        p       = get_user_location(req)
         period  = default_period(req)
-        filters = {'period':period,
-          'location':kwargs.get('location', idem)(default_location(req), period),
-          'province':kwargs.get('province', idem)(default_province(req), period),
-          'district':kwargs.get('district', idem)(default_district(req), period)}
+        locat   = default_location(req)
+        provi   = default_province(req)
+        distr   = default_district(req)
+        filters = ReactiveFilters(req, period,
+          {'period':period,
+          'location':kwargs.get('location', idem)(req, locat, period) if locat else locat,
+          'province':kwargs.get('province', idem)(req, provi, period) if provi else provi,
+          'district':kwargs.get('district', idem)(req, distr, period) if distr else distr})
         try:    sel,lxn=HealthCentre.objects.get(pk=int(req.REQUEST['location'])),HealthCentre.objects.get(pk=int(req.REQUEST['location']))
         except KeyError:
             try:    sel,dst=District.objects.get(pk=int(req.REQUEST['district'])),District.objects.get(pk=int(req.REQUEST['district']))
@@ -621,16 +655,35 @@ def fetch_edd(start, end):
     return ThouReport.query('testing_report_transfers', sel)
 
 class ReactiveLocation:
-  def __init__(self, loc, prd):
+  def __init__(self, req, loc, prd):
     self.location = loc
     self.period   = prd
+    self.request  = req
+    self.params   = req.REQUEST
+
+  def own_link(self):
+    start = self.period['start']
+    end   = self.period['end']
+    dst   = self.params.get('district')
+    prv   = self.params.get('province')
+    cle   = ('location' if dst else ('district' if prv else 'province'))
+    gat   = self.params.get(cle, str(self.location.pk))
+    loc   = '%s=%s&' % (cle, gat)
+    return ('%s?%sstart_date=%s&end_date=%s' % (self.request.path, loc, start, end))
+
+  def location_col(self):
+    return 'province_pk'
+
+  def guides(self):
+    return (self.location_col() + ' = %s', self.location.pk)
 
   def registered_pregnancies(self):
-    return ThouReport.query('testing_report_transfers', {'''report_type = 'PRE' AND province_pk = %s''': self.location.pk})
+    k, v = self.guides()
+    return ThouReport.query('testing_report_transfers', {('''report_type = 'PRE' AND ''' + k): v})
 
   def as_high_risk(self, qry):
     return qry.specialise({
-      '''NOT pre_rm_bool OR pre_gs_bool /*OR TODO: pre_ol_bool OR pre_yg_bool OR pre_mu_bool*/''': ''
+      '''NOT (pre_rm_bool OR pre_gs_bool /*OR TODO: pre_ol_bool OR pre_yg_bool OR pre_mu_bool*/)''': ''
     })
 
   def high_risk_pregnancies(self):
@@ -672,39 +725,69 @@ class ReactiveLocation:
         return getattr(self, k)()
     return 'ReactiveLocation: %s' % (k,)
 
+class ReactiveDistrict(ReactiveLocation):
+  def location_col(self):
+    return 'district_pk'
+
+class ReactiveHC(ReactiveLocation):
+  def location_col(self):
+    return 'health_center_pk'
+
+  def own_link(self):
+    gat   = str(self.params.get('location', str(self.location.pk)))
+    lk    = (u'/ubuzima/?location=%s&province=%d&district=%d&start_date=%s&end_date=%s' % (gat, self.location.province.pk, self.location.district.pk, self.params.get('start_date'), self.params.get('end_date')))
+    return lk
+
 class ReactiveLocations:
-  def __init__(self, lox, period):
+  def __init__(self, req, lox, period):
     self.locations =  lox
     self.period    =  period
+    self.request   =  req
+
+  def filter(self, *args, **kwargs):
+    return self.locations.filter(*args, **kwargs)
+
+  def reactor(self):
+    return ReactiveLocation
 
   def __getitem__(self, ix):
-    return ReactiveLocation(self.locations[ix], self.period)
+    return self.reactor()(self.request, self.locations[ix], self.period)
+
+class ReactiveDistricts(ReactiveLocations):
+  def reactor(self):
+    return ReactiveDistrict
+
+class ReactiveHCs(ReactiveLocations):
+  def reactor(self):
+    return ReactiveHC
+
+def our_data_dump(obj):
+  return {}
+  raise Exception, str(obj)
+
+@permission_required('ubuzima.can_view')
+def json_api(req):
+    resp  = pull_req_with_filters(req,
+      province = ReactiveLocations,
+      district = ReactiveDistricts,
+      location = ReactiveHCs
+    )
+    ans = {'filters':resp['filters']}
+    return HttpResponse(json.dumps(ans, default = our_data_dump), content_type = 'application/json')
 
 @permission_required('ubuzima.can_view')
 def preg_report(req):
     resp  = pull_req_with_filters(req,
-      province = ReactiveLocations
+      province = ReactiveLocations,
+      district = ReactiveDistricts,
+      location = ReactiveHCs
     )
-    precs = [
-      'patient_id AS indanga_muntu'
-    ]
-    preg  = matching_reports(req, resp['filters'], {'report_type = %s':'PRE', 'province_pk = ANY(%s)': [l.pk for l in resp['locs']]}) #, cols = precs)
-    prgw  = ThouReport.query('testing_report_transfers', {'''lmp >= (%s - '9 MONTHS'::INTERVAL)'''})
-    end   = resp['filters']['period']['end']
-    start = resp['filters']['period']['start']
-    edd   = preg.specialise({
-      'report_type = %s': 'PRE',
-      '''(lmp + '9 MONTHS' :: INTERVAL) >= %s''': start,
-      '''(lmp + '9 MONTHS' :: INTERVAL) <= %s''': end,
-    })
-    resp['report_type'] = ReportType.objects.get(name = 'Pregnancy')
+    resp['date1'], resp['date2']  = [resp['filters']['period'][x].strftime('%Y-%m-%d') for x in ['start', 'end']]
+    resp['request'] = req
     if req.REQUEST.has_key('csv') or req.REQUEST.has_key('excel'):
-      return reports_to_excel(preg)  
+      raise Exception, 'Not handling Excel yet.'  # TODO.
     else:
-      # resp['reports'] = paginated(req, preg)
       return render_to_response('novatemplates/preg_report.jinja', resp, context_instance = RequestContext(req))
-
-##END OF PREGNANCY TABLES, CHARTS, MAP
 
 ##START OF PREGNANCY TABLES, CHARTS, MAP
 @permission_required('ubuzima.can_view')

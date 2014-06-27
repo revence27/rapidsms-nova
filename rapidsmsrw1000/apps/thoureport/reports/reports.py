@@ -143,6 +143,9 @@ class ThouQuery:
     if not self.cursor:
       self.execute()
       return self[them]
+    if type(them) in [type('method'), type(u'method')]:
+      raise AttributeError, 'Call the method itself, O foolish and mal-designed Django templates engine!'
+      return apply(getattr(self, them))
     if type(them) == type(0):
       try:
         self.cursor.scroll(them, mode = 'absolute')
@@ -155,7 +158,7 @@ class ThouQuery:
       curz  = self.cursor.fetchmany(them.stop - them.start)
       for ent in curz:
         dem.append(ThouRow(self, ent, **self.kwargs))
-    except IndexError:
+    except Exception:
       pass
     return dem
 
@@ -178,8 +181,7 @@ class ThouQuery:
   # TODO: Work with views to ensure closing of cursors.
   def __execute(self):
     qry   = self.query
-    # TODO: remove this.
-    stderr.write('%s\r\n' % (qry,))
+    # stderr.write('%s\r\n' % (qry,))
     curz        = postgres.cursor()
     curz.execute(qry)
     cols  = [x.name for x in curz.description]
@@ -537,7 +539,7 @@ class OldStyleReport:
   # 5.  Reports.
   # 6.  Messages
   # 7.  Patients
-  def __gather_fields(self, hsh):
+  def __gather_fields(self, hsh = {}):
     fds = Field.objects.filter(report = self.autos)
     prp = self.db_prepend
     for fd in fds:
@@ -546,7 +548,8 @@ class OldStyleReport:
       typedata  = self[ftype.pk]
       typedata[self.__val_name(fd)] = fd.value if ftype.has_value else (fd.value and True or False)
       for td in typedata:
-        nom       = '%s_%s_%s' % (prp, cle, td)
+        # nom       = '%s_%s_%s' % (prp, cle, td)
+        nom       = '%s_%s' % (cle, td)
         hsh[nom]  = typedata[td]
     return hsh
 
@@ -568,24 +571,27 @@ class OldStyleReport:
     ans['patient_pk']         = self.patient.pk
     ans['report_date']        = him.created
     if him.village:
-      ans['village_pk']         = him.village.pk
+      ans['village_pk']       = him.village.pk
     ans['health_center_pk']   = self.hc.pk
     ans['district_pk']        = self.district.pk
     ans['sector_pk']          = him.sector.pk
     ans['province_pk']        = self.province.pk
     if him.cell:
-      ans['cell_pk']         = him.cell.pk
+      ans['cell_pk']          = him.cell.pk
     ans['nation_pk']          = self.nation.pk
     if him.date:
-      ans['lmp']  = him.date
+      ans['lmp']              = him.date
+    cls                       = copy.copy(ans)
     # TODO: gather reminders
     # TODO: gather alerts
     # birth, bmi_anc1, childhealth, childnutrition, edd_anc2_date, edd_anc3_date, edd_anc4_date, edd_date, edd_pnc1_date, edd_pnc2_date, edd_pnc3_date
-    return self.__gather_fields(ans)
+    return ('%s_table' % (self.db_prepend,), cls, self.__gather_fields(ans))
 
   def convert(self):
-    dat = self.__as_hash()
-    thr = ThouReport.store(dat, 'testing_report_transfers')
+    tbn, cls, dat = self.__as_hash()
+    thr           = ThouReport.store(cls, 'report_logs')
+    dat['log_id'] = thr
+    ThouReport.store(dat, tbn)
     return thr
 
   # TODO: either fetch the message from the DB, or re-construct it. How silly of RapidSMS to not relate the report and its message!

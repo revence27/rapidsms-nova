@@ -22,6 +22,7 @@ from django.utils.safestring import SafeString
 from dateutil import rrule
 from random import randint
 import xlsxwriter
+import re
 
 #wbk = xlwt.Workbook()
 #sheet.write(0,0,"ReportID")
@@ -423,9 +424,12 @@ def location_name(req):
     return ', '.join(ans)
 
 def cut_date(str):
-    stt = [int(x) for x in str.split('.')]
-    stt.reverse()
-    return date(* stt)
+    stt = [int(x) for x in re.split(r'\D+', str)]
+    try:
+      return date(* stt)
+    except ValueError:
+      stt.reverse()
+      return date(* stt)
 
 
 def default_period(req):
