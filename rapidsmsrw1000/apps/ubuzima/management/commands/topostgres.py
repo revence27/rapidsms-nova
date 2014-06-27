@@ -22,11 +22,15 @@ class Command(BaseCommand):
                     help='Number of reports to transfer.'),
         )
 
-
     def handle(self, *args, **options):
       curz  = postgres.cursor()
       cpt   = int(options.get('number', 5000))
-      reps  = Report.objects.order_by('-date')[0:cpt]
+      seen  = []
+      qry   = ThouReport.query('report_logs', {}, cols = ['indexcol'])
+      for ix in range(qry.count()):
+        seen.append(qry[ix]['indexcol'])
+      print ('Already got %d ...' % (len(seen),))
+      reps  = Report.objects.exclude(id__in = seen).order_by('-date')[0:cpt]
       convr = BasicConverter()
       print ('Starting conversion (%d) ...' % (cpt,))
       cpt   = float(reps.count())

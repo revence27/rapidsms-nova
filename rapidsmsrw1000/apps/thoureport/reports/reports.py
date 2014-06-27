@@ -591,6 +591,9 @@ class OldStyleReport:
 
   def convert(self):
     tbn, cls, dat = self.__as_hash()
+    old           = ThouReport.query('report_logs', {'former_pk = %s':cls['former_pk']})[0]
+    if old:
+      return (old['indexcol'], old['indexcol'], tbn)
     thr           = ThouReport.store('report_logs', cls)
     dat['log_id'] = thr
     suc           = ThouReport.store(tbn, dat)
