@@ -8,8 +8,25 @@ from rapidsmsrw1000.settings import *
 from .models import *
 
 REPORT_SET = {
+  'PRE':  PregReport,
+  'REF':  RefReport,
+  'ANC':  ANCReport,
+  'DEP':  DepReport,
+  'RISK': RiskReport,
   'RED':  RedReport,
-  'REV':  RevenceReport,
+  'BIR':  BirReport,
+  'CHI':  ChildReport,
+  'DTH':  DeathReport,
+  'RES':  ResultReport,
+  'RAR':  RedResultReport,
+  'NBC':  NBCReport,
+  'CCM':  CCMReport,
+  'CMR':  CMRReport,
+  'CBN':  CBNReport,
+  'PNC':  PNCReport,
+
+  'TIM':  TimothyReport,
+  'REV': RevenceReport,
 }
 
 TRANSFORMATIONS = {
