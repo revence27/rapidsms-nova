@@ -1,6 +1,7 @@
 # encoding: utf-8
 # vim: expandtab ts=2
 
+#This is a comment. Push it, push it. Harder now!
 from abc import ABCMeta, abstractmethod
 import re
 from ..messages.parser import *
