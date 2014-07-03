@@ -11,6 +11,8 @@ import psycopg2
 import re
 from sys import stderr
 
+REPORTS_TABLE = __DEFAULTS['REPORTS']
+
 class ThouRow:
   def __init__(self, query, value = None, **kwargs):
     self.query  = query
@@ -26,6 +28,10 @@ class ThouRow:
 
   def __getitem__(self, k):
     try:
+      if not self.query.cols:
+        self.query.names  = self.query.__names()
+        self.query.cols   = self.query.__set_names()
+        return self[k]
       return self.value[self.query.cols[k]]
     except KeyError:
       hk  = self.hooks[k]
@@ -38,14 +44,16 @@ class ThouRow:
 
 class ThouQuery:
   def __init__(self, djconds, tn, **kwargs):
-    self.djconds = djconds
-    self.tablenm = kwargs.get('table', tn)
-    self.kwargs  = kwargs
-    self.cursor  = None
-    self.names   = kwargs.get('cols', [])
-    self.annots  = kwargs.get('annotate', {})
-    self.flat    = False
-    self.sort    = None
+    self.djconds  = djconds
+    self.tablenm  = kwargs.get('table', tn)
+    self.kwargs   = kwargs
+    self.cursor   = None
+    self.names    = kwargs.get('cols', [])
+    self.annots   = kwargs.get('annotate', {})
+    self.optim    = kwargs.get('optimise', {})
+    self.precount = kwargs.get('precount')
+    self.flat     = False
+    self.sort     = None
 
   def where(self, k, v):
     self.djconds[k] = v
@@ -103,8 +111,7 @@ class ThouQuery:
     return max(self.cursor.rowcount, 0) < 1
 
   def annotate(self, **kwargs):
-    # TODO.
-    return self
+    return self.specialise(annotate = kwargs)
 
   def order_by(self, _, cue = ''):
     if len(cue) < 1: return self
@@ -119,13 +126,36 @@ class ThouQuery:
   def count(self):
     if not self.cursor:
       self.execute()
-    return max(0, self.cursor.rowcount)
+    if not (self.precount is None):
+      return self.precount
+    minim = 0
+    hdl   = self.optim.get('counter')
+    if self.cursor.rowcount < minim and hdl:
+      self.precount  = hdl(self)
+      return self.count()
+    return max(minim, self.cursor.rowcount)
 
-  def execute(self):
+  def __names(self, curz, dft):
+   return [x.name for x in curz.description] if curz.description else dft
+
+  def execute(self, retries = True):
     if not self.cursor:
-      self.names, self.cursor = self.__execute()
+      try:
+        self.names, self.cursor = self.__execute()
+      except psycopg2.ProgrammingError, e:
+        if retries:
+          postgres.commit()
+          self.migrate(self.kwargs.get('migrations', []), e)
+          return self.execute(False)
+        raise e
       self.cols               = self.__set_names()
     return self
+
+  def migrate(self, migs, _):
+    curz = postgres.cursor()
+    for mig in migs:
+      ThouReport.ensure_column(curz, self.tablenm, *mig)
+    curz.close()
 
   def fetchall(self):
     if not self.cursor:
@@ -151,7 +181,8 @@ class ThouQuery:
         self.cursor.scroll(them, mode = 'absolute')
       except Exception:
         return None
-      return ThouRow(self, self.cursor.fetchone(), **self.kwargs)
+      seul  = self.cursor.fetchone()
+      return ThouRow(self, seul, **self.kwargs)
     dem = []
     try:
       self.cursor.scroll(them.start, mode = 'absolute')
@@ -173,7 +204,7 @@ class ThouQuery:
   def __set_names(self):
     self.cols   = {}
     notI        = 0
-    for x in self.names:
+    for x in (self.names or {}):
       self.cols[x]  = notI
       notI          = notI + 1
     return self.cols
@@ -181,10 +212,15 @@ class ThouQuery:
   # TODO: Work with views to ensure closing of cursors.
   def __execute(self):
     qry   = self.query
-    # stderr.write('%s\r\n' % (qry,))
-    curz        = postgres.cursor()
+    curz  = None
+    optim = self.optim
+    if optim:
+      curn  = optim['name']
+      curz  = postgres.cursor(curn)
+    else:
+      curz  = postgres.cursor()
     curz.execute(qry)
-    cols  = [x.name for x in curz.description]
+    cols  = self.__names(curz, optim.get('cols', self.kwargs.get('cols')))
     return (cols, curz)
 
   def close(self):
@@ -209,9 +245,6 @@ class ThouQuery:
   def __unicode__(self):
     return self.query
 
-# TODO:
-# Load the report(s).
-# Find a report.
 class ThouReport:
   'The base class for all "RapidSMS 1000 Days" reports.'
   created   = False
@@ -278,18 +311,16 @@ It is not idempotent at this level; further constraints should be added by inher
     except KeyError:
       raise Exception, ('Specify adapter for %s (%s)' % (ok, conds[ok]))
 
-  # TODO: map old filters to new DB structure.
   @classmethod
   def assemble_conditions(self, conds):
-    # TODO: review condition-handling.
     curz  = postgres.cursor()
     ans   = []
+    neg   = conds.pop('Invert Query', False)
     for cond in conds:
-      # nk, nv  = self.alter_condition(conds, cond)
       rez = conds[cond]
       ans.append(curz.mogrify(cond, rez if type(rez) == type((1, 2)) else (rez,)))
     curz.close()
-    return (' WHERE ' if conds else '') + ' AND '.join(ans)
+    return (' WHERE ' if conds else '') + (('NOT (%s)' if neg else '%s') % (' AND '.join(ans)))
 
   @classmethod
   def assemble_sort(self, dem):
@@ -319,7 +350,6 @@ It is not idempotent at this level; further constraints should be added by inher
     tbl = self.ensure_table(tn)
     qry = 'SELECT %s FROM %s%s' % (', '.join(kwargs.get('cols', self.active_columns(kwargs.get('qid')) or ['*'])), tbl, self.assemble_conditions(djconds))
     curz  = postgres.cursor()
-    # TODO: remove this.
     stderr.write('%s\r\n' % (qry,))
     curz.execute(qry)
     cols  = [x.name for x in curz.description]
@@ -330,7 +360,6 @@ It is not idempotent at this level; further constraints should be added by inher
 
   @classmethod
   def query(self, tn, djconds, **kwargs):
-    if not tn: return self.query(kwargs.get('table', __DEFAULTS['REPORTS']), djconds, **kwargs)
     tbl = self.ensure_table(tn)
     return ThouQuery(djconds, tn, **kwargs)
 
@@ -338,13 +367,13 @@ It is not idempotent at this level; further constraints should be added by inher
   def find_matching_type(self, val, ctyp, cn = None):
     try:
       return {
-        str:       ctyp,
-        unicode:   ctyp,
-        int:       'INTEGER /*NOT NULL*/',
-        long:      'INTEGER /*NOT NULL*/',
-        float:     'FLOAT /*NOT NULL*/',
-        bool:      'BOOLEAN /*NOT NULL*/',
-        Decimal:   'FLOAT /*NOT NULL*/',
+        str:                ctyp,
+        unicode:            ctyp,
+        int:                'INTEGER /*NOT NULL*/',
+        long:               'INTEGER /*NOT NULL*/',
+        float:              'FLOAT /*NOT NULL*/',
+        bool:               'BOOLEAN /*NOT NULL*/',
+        Decimal:            'FLOAT /*NOT NULL*/',
         datetime.datetime:  'TIMESTAMP',
         datetime.date:      'TIMESTAMP WITHOUT TIME ZONE',
         datetime.time:      'TIMESTAMP'
@@ -369,27 +398,23 @@ It is not idempotent at this level; further constraints should be added by inher
       return self.decide_type((dval, ctyp), cn)
     return ctyp, dval
 
-  seen_columns  = {}
   @classmethod
   def store(self, tn, dat):
     if type(dat) == type([]):
       return [self.store(tn, cv) for cv in dat]
     if not dat: return None
-    cols  = dat.keys()
-    vals  = []
-    curz  = postgres.cursor()
-    tbl   = self.ensure_table(tn)
-    ans   = dat.get('indexcol')
+    vals    = []
+    curz    = postgres.cursor()
+    tbl     = self.ensure_table(tn)
+    ans     = dat.pop('indexcol', None)
+    multid  = False
+    if type(ans) in [type(x) for x in [set(), []]]:
+      multid  = True
+    cols    = dat.keys()
     for col in cols:
       dval  = dat[col]
-      sncs  = self.seen_columns.get(tn, set())
-      if not col in sncs:
-        curz.execute('SELECT TRUE FROM information_schema.columns WHERE table_name = %s AND column_name = %s', (tbl, col))
-        if not curz.fetchone():
-          ctyp, dval  = self.decide_type(dval, col)
-          curz.execute('ALTER TABLE %s ADD COLUMN %s %s;' % (tbl, col, ctyp))
-          sncs.add(col)
-      self.seen_columns[tn] = sncs
+      col   = self.ensure_column(curz, tbl, col, dval)
+      postgres.commit()
       elval = curz.mogrify('%s', (dval, ))
       if ans:
         dat[col]  = elval
@@ -399,22 +424,43 @@ It is not idempotent at this level; further constraints should be added by inher
       curz.execute('INSERT INTO %s (%s) VALUES (%s) RETURNING indexcol;' % (tbl, ', '.join(cols), ', '.join(vals)))
       ans = curz.fetchone()[0]
     else:
-      curz.execute('UPDATE %s SET %s WHERE indexcol = %d;' % (tbl, ', '.join(['%s = %s' % (k, dat[k]) for k in dat]), ans))
+      bzt = ('UPDATE %s SET %s WHERE indexcol %s %s;' % (tbl, ', '.join(['%s = %s' % (k, dat[k]) for k in dat]), 'IN' if multid else '=', ('(%s)' % ', '.join(ans)) if multid else curz.mogrify('%s', (ans, ))))
+      curz.execute(bzt)
     postgres.commit()
     curz.close()
     return ans
 
+  seen_columns  = {}
+  @classmethod
+  def ensure_column(self, curz, tbl, col, dval, opts = {}):
+    sncs  = self.seen_columns.get(tbl, set())
+    if not col in sncs:
+      curz.execute('SELECT TRUE FROM information_schema.columns WHERE table_name = %s AND column_name = %s', (tbl, col))
+      if not curz.fetchone():
+        word    = None
+        # TODO: Scheduling the migrations.
+        prepper = opts.get('prepper')
+        if prepper:
+          word  = prepper(tbl, col, dval)
+        else:
+          ctyp, dval  = self.decide_type(dval, col)
+          word        = 'ALTER TABLE %s ADD COLUMN %s %s;' % (tbl, col, ctyp)
+        curz.execute(word)
+        sncs.add(col)
+    self.seen_columns[tbl] = sncs
+    return col
+
   seen_tables = set()
   @classmethod
-  def ensure_table(self, tbl = None):
+  def ensure_table(self, tbl):
     try:
-      tbl   = (tbl or __DEFAULTS['REPORTS'])
       if tbl in self.seen_tables: return tbl
       curz  = postgres.cursor()
       curz.execute('SELECT TRUE FROM information_schema.tables WHERE table_name = %s', (tbl,))
       if not curz.fetchone():
         curz.execute('CREATE TABLE %s (indexcol SERIAL NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW());' % (tbl,))
         curz.close()
+      postgres.commit()
       self.seen_tables.add(tbl)
       return tbl
     except Exception, e:
@@ -466,12 +512,13 @@ NAME_MATCHING = {
       }
 
 class BasicConverter:
-  def __init__(self):
-    self.types  = ReportType.objects.all()
-    self.thash  = self.__type_hash()
+  def __init__(self, dft = {}):
+    self.types    = ReportType.objects.all()
+    self.defaults = dft
+    self.thash    = self.__type_hash()
 
   def __type_hash(self):
-    ans = {}
+    ans = self.defaults
     for t in self.types:
       ans[t.pk] = NAME_MATCHING[t.name]
     return ans
@@ -544,10 +591,10 @@ class OldStyleReport:
     fds = Field.objects.filter(report = self.autos)
     prp = self.db_prepend
     for fd in fds:
-      ftype     = fd.type
-      cle       = ftype.key
-      typedata  = self[ftype.pk]
-      typedata[self.__val_name(fd)] = fd.value if ftype.has_value else (fd.value and True or False)
+      ftype                         = fd.type
+      cle                           = ftype.key
+      typedata                      = self[ftype.pk]
+      typedata[self.__val_name(fd)] = (fd.value or 0.0) if ftype.has_value else (fd.value and True or False)
       for td in typedata:
         # nom       = '%s_%s_%s' % (prp, cle, td)
         nom       = '%s_%s' % (cle, td)
@@ -557,7 +604,7 @@ class OldStyleReport:
   def __val_name(self, fd):
     mid = 'bool'
     if fd.type.has_value:
-      mid = ThouReport.find_matching_type(fd.value, mid, None)
+      mid = ThouReport.find_matching_type(fd.value or 0.0, mid, None)
     return re.split(r'\s+', mid, 2)[0].lower()
 
   def __as_hash(self):
@@ -584,21 +631,14 @@ class OldStyleReport:
     if him.date:
       ans['lmp']              = him.date
     cls                       = copy.copy(ans)
-    # TODO: gather reminders
-    # TODO: gather alerts
-    # birth, bmi_anc1, childhealth, childnutrition, edd_anc2_date, edd_anc3_date, edd_anc4_date, edd_date, edd_pnc1_date, edd_pnc2_date, edd_pnc3_date
     return ('%s_table' % (self.db_prepend,), cls, self.__gather_fields(ans))
 
   def convert(self):
     tbn, cls, dat = self.__as_hash()
-    old           = ThouReport.query('report_logs', {'former_pk = %s':cls['former_pk']})[0]
-    if old:
-      return (old['indexcol'], old['indexcol'], tbn)
-    thr           = ThouReport.store('report_logs', cls)
+    thr           = ThouReport.store(REPORTS_TABLE, cls)
     dat['log_id'] = thr
     suc           = ThouReport.store(tbn, dat)
     return (suc, thr, tbn)
 
-  # TODO: either fetch the message from the DB, or re-construct it. How silly of RapidSMS to not relate the report and its message!
   def __str__(self):
-    return '%s TESTER' % (self.conver[self.autos.type.pk],)
+    return '%s ...' % (self.conver[self.autos.type.pk],)

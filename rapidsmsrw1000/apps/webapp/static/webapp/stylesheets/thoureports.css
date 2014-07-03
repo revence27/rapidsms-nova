@@ -1,2 +1,4 @@
 body #disptable input[type="date"] {
   width: 100%; }
+body #tdmain {
+  font-family: "Quattrocento Sans"; }

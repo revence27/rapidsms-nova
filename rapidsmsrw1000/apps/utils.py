@@ -24,6 +24,8 @@ from random import randint
 import xlsxwriter
 import re
 
+REPORTS_TABLE = __DEFAULTS['REPORTS']
+
 #wbk = xlwt.Workbook()
 #sheet.write(0,0,"ReportID")
 #sheet.write(0,1,"Date")
@@ -294,7 +296,7 @@ def new_matching_reports(req, diced, newcs, alllocs = False, **kwargs):
     elif level['level'] == 'Province':  newcs['province_pk = %s'] = level['uloc'].province.id
     elif level['level'] == 'District':  newcs['district_pk = %s'] = level['uloc'].district.id
     elif level['level'] == 'HealthCentre':  rez['health_center_pk = %s'] = level['uloc'].health_centre.id
-    ans = ThouReport.query('testing_report_transfers', newcs, **kwargs)
+    ans = ThouReport.query(REPORTS_TABLE, newcs, **kwargs)
     if rez:
       ans = ans.filter(**rez)
     return ans
@@ -345,7 +347,7 @@ def matching_reports(req, diced, newcs = {}, alllocs = False, **kwargs):
 # Call query-optimising functions.
 def fetch_new_reports(self, args):
   # __DEFAULTS['REPORTS']
-  return ThouReport.query('testing_report_transfers', args)
+  return ThouReport.query(REPORTS_TABLE, args)
 
 def new_style_reports(req, diced):
     rez = {}

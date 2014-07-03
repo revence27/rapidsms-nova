@@ -68,6 +68,9 @@ def get_user_location(req):
 
 
 @permission_required('ubuzima.can_view')
+def optimised_counter(req):
+  return (req[0] or {'total':0})['total']
+
 @require_http_methods(["GET"])
 def index(req,**flts):
     req.base_template = "webapp/layout.html"
@@ -76,7 +79,13 @@ def index(req,**flts):
              'location':default_location(req),
              'province':default_province(req),
              'district':default_district(req)}
-    reports=matching_reports(req,filters)
+    reports = matching_reports(req, filters,
+      annotate  = {'total':'COUNT(*)'},
+      optimise  = {
+        'name':'ubuzima_index_page',
+        # 'counter': optimised_counter
+      }
+    )
 
     req.session['track']=[
        {'label':'Pregnancy',          'id':'allpreg',
@@ -652,7 +661,7 @@ def fetch_edd(start, end):
       '''(lmp + '9 MONTHS' :: INTERVAL) <= %s''': end,
     }
     # edd_date__gte =start, edd_date__lte = end  # .select_related('patient')  # TODO. Why that extra?
-    return ThouReport.query('pre_table', sel)
+    raise Exception, 'No!'
 
 class ReactiveLocation:
   def __init__(self, req, loc, prd):
@@ -679,8 +688,9 @@ class ReactiveLocation:
 
   def registered_pregnancies(self):
     k, v = self.guides()
-    # return ThouReport.query('pre_table', {('''report_type = 'PRE' AND ''' + k): v})
-    return ThouReport.query('pre_table', {k: v})
+    return ThouReport.query('pre_table', {k: v},
+      optimise = {'name':'ubuzima_front_page'}
+    )
 
   def as_high_risk(self, qry):
     return qry.specialise({
@@ -763,8 +773,29 @@ class ReactiveHCs(ReactiveLocations):
     return ReactiveHC
 
 def our_data_dump(obj):
-  return {}
+  ans = []
+  for area in obj.child_areas():
+    lk  = {'link':area.own_link(),
+           'name':area['name'],
+          'pregs':area.registered_pregnancies().count(),
+'high_risk_pregs':area.high_risk_pregnancies().count(),
+'expected_hrisk_pregs':area.expected_high_risk().count(),
+       'expected':area.expected_deliveries().count(),
+ 'deliveries_2weeks':area.deliver_in_2_weeks().count(),
+ 'high_risk_deliveries_2weeks':area.deliver_soon_high_risk().count(),
+          }
+    ans.append(lk)
+  return ans
   raise Exception, str(obj)
+
+@permission_required('ubuzima.can_view')
+def json_tester(req):
+    resp  = pull_req_with_filters(req,
+      province = ReactiveLocations,
+      district = ReactiveDistricts,
+      location = ReactiveHCs
+    )
+    return render_to_response('novatemplates/charts.html', resp, context_instance = RequestContext(req))
 
 @permission_required('ubuzima.can_view')
 def json_api(req):

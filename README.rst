@@ -16,18 +16,14 @@ The new RapidSMS, for Rwanda.
 
 TODO:
 ----
-- ORM backward-compatible with Django ORM.
 - Speed test and proof.
-- Lazy querying.
-- Total data transfer.
-- All pages load (1).
+- All pages load.
 - Interject our message-handler.
-- Online technical documentation and tutorial (HTML and PDF).
 - Data-generation.
 - Dynamic query optimisation (narrowing the SELECT based on automatic analysis of named queries).
+- Auto-created report-type-specific views over reports table.
 - Ensure that ThouTable implements full relational algebra (5 primitives).
 - Ensure that ThouTable implements full monoid algebra.
-- Auto-created report-type-specific views over reports table.
 - Ensure that ThouTable implements co-extensive functor algebra.
 - Ensure that ThouTable implements traditional functional morphisms.
 - grep -r TODO .

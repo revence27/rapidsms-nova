@@ -8,6 +8,7 @@ import rapidsmsrw1000.apps.ubuzima.views as views
 
 urlpatterns = patterns('',
     url(r'^$', views.index),
+    url(r'^charts$', views.json_tester),
     url(r'^jsonapi$', views.json_api),
     url(r'^reporter/(?P<pk>\d+)$', views.by_reporter),
     url(r'^patient/(?P<pk>\d+)$', views.by_patient),
