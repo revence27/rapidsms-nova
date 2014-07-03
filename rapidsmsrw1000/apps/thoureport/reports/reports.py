@@ -29,8 +29,7 @@ class ThouRow:
   def __getitem__(self, k):
     try:
       if not self.query.cols:
-        self.query.names  = self.query.__names()
-        self.query.cols   = self.query.__set_names()
+        self.query.load_description()
         return self[k]
       return self.value[self.query.cols[k]]
     except KeyError:
@@ -58,6 +57,9 @@ class ThouQuery:
   def where(self, k, v):
     self.djconds[k] = v
     return self
+
+  def put_names(self, dat):
+    self.names  = dat
 
   def set_names(self, dat):
     self.names  = dat.keys()
@@ -123,15 +125,28 @@ class ThouQuery:
     ans.sort  = (etc, asc)
     return ans
 
+  def hdl_(self, qry):
+    nq  = qry.specialise({})
+    nq.names  = ['COUNT(*) AS tot']
+    nq.kwargs.pop('optims', None)
+    try:
+      return nq[0].value[0]
+    except Exception, e:
+      return 0
+
   def count(self):
     if not self.cursor:
       self.execute()
     if not (self.precount is None):
       return self.precount
     minim = 0
-    hdl   = self.optim.get('counter')
-    if self.cursor.rowcount < minim and hdl:
-      self.precount  = hdl(self)
+    if self.optim.get('name'):
+      hdl = self.optim.get('counter', self.hdl_)
+      if self.cursor.rowcount < minim:
+        self.precount  = hdl(self)
+        return self.count()
+    else:
+      self.precount = self.hdl_(self)
       return self.count()
     return max(minim, self.cursor.rowcount)
 
@@ -200,6 +215,25 @@ class ThouQuery:
       return them.stop[self.names[them.start]]
     except ValueError:
       raise NameError, ('No column called "%s" (has: %s).' % (colnm, ', '.join(cols)))
+
+  def load_description(self):
+    ans = {}
+    nms = []
+    pos = 0
+    if not self.cursor:
+      self.__execute()
+      return self.load_description()
+    if self.cursor.description:
+      for dsc in self.cursor.description:
+        nms.append(dsc.name)
+        ans[dsc.name] = pos
+        pos           = pos + 1
+    else:
+      self.count()
+      return self.load_description()
+    self.names  = nms
+    self.cols   = ans
+    return (nms, ans)
 
   def __set_names(self):
     self.cols   = {}

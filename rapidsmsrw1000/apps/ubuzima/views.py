@@ -81,6 +81,7 @@ def index(req,**flts):
              'district':default_district(req)}
     reports = matching_reports(req, filters,
       annotate  = {'total':'COUNT(*)'},
+      # precount  = 2,
       optimise  = {
         'name':'ubuzima_index_page',
         # 'counter': optimised_counter
