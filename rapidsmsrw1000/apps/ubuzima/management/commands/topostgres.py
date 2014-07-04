@@ -59,7 +59,9 @@ class Command(BaseCommand):
       )
       upds  = set()
       for ix in range(qry.count()):
-        ixnum = qry[ix]['former_pk']
+        row   = qry[ix]
+        if not row: break
+        ixnum = row['former_pk']
         act   = 'Loaded'
         if deler:
           try:
@@ -67,7 +69,7 @@ class Command(BaseCommand):
             it.delete()
           except Exception, e:
             pass
-          upds.add(str(qry[ix]['indexcol']))
+          upds.add(str(row['indexcol']))
         act   = 'Deleted'
         sys.stdout.write('%s %d: %d ...\r' % (act, ix + 1, ixnum))
         sys.stdout.flush()
