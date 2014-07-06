@@ -796,6 +796,19 @@ def json_tester(req):
       district = ReactiveDistricts,
       location = ReactiveHCs
     )
+    nat     = ThouReport.query('pre_table',
+      {},
+      cols      = ['COUNT(*) AS allpregs']
+    )
+    toi     = nat.specialise({'to_bool IS NOT NULL':''})
+    hnd     = nat.specialise({'hw_bool IS NOT NULL':''})
+    total   = nat[0]['allpregs']
+    toils   = toi[0]['allpregs']
+    toilpc  = (float(toils) / float(total)) * 100.0
+    hands   = hnd[0]['allpregs']
+    handpc  = (float(hands) / float(total)) * 100.0
+    # TODO: do optimisations specialise?
+    resp['display'] = {'total':total, 'toilets': toils, 'toilpc':round(toilpc, 2), 'handw':hands, 'handpc':round(handpc, 2)}
     return render_to_response('novatemplates/charts.html', resp, context_instance = RequestContext(req))
 
 @permission_required('ubuzima.can_view')

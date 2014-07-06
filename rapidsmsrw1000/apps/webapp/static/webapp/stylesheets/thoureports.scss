@@ -1,15 +1,1571 @@
-body
-{
-  #disptable
-  {
-    input[type="date"]
-    {
-      width: 100%;
-    }
-  }
+ body {
+	margin: 0;
+	padding: 0;
+ }
 
-  #tdmain
-  {
-    font-family: "Quattrocento Sans";
-  }
+ a{
+	color: #000;
+ 	text-decoration:none;
+ 	cursor: pointer;
+ }
+ a:hover{
+	color:#fff;
+ }
+ #background 
+{ 
+	 left: 0px; 
+	 top: 0px; 
+	 position: relative; 
+	 margin-left: auto; 
+	 margin-right: auto; 
+	 width: 1000px;
+	 height: 2188px; 
+	 overflow: hidden;
+	 z-index:0;
+	} 
+
+ #Background 
+{ 
+	background: url('/static/webapp/images/reports/Background.png') repeat-x;
+	 left: 0px; 
+	 top: 0px; 
+	 position: absolute; 
+	 width: 100%;
+	 height: 2188px;
+	 z-index:1;
+} 
+
+ #Layer7copy 
+{ 
+	 left: 65px; 
+	 top: 319px; 
+	 position: absolute; 
+	 width: 857px;
+	 height: 516px;
+	 z-index:2;
+} 
+
+ #Layer7copy_0 
+{ 
+	 left: 63px; 
+	 top: 1067px; 
+	 position: absolute; 
+	 width: 857px;
+	 height: 272px;
+	 z-index:3;
+} 
+
+ #Layer7copy_1 
+{ 
+	 left: 65px; 
+	 top: 1622px; 
+	 position: absolute; 
+	 width: 857px;
+	 height: 194px;
+	 z-index:4;
+} 
+
+ #Layer1copy 
+{ 
+	background: url('/static/webapp/images/reports/Layer1copy.png') repeat-x;
+	 left: 0px; 
+	 top: 251px; 
+	 position: absolute; 
+	 width: 100%;
+	 height: 44px;
+	 z-index:5;
+} 
+
+ #Layer1 
+{ 
+	 left: 217px; 
+	 top: 252px; 
+	 position: absolute; 
+	 width: 380px;
+	 height: 42px;
+	 z-index:6;
+} 
+
+ #PregnanciesConfirmed 
+{ 
+	 left: 278px; 
+	 top: 255px; 
+	 position: absolute; 
+	 width: 389px;
+	 height: 18px;
+	 z-index:7;
+	font-family: 'Open Sans', sans-serif;
+	font-weight:lighter;
+	font-size: 20px;
+} 
+
+ #ExpectedDeliveries 
+{ 
+	 left: 687px; 
+	 top: 255px; 
+	 position: absolute; 
+	 width: 359px;
+	 height: 18px;
+	 z-index:8;
+	font-family: 'Open Sans', sans-serif;
+	font-weight:lighter;
+	font-size: 20px;
+} 
+
+ #pregnancies 
+{ 
+	 left: 262px; 
+	 top: 330px; 
+	 position: absolute; 
+	 width: 83px;
+	 height: 163px;
+	 z-index:9;
+} 
+
+ #Pregnanciesconfirmed 
+{ 
+	 left: 560px; 
+	 top: 400px; 
+	 position: absolute; 
+	 width: 320px;
+	 height: 53px;
+	 z-index:10;
+	font-family: 'Open Sans', sans-serif;
+	
+	font-size: 18px;
+} 
+
+ #Pregnanciesconfirmed_0 
+{ 
+	 left: 376px; 
+	 top: 381px; 
+	 position: absolute; 
+	 width: 118px;
+	 height: 44px;
+	 z-index:11;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 18px;
+	color: #f79242;
+} 
+
+ #layer_150 
+{ 
+	 left: 393px; 
+	 top: 437px; 
+	 position: absolute; 
+	 width: 62px;
+	 height: 28px;
+	 z-index:12;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 30px;
+	font-weight:bold;
+} 
+
+ #VectorSmartObject 
+{ 
+	 left: 112px; 
+	 top: 897px; 
+	 position: absolute; 
+	 width: 140px;
+	 height: 140px;
+	 z-index:13;
+} 
+
+ #risks69 
+{ 
+	 left: 843px; 
+	 top: 1020px; 
+	 position: absolute; 
+	 width: 47px;
+	 height: 18px;
+	 z-index:14;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 20px;
+} 
+
+ #risks78 
+{ 
+	 left: 790px; 
+	 top: 1013px; 
+	 position: absolute; 
+	 width: 40px;
+	 height: 27px;
+	 z-index:15;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 35px;
+	
+	
+} 
+
+ #numberofmotherpr 
+{ 
+	 left: 291px; 
+	 top: 1031px; 
+	 position: absolute; 
+	 width: 494px;
+	 height: 19px;
+	 z-index:16;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 19px;
+	color: #b30000;
+	
+	
+} 
+
+ #risks66 
+{ 
+	 left: 700px; 
+	 top: 999px; 
+	 position: absolute; 
+	 width: 46px;
+	 height: 18px;
+	 z-index:17;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 20px;
+} 
+
+ #risks65 
+{ 
+	 left: 648px; 
+	 top: 990px; 
+	 position: absolute; 
+	 width: 39px;
+	 height: 28px;
+	 z-index:18;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 35px;
+} 
+
+ #numberofmotherswell 
+{ 
+	 left: 291px; 
+	 top: 1002px; 
+	 position: absolute; 
+	 width: 348px;
+	 height: 20px;
+	 z-index:19;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 19px;
+	color: #b30000;
+} 
+
+ #Layer2 
+{ 
+	 left: 487px; 
+	 top: 861px; 
+	 position: absolute; 
+	 width: 128px;
+	 height: 129px;
+	 z-index:20;
+} 
+
+ #Layer1copy_0 
+{ 
+	 left: 291px; 
+	 top: 865px; 
+	 position: absolute; 
+	 width: 129px;
+	 height: 129px;
+	 z-index:21;
+} 
+
+ #ReportedRisks 
+{ 
+	 left: 301px; 
+	 top: 902px; 
+	 position: absolute; 
+	 width: 107px;
+	 height: 17px;
+	 z-index:22;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 15px;
+	color: #fff;
+} 
+
+ #layer_129 
+{ 
+	 left: 322px; 
+	 top: 915px; 
+	 position: absolute; 
+	 width: 60px;
+	 height: 27px;
+	 z-index:23;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 35px;
+	
+} 
+
+ #layer_89 
+{ 
+	 left: 343px; 
+	 top: 956px; 
+	 position: absolute; 
+	 width: 36px;
+	 height: 14px;
+	 z-index:24;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 20px;
+	
+} 
+
+ #ResultsReported 
+{ 
+	 left: 495px; 
+	 top: 903px; 
+	 position: absolute; 
+	 width: 115px;
+	 height: 16px;
+	 z-index:25;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 14px;
+	color: #fff;
+} 
+
+ #layer_89_0 
+{ 
+	 left: 528px; 
+	 top: 915px; 
+	 position: absolute; 
+	 width: 39px;
+	 height: 27px;
+	 z-index:26;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 35px;
+} 
+
+ #layer_75 
+{ 
+	 left: 532px; 
+	 top: 958px; 
+	 position: absolute; 
+	 width: 36px;
+	 height: 14px;
+	 z-index:27;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 20px;
+} 
+
+ #lmpgraph 
+{ 
+	 left: 555px; 
+	 top: 611px; 
+	 position: absolute; 
+	 width: 365px;
+	 height: 220px;
+	 z-index:28;
+} 
+
+ #monthlyavggrph 
+{ 
+	 left: 149px; 
+	 top: 590px; 
+	 position: absolute; 
+	 width: 362px;
+	 height: 241px;
+	 z-index:29;
+} 
+
+ #LMPinrelativetopregn 
+{ 
+	 left: 579px; 
+	 top: 575px; 
+	 position: absolute; 
+	 width: 326px;
+	 height: 17px;
+	 z-index:30;
+} 
+
+ #MonthlyPregnancyAvg9 
+{ 
+	 left: 228px; 
+	 top: 568px; 
+	 position: absolute; 
+	 width: 222px;
+	 height: 24px;
+	 z-index:31;
+} 
+
+ #Layer3 
+{ 
+	 left: 395px; 
+	 top: 1086px; 
+	 position: absolute; 
+	 width: 67px;
+	 height: 77px;
+	 z-index:32;
+} 
+
+ #Layer1copy_1 
+{ 
+	 left: 468px; 
+	 top: 1087px; 
+	 position: absolute; 
+	 width: 68px;
+	 height: 78px;
+	 z-index:33;
+} 
+
+ #Layer1copy2 
+{ 
+	 left: 541px; 
+	 top: 1089px; 
+	 position: absolute; 
+	 width: 68px;
+	 height: 77px;
+	 z-index:34;
+} 
+
+ #Layer1copy6 
+{ 
+	 left: 613px; 
+	 top: 1089px; 
+	 position: absolute; 
+	 width: 67px;
+	 height: 77px;
+	 z-index:35;
+} 
+
+ #Layer1copy7 
+{ 
+	 left: 650px; 
+	 top: 1152px; 
+	 position: absolute; 
+	 width: 67px;
+	 height: 77px;
+	 z-index:36;
+} 
+
+ #Layer1copy8 
+{ 
+	 left: 686px; 
+	 top: 1089px; 
+	 position: absolute; 
+	 width: 68px;
+	 height: 77px;
+	 z-index:37;
+} 
+
+ #Layer1copy3 
+{ 
+	 left: 431px; 
+	 top: 1148px; 
+	 position: absolute; 
+	 width: 68px;
+	 height: 78px;
+	 z-index:38;
+} 
+
+ #Layer1copy4 
+{ 
+	 left: 504px; 
+	 top: 1151px; 
+	 position: absolute; 
+	 width: 68px;
+	 height: 78px;
+	 z-index:39;
+} 
+
+ #Layer1copy5 
+{ 
+	 left: 577px; 
+	 top: 1153px; 
+	 position: absolute; 
+	 width: 67px;
+	 height: 78px;
+	 z-index:40;
+} 
+
+ #Layer1copy9 
+{ 
+	 left: 720px; 
+	 top: 1154px; 
+	 position: absolute; 
+	 width: 68px;
+	 height: 77px;
+	 z-index:41;
+} 
+
+ #Layer1copy10 
+{ 
+	 left: 757px; 
+	 top: 1091px; 
+	 position: absolute; 
+	 width: 67px;
+	 height: 77px;
+	 z-index:42;
+} 
+
+ #Layer1copy11 
+{ 
+	 left: 829px; 
+	 top: 1094px; 
+	 position: absolute; 
+	 width: 67px;
+	 height: 77px;
+	 z-index:43;
+} 
+
+ #Layer1copy12 
+{ 
+	 left: 792px; 
+	 top: 1156px; 
+	 position: absolute; 
+	 width: 67px;
+	 height: 77px;
+	 z-index:44;
+} 
+
+ #Layer1copy13 
+{ 
+	 left: 360px; 
+	 top: 1086px; 
+	 position: absolute; 
+	 width: 284px;
+	 height: 144px;
+	 z-index:45;
+} 
+
+ #COUGHING24 
+{ 
+	 left: 396px; 
+	 top: 1107px; 
+	 position: absolute; 
+	 width: 63px;
+	 height: 45px;
+	 z-index:46;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
 }
+#COUGHING24 > strong
+{
+	margin-left: 20px;
+	font-size: 20px
+}
+
+ #DIARRHEA33 
+{ 
+	 left: 469px; 
+	 top: 1107px; 
+	 position: absolute; 
+	 width: 59px;
+	 height: 49px;
+	 z-index:47;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 11px;
+} 
+#DIARRHEA33 > strong
+{
+	margin-left: 20px;
+	font-size: 20px
+}
+ #FEVER12 
+{ 
+	 left: 555px; 
+	 top: 1106px; 
+	 position: absolute; 
+	 width: 36px;
+	 height: 49px;
+	 z-index:48;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
+}
+#FEVER12 > strong
+{
+	margin-left: 10px;
+	font-size: 20px
+}	
+
+ #MALARIA09 
+{ 
+	 left: 437px; 
+	 top: 1168px; 
+	 position: absolute; 
+	 width: 53px;
+	 height: 49px;
+	 z-index:49;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
+}
+#MALARIA09 > strong
+{
+	margin-left: 20px;
+	font-size: 20px
+}
+
+ #VOMITING18 
+{ 
+	 left: 507px; 
+	 top: 1171px; 
+	 position: absolute; 
+	 width: 59px;
+	 height: 49px;
+	 z-index:50;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
+}
+#VOMITING18 > strong
+{
+	margin-left: 20px;
+	font-size: 20px
+}
+
+ #STILLBORN21 
+{ 
+	 left: 577px; 
+	 top: 1171px; 
+	 position: absolute; 
+	 width: 65px;
+	 height: 48px;
+	 z-index:51;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
+}
+#STILLBORN21 > strong
+{
+	margin-left: 20px;
+	font-size: 20px
+}
+
+ #EDEMA13 
+{ 
+	 left: 624px; 
+	 top: 1108px; 
+	 position: absolute; 
+	 width: 42px;
+	 height: 49px;
+	 z-index:52;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
+}
+#EDEMA13 > strong
+{
+	margin-left: 10px;
+	font-size: 20px
+}
+
+ #JAUNDICE09 
+{ 
+	 left: 655px; 
+	 top: 1172px; 
+	 position: absolute; 
+	 width: 59px;
+	 height: 48px;
+	 z-index:53;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
+}
+#JAUNDICE09 > strong
+{
+	margin-left: 20px;
+	font-size: 20px
+}
+
+ #PNEUMONIA21 
+{ 
+	 left: 685px; 
+	 top: 1112px; 
+	 position: absolute; 
+	 width: 72px;
+	 height: 48px;
+	 z-index:54;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 10px;
+}
+#PNEUMONIA21 > strong
+{
+	margin-left: 20px;
+	font-size: 20px
+}
+
+ #DISABILITY21 
+{ 
+	 left: 761px; 
+	 top: 1112px; 
+	 position: absolute; 
+	 width: 62px;
+	 height: 48px;
+	 z-index:55;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
+}
+#DISABILITY21 > strong
+{
+	margin-left: 20px;
+	font-size: 20px
+}
+
+ #HYPOTHEMIA21 
+{ 
+	 left: 721px; 
+	 top: 1175px; 
+	 position: absolute; 
+	 width: 63px;
+	 height: 47px;
+	 z-index:56;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 10px;
+}
+#HYPOTHEMIA21 > strong
+{
+	margin-left: 20px;
+	font-size: 20px
+}
+
+ #CLEFTPALATE21 
+{ 
+	 left: 795px; 
+	 top: 1174px; 
+	 position: absolute; 
+	 width: 35px;
+	 height: 57px;
+	 z-index:57;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 10px;
+}
+#CLEFTPALATE21 > strong
+{
+	margin-left: 20px;
+	font-size: 20px
+}
+
+ #CORDINFECTION 
+{ 
+	 left: 840px; 
+	 top: 1106px; 
+	 position: absolute; 
+	 width: 46px;
+	 height: 56px;
+	 z-index:58;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size:10px;
+}
+#CORDINFECTION > strong
+{
+	margin-left: 13px;
+	font-size: 20px
+}
+
+ #NECKSTIFFNESS 
+{ 
+	 left: 368px; 
+	 top: 1166px; 
+	 position: absolute; 
+	 width: 48px;
+	 height: 44px;
+	 z-index:59;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
+}
+#NECKSTIFFNESS > strong
+{
+	margin-left: 15px;
+	font-size: 20px
+}
+
+ #motherssympotmpic 
+{ 
+	 left: 174px; 
+	 top: 1093px; 
+	 position: absolute; 
+	 width: 185px;
+	 height: 98px;
+	 z-index:60;
+} 
+
+ #highriskpic 
+{ 
+	 left: 416px; 
+	 top: 1263px; 
+	 position: absolute; 
+	 width: 294px;
+	 height: 30px;
+	 z-index:61;
+} 
+
+ #HighRisks 
+{ 
+	 left: 446px; 
+	 top: 1270px; 
+	 position: absolute; 
+	 width: 79px;
+	 height: 17px;
+	 z-index:62;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
+} 
+
+ #MothersSymptoms 
+{ 
+	 left: 186px; 
+	 top: 1114px; 
+	 position: absolute; 
+	 width: 137px;
+	 height: 61px;
+	 z-index:63;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 20px;
+} 
+
+ #LowRisks 
+{ 
+	 left: 719px; 
+	 top: 1272px; 
+	 position: absolute; 
+	 width: 74px;
+	 height: 13px;
+	 z-index:64;
+		font-family: 'Open Sans', sans-serif;
+	font-weight: normal;
+	font-size: 12px;
+} 
+
+ #Layer4 
+{ 
+	 left: 0px; 
+	 top: 0px; 
+	 position: absolute; 
+	 width: 1000px;
+	 height: 196px;
+	 z-index:65;
+} 
+
+ #Layer1copy_2 
+{ 
+	background: url('/static/webapp/images/reports/banner_background.png') repeat-x;
+	 left: 0px; 
+	 top: 0px; 
+	 position: absolute; 
+	 width: 100%;
+	 height: 190px;
+	 z-index:66;
+} 
+
+ #Layer5 
+{ 
+	 left: 242px; 
+	 top: 156px; 
+	 position: absolute; 
+	 width: 119px;
+	 height: 28px;
+	 z-index:67;
+} 
+
+ #Preventingthedeathso 
+{ 
+	 left: 441px; 
+	 top: 83px; 
+	 position: absolute; 
+	 width: 376px;
+	 height: 78px;
+	 z-index:68;
+	font-family: 'Open Sans', sans-serif;
+	font-weight:lighter;
+	font-size: 20px;
+} 
+
+ #Layer6 
+{ 
+	 left: 850px; 
+	 top: 60px; 
+	 position: absolute; 
+	 width: 116px;
+	 height: 119px;
+	 z-index:69;
+} 
+
+ #Layer18copy8 
+{ 
+	background: url('/static/webapp/images/reports/Layer18copy8.png') repeat-x;
+	 left: 0px; 
+	 top: 0px; 
+	 position: absolute; 
+	 width: 100%;
+	 height: 3px;
+	 z-index:70;
+} 
+
+ #Layer19copy8 
+{ 
+	background: url('/static/webapp/images/reports/Layer19copy8.png') repeat-x;
+	 left: 0px; 
+	 top: 3px; 
+	 position: absolute; 
+	 width: 100%;
+	 height: 25px;
+	 z-index:71;
+} 
+
+ #ENGLISH 
+{ 
+	 left: 792px; 
+	 top: 12px; 
+	 position: absolute; 
+	 width: 36px;
+	 height: 7px;
+	 z-index:72;
+	font-family: 'Open Sans', sans-serif;
+	font-weight:normal;
+	font-size: 10px;
+} 
+
+ #FRENCH 
+{ 
+	 left: 940px; 
+	 top: 12px; 
+	 position: absolute; 
+	 width: 34px;
+	 height: 7px;
+	 z-index:73;
+	font-family: 'Open Sans', sans-serif;
+	font-weight:normal;
+	font-size: 10px;
+} 
+
+ #KINYARWANDA 
+{ 
+	 left: 852px; 
+	 top: 12px; 
+	 position: absolute; 
+	 width: 66px;
+	 height: 7px;
+	 z-index:74;
+	font-family: 'Open Sans', sans-serif;
+	font-weight:normal;
+	font-size: 10px;
+} 
+
+ #Layer7 
+{ 
+	 left: 239px; 
+	 top: 75px; 
+	 position: absolute; 
+	 width: 119px;
+	 height: 55px;
+	 z-index:75;
+} 
+
+ #Layer1copy17 
+{ 
+	 left: 136px; 
+	 top: 26px; 
+	 position: absolute; 
+	 width: 820px;
+	 height: 31px;
+	 z-index:76;
+} 
+
+ #Layer8 
+{ 
+	 left: 198px; 
+	 top: 26px; 
+	 position: absolute; 
+	 width: 597px;
+	 height: 31px;
+	 z-index:77;
+} 
+
+ #Layer1copy18 
+{ 
+	 left: 332px; 
+	 top: 33px; 
+	 position: absolute; 
+	 width: 626px;
+	 height: 17px;
+	 z-index:78;
+} 
+
+ #PregnanciesNewBornCh 
+{ 
+	 left: 243px; 
+	 top: 35px; 
+	 position: absolute; 
+	 width: 788px;
+	 height: 14px;
+	 z-index:79;
+} 
+
+ #Layer9 
+{ 
+	 left: 138px; 
+	 top: 57px; 
+	 position: absolute; 
+	 width: 295px;
+	 height: 123px;
+	 z-index:80;
+} 
+
+ #dotscopy4 
+{ 
+	 left: 145px; 
+	 top: 67px; 
+	 position: absolute; 
+	 width: 202px;
+	 height: 77px;
+	 z-index:81;
+} 
+
+ #SubmittedPregnancies 
+{ 
+	 left: 150px; 
+	 top: 71px; 
+	 position: absolute; 
+	 width: 274px;
+	 height: 69px;
+	 z-index:82;
+} 
+
+ #Layer5copy 
+{ 
+	 left: 235px; 
+	 top: 57px; 
+	 position: absolute; 
+	 width: 156px;
+	 height: 81px;
+	 z-index:83;
+} 
+
+ #dotscopy5 
+{ 
+	 left: 242px; 
+	 top: 67px; 
+	 position: absolute; 
+	 width: 18px;
+	 height: 47px;
+	 z-index:84;
+} 
+
+ #TrackingNewBornPo 
+{ 
+	 left: 247px; 
+	 top: 71px; 
+	 position: absolute; 
+	 width: 119px;
+	 height: 39px;
+	 z-index:85;
+} 
+
+ #Layer2copy8 
+{ 
+	 left: 430px; 
+	 top: 26px; 
+	 position: absolute; 
+	 width: 106px;
+	 height: 31px;
+	 z-index:86;
+} 
+
+ #Layer2copy12 
+{ 
+	 left: 621px; 
+	 top: 26px; 
+	 position: absolute; 
+	 width: 118px;
+	 height: 31px;
+	 z-index:87;
+} 
+
+ #Layer2copy14 
+{ 
+	 left: 961px; 
+	 top: 26px; 
+	 position: absolute; 
+	 width: 95px;
+	 height: 31px;
+	 z-index:88;
+} 
+
+ #Layer2copy13 
+{ 
+	 left: 747px; 
+	 top: 26px; 
+	 position: absolute; 
+	 width: 206px;
+	 height: 31px;
+	 z-index:89;
+} 
+
+ #Layer2copy11 
+{ 
+	 left: 539px; 
+	 top: 26px; 
+	 position: absolute; 
+	 width: 77px;
+	 height: 31px;
+	 z-index:90;
+} 
+
+ #Layer2copy9 
+{ 
+	 left: 237px; 
+	 top: 26px; 
+	 position: absolute; 
+	 width: 95px;
+	 height: 31px;
+	 z-index:91;
+} 
+
+ #Layer2copy10 
+{ 
+	 left: 337px; 
+	 top: 26px; 
+	 position: absolute; 
+	 width: 84px;
+	 height: 31px;
+	 z-index:92;
+}
+ #Layer2copy9:hover
+{ 
+	background-color: #ffffff;
+	opacity: 0.7;
+	border-radius: 25px;
+	cursor: pointer;
+}
+ #Layer2copy8:hover
+{ 
+	background-color: #ffffff;
+	opacity: 0.7;
+	border-radius: 25px;
+	cursor: pointer;
+}
+ #Layer2copy12:hover
+{ 
+	background-color: #ffffff;
+	opacity: 0.7;
+	border-radius: 25px;
+	cursor: pointer;
+}
+ #Layer2copy13:hover
+{ 
+	background-color: #ffffff;
+	opacity: 0.7;
+	border-radius: 25px;
+	cursor: pointer;
+}
+ #Layer2copy14:hover
+{ 
+	background-color: #ffffff;
+	opacity: 0.7;
+	border-radius: 25px;
+	cursor: pointer;
+}
+ #Layer2copy11:hover
+{ 
+	background-color: #ffffff;
+	opacity: 0.7;
+	border-radius: 25px;
+	cursor: pointer;
+}
+ #Layer2copy10:hover
+{ 
+	background-color: #ffffff;
+	opacity: 0.7;
+	border-radius: 25px;
+	cursor: pointer;
+}
+
+ #Layer10 
+{ 
+	background: url('/static/webapp/images/reports/Layer10.png') repeat-x;
+	 left: 0px; 
+	 top: 189px; 
+	 position: absolute; 
+	 width: 100%;
+	 height: 62px;
+	 z-index:93;
+} 
+
+ #Layer11 
+{ 
+	 left: 755px; 
+	 top: 211px; 
+	 position: absolute; 
+	 width: 208px;
+	 height: 22px;
+	 z-index:94;
+} 
+
+ #Layer12 
+{ 
+	 left: 942px; 
+	 top: 212px; 
+	 position: absolute; 
+	 width: 21px;
+	 height: 19px;
+	 z-index:95;
+} 
+
+ #SelectHealthCare 
+{ 
+	 left: 778px; 
+	 top: 215px; 
+	 position: absolute; 
+	 width: 128px;
+	 height: 12px;
+	 z-index:96;
+} 
+
+ #Layer13 
+{ 
+	 left: 732px; 
+	 top: 210px; 
+	 position: absolute; 
+	 width: 15px;
+	 height: 23px;
+	 z-index:97;
+} 
+
+ #Layer14 
+{ 
+	 left: 520px; 
+	 top: 209px; 
+	 position: absolute; 
+	 width: 198px;
+	 height: 24px;
+	 z-index:98;
+} 
+
+ #Layer4copy 
+{ 
+	 left: 281px; 
+	 top: 210px; 
+	 position: absolute; 
+	 width: 210px;
+	 height: 23px;
+	 z-index:99;
+} 
+
+ #From 
+{ 
+	 left: 233px; 
+	 top: 216px; 
+	 position: absolute; 
+	 width: 40px;
+	 height: 11px;
+	 z-index:100;
+} 
+
+ #Layer15 
+{ 
+	 left: 201px; 
+	 top: 208px; 
+	 position: absolute; 
+	 width: 24px;
+	 height: 26px;
+	 z-index:101;
+} 
+
+ #To 
+{ 
+	 left: 498px; 
+	 top: 214px; 
+	 position: absolute; 
+	 width: 21px;
+	 height: 11px;
+	 z-index:102;
+} 
+
+ #Layer16 
+{ 
+	 left: 0px; 
+	 top: 1918px; 
+	 position: absolute; 
+	 width: 996px;
+	 height: 6px;
+	 z-index:103;
+} 
+
+ #ContactUsReachouttou 
+{ 
+	 left: 276px; 
+	 top: 1969px; 
+	 position: absolute; 
+	 width: 162px;
+	 height: 170px;
+	 z-index:104;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 11px;
+	
+} 
+
+ #FollowusonSocialNetw 
+{ 
+	 left: 540px; 
+	 top: 1977px; 
+	 position: absolute; 
+	 width: 183px;
+	 height: 59px;
+	 z-index:105;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 11px;
+}
+ #ContactUsReachouttou > strong
+{ 
+	font-size: 15px;
+}
+ #FollowusonSocialNetw > strong
+{ 
+	font-size: 15px;
+} 
+
+ #Layer17 
+{ 
+	 left: 540px; 
+	 top: 2051px; 
+	 position: absolute; 
+	 width: 98px;
+	 height: 29px;
+	 z-index:106;
+} 
+
+ #Layer18 
+{ 
+	 left: 513px; 
+	 top: 2104px; 
+	 position: absolute; 
+	 width: 118px;
+	 height: 29px;
+	 z-index:107;
+} 
+
+ #Layer19 
+{ 
+	 left: 375px; 
+	 top: 1897px; 
+	 position: absolute; 
+	 width: 261px;
+	 height: 65px;
+	 z-index:108;
+} 
+
+ #Layer20 
+{ 
+	 left: 658px; 
+	 top: 2072px; 
+	 position: absolute; 
+	 width: 61px;
+	 height: 64px;
+	 z-index:109;
+} 
+
+ #handwashpic 
+{ 
+	 left: 232px; 
+	 top: 1483px; 
+	 position: absolute; 
+	 width: 89px;
+	 height: 90px;
+	 z-index:110;
+} 
+
+ #handwashfacilities 
+{ 
+	 left: 192px; 
+	 top: 1441px; 
+	 position: absolute; 
+	 width: 286px;
+	 height: 25px;
+	 z-index:111;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 20px;
+} 
+
+ #layer_12289 
+{ 
+	 left: 340px; 
+	 top: 1506px; 
+	 position: absolute; 
+	 width: 127px;
+	 height: 31px;
+	 z-index:112;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 18px;
+}
+ #layer_12289>strong
+{ 
+	font-weight: lighter;
+	font-size: 45px; 
+} 
+
+ #layer_10985 
+{ 
+	 left: 712px; 
+	 top: 1506px; 
+	 position: absolute; 
+	 width: 126px;
+	 height: 31px;
+	 z-index:113;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 18px;
+}
+#layer_10985 > strong
+{ 
+	font-weight: lighter;
+	font-size: 45px; 
+} 
+
+ #ToiletFacilities 
+{ 
+	 left: 633px; 
+	 top: 1436px; 
+	 position: absolute; 
+	 width: 214px;
+	 height: 25px;
+	 z-index:114;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: lighter;
+	font-size: 20px;
+} 
+
+ #Availabilityof 
+{ 
+	 left: 445px; 
+	 top: 1396px; 
+	 position: absolute; 
+	 width: 213px;
+	 height: 33px;
+	 z-index:115;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: bold;
+	font-size: 25px;
+} 
+
+ #toiletpic 
+{ 
+	 left: 591px; 
+	 top: 1475px; 
+	 position: absolute; 
+	 width: 102px;
+	 height: 102px;
+	 z-index:116;
+	
+} 
+
+ #LESSTHAN1990 
+{ 
+	 left: 167px; 
+	 top: 1657px; 
+	 position: absolute; 
+	 width: 129px;
+	 height: 129px;
+	 z-index:117;
+
+} 
+
+ #MORETHE2521 
+{ 
+	 left: 455px; 
+	 top: 1669px; 
+	 position: absolute; 
+	 width: 129px;
+	 height: 129px;
+	 z-index:118;
+} 
+
+ #MORETHAN25 
+{ 
+	 left: 466px; 
+	 top: 1710px; 
+	 position: absolute; 
+	 width: 112px;
+	 height: 12px;
+	 z-index:119;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 15px;
+	color:#fff;
+} 
+
+ #layer_21 
+{ 
+	 left: 500px; 
+	 top: 1739px; 
+	 position: absolute; 
+	 width: 40px;
+	 height: 31px;
+	 z-index:120;
+	font-family: 'Open Sans', sans-serif;
+	font-weight:lighter;
+	font-size: 30px;
+	color:#fff;
+} 
+
+ #LESSTHAN19 
+{ 
+	 left: 176px; 
+	 top: 1705px; 
+	 position: absolute; 
+	 width: 101px;
+	 height: 12px;
+	 z-index:121;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 15px;
+	color:#fff;
+} 
+
+ #layer_90 
+{ 
+	 left: 210px; 
+	 top: 1735px; 
+	 position: absolute; 
+	 width: 46px;
+	 height: 31px;
+	 z-index:122;
+	font-family: 'Open Sans', sans-serif;
+	font-weight:lighter;
+	font-size: 30px;
+	color:#fff;
+} 
+
+ #BMI 
+{ 
+	 left: 289px; 
+	 top: 1632px; 
+	 position: absolute; 
+	 width: 174px;
+	 height: 174px;
+	 z-index:123;
+} 
+
+ #BMIBODYMASSINDEXismo 
+{ 
+	 left: 598px; 
+	 top: 1707px; 
+	 position: absolute; 
+	 width: 275px;
+	 height: 44px;
+	 z-index:124;
+	font-family: 'Open Sans', sans-serif;
+	font-weight:lighter;
+	font-size: 15px;
+	
+} 

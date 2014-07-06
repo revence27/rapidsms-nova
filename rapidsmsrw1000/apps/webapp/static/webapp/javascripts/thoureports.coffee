@@ -1,5 +1,8 @@
-# TODO:
-# 1.  <input type="date" /> JS for shit browsers.
-$(() ->
-  
-)
+class ThousandQueries
+  constructor: (@reqdata) ->
+
+  lmpData: (them) ->
+    return them
+
+  pregsPerMonth: (them) ->
+    return them

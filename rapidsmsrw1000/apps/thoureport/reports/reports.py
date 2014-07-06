@@ -10,6 +10,7 @@ from ....settings import __DEFAULTS, THE_DATABASE as postgres
 import psycopg2
 import re
 from sys import stderr
+from StringIO import StringIO
 
 REPORTS_TABLE = __DEFAULTS['REPORTS']
 
@@ -145,9 +146,6 @@ class ThouQuery:
       if self.cursor.rowcount < minim:
         self.precount  = hdl(self)
         return self.count()
-    else:
-      self.precount = self.hdl_(self)
-      return self.count()
     return max(minim, self.cursor.rowcount)
 
   def __names(self, curz, dft):
@@ -164,6 +162,7 @@ class ThouQuery:
           return self.execute(False)
         raise e
       self.cols               = self.__set_names()
+    stderr.write('>>>\t%s\r\n' % (self.query, ))
     return self
 
   def migrate(self, migs, _):
@@ -279,6 +278,35 @@ class ThouQuery:
   def __unicode__(self):
     return self.query
 
+class ThouReportBatch:
+  def __init__(self):
+    self.tables   = {}
+
+  def append(self, tn, cols, vals, sepstr = '\t', nullstr = '\\N'):
+    if not (tn in self.tables):
+      self.tables[tn] = (cols, StringIO())
+      return self.append(tn, cols, vals)
+    _, sio  = self.tables[tn]
+    sio.write(sepstr.join(vals))
+    sio.write('\n')
+    return self
+
+  def store(self):
+    curz  = postgres.cursor()
+    for tbl in self.tables:
+      cols, sio = self.tables[tbl]
+      # TODO.
+      sio.seek(0)
+      # stderr.write('>>>\t%s:%s:%s\r\n' % (tbl, '.'.join(cols), sio.read()))
+      sio.seek(0)
+      curz.copy_from(sio, tbl, columns = cols)
+    curz.close()
+    postgres.commit()
+    return self
+    
+  def run(self):
+    return self.store()
+
 class ThouReport:
   'The base class for all "RapidSMS 1000 Days" reports.'
   created   = False
@@ -379,20 +407,6 @@ It is not idempotent at this level; further constraints should be added by inher
     return us
 
   @classmethod
-  def old_query(self, djconds, tn = None, **kwargs):
-    if not tn: return self.query(djconds, kwargs.get('table', __DEFAULTS['REPORTS']))
-    tbl = self.ensure_table(tn)
-    qry = 'SELECT %s FROM %s%s' % (', '.join(kwargs.get('cols', self.active_columns(kwargs.get('qid')) or ['*'])), tbl, self.assemble_conditions(djconds))
-    curz  = postgres.cursor()
-    stderr.write('%s\r\n' % (qry,))
-    curz.execute(qry)
-    cols  = [x.name for x in curz.description]
-    ans   = curz.fetchall()
-    curz.close()
-    postgres.commit()
-    return (cols, ans)
-
-  @classmethod
   def query(self, tn, djconds, **kwargs):
     tbl = self.ensure_table(tn)
     return ThouQuery(djconds, tn, **kwargs)
@@ -433,16 +447,23 @@ It is not idempotent at this level; further constraints should be added by inher
     return ctyp, dval
 
   @classmethod
-  def store(self, tn, dat):
-    if type(dat) == type([]):
-      return [self.store(tn, cv) for cv in dat]
+  def batch(self):
+    btc = ThouReportBatch()
+    return btc
+
+  @classmethod
+  def store(self, tn, dat, **kwargs):
+    if type(dat) in [type(x) for x in [set(), []]]:
+      return [self.store(tn, cv, **kwargs) for cv in dat]
     if not dat: return None
     vals    = []
     curz    = postgres.cursor()
+    btc     = kwargs.get('batch', None)
     tbl     = self.ensure_table(tn)
-    ans     = dat.pop('indexcol', None)
+    ans     = dat.pop('indexcol', [])
     multid  = False
-    if type(ans) in [type(x) for x in [set(), []]]:
+    # if type(ans) in [type(x) for x in [set(), []]]:
+    if hasattr(ans, '__iter__'):
       multid  = True
     cols    = dat.keys()
     for col in cols:
@@ -450,15 +471,22 @@ It is not idempotent at this level; further constraints should be added by inher
       col   = self.ensure_column(curz, tbl, col, dval)
       postgres.commit()
       elval = curz.mogrify('%s', (dval, ))
-      if ans:
+      if len(ans) > 0:
         dat[col]  = elval
       else:
+        if btc and hasattr(dval, '__getitem__'):
+          elval = dval.replace('\t', '\\t').replace('\n', '\\n')
         vals.append(elval)
     if vals:
-      curz.execute('INSERT INTO %s (%s) VALUES (%s) RETURNING indexcol;' % (tbl, ', '.join(cols), ', '.join(vals)))
-      ans = curz.fetchone()[0]
+      if btc:
+        ans = btc.append(tbl, cols, vals)
+      else:
+        qry = ('INSERT INTO %s (%s) VALUES (%s) RETURNING indexcol;' % (tbl, ', '.join(cols), ', '.join(vals)))
+        curz.execute(qry)
+        ans = curz.fetchone()[0]
     else:
       bzt = ('UPDATE %s SET %s WHERE indexcol %s %s;' % (tbl, ', '.join(['%s = %s' % (k, dat[k]) for k in dat]), 'IN' if multid else '=', ('(%s)' % ', '.join(ans)) if multid else curz.mogrify('%s', (ans, ))))
+      stderr.write('>>>\t%s\r\n' % (bzt, ))
       curz.execute(bzt)
     postgres.commit()
     curz.close()
@@ -512,7 +540,8 @@ It is not idempotent at this level; further constraints should be added by inher
         tn, cols = self.msg.__class__.creation_sql(self.__class__)
         return self.sparse_matrix(tn, self.__insertables(cols), prep)
       raise ValueError, 'sparse_matrix wants a (string, hash), a (string, [hash]), or a (ThouReport). There is always an optional string after (super-table name).'
-    if type(cvs) == type([]):
+    # if type(cvs) == type([]):
+    if hasattr(cvs, '__iter__'):
       return [self.sparse_matrix(tn, cv, prep) for cv in cvs]
     if type(cvs) == type({}):
       fxnms = {}
@@ -667,11 +696,13 @@ class OldStyleReport:
     cls                       = copy.copy(ans)
     return ('%s_table' % (self.db_prepend,), cls, self.__gather_fields(ans))
 
-  def convert(self):
+  def convert(self, **kwargs):
     tbn, cls, dat = self.__as_hash()
-    thr           = ThouReport.store(REPORTS_TABLE, cls)
-    dat['log_id'] = thr
-    suc           = ThouReport.store(tbn, dat)
+    thr           = ThouReport.store(REPORTS_TABLE, cls, **kwargs)
+    if not kwargs.get('batch'):
+      # If we are batching, this fails.
+      dat['log_id'] = thr
+    suc           = ThouReport.store(tbn, dat, **kwargs)
     return (suc, thr, tbn)
 
   def __str__(self):

@@ -47,8 +47,6 @@ class Command(BaseCommand):
 
     def single_handle(self, *args, **options):
       cpt   = int(options.get('number', 5000))
-      seen  = set()
-      deler = options.get('delete', False)
       force = options.get('force', False)
       qry   = ThouReport.query(REPORTS_TABLE,
         {'NOT transferred' : ('',)},
@@ -57,8 +55,13 @@ class Command(BaseCommand):
           ('transferred', (True, 'BOOLEAN NOT NULL DEFAULT FALSE'))
         ]
       )
-      upds  = set()
-      for ix in range(qry.count()):
+      dsiz  = qry.count()
+      seen  = set()
+      upds  = []
+      deler = options.get('delete', False)
+      if deler:
+        upds  = []
+      for ix in range(dsiz):
         row   = qry[ix]
         if not row: break
         ixnum = row['former_pk']
@@ -69,9 +72,8 @@ class Command(BaseCommand):
             it.delete()
           except Exception, e:
             pass
-          upds.add(str(row['indexcol']))
+          upds.append(str(row['indexcol']))
         act   = 'Deleted'
-        sys.stdout.write('%s %d: %d ...\r' % (act, ix + 1, ixnum))
         sys.stdout.flush()
         seen.add(ixnum)
       print 'Updating deletion status ...',
@@ -90,6 +92,8 @@ class Command(BaseCommand):
       cpt   = float(cpt)
       pos   = 0
       maxw  = 80
+      # batch = ThouReport.batch()
+      batch = ThouReport.batch()
       stbs  = set()
       sttm  = times.time()
       for rep in reps:
@@ -104,6 +108,7 @@ class Command(BaseCommand):
         rsp = ('%d %s%3.1f%%%s' % (pos + 1, gap, pct, pad))
         sys.stdout.write('\r' + rsp[0:maxw])
         sys.stdout.flush()
+        # gat             = osp.convert(batch = batch)
         gat             = osp.convert()
         suc, thid, tbn  = gat
         if not any([suc, thid]):
@@ -113,6 +118,7 @@ class Command(BaseCommand):
         stbs.add(tbn)
         pos = pos + 1
         postgres.commit()
+      batch.run()
       print 'Done converting ...'
       print 'List of secondary tables:'
       for tbn in stbs:

@@ -1,31 +1,33 @@
 # vim: expandtab ts=2
 from django.contrib import messages as flashes
 from django.shortcuts import render, redirect
-from .messages.rapid1000messages import *
-from .reports.rapid1000reports import *
+# from .messages.rapid1000messages import *
+# from .reports.rapid1000reports import *
 # from .reports.reports import THE_DATABASE as db
 from rapidsmsrw1000.settings import *
+from rapidsmsrw1000.apps.thoureport.reports.rapid1000reports import *
+from rapidsmsrw1000.apps.thoureport.reports.reports import *
 from .models import *
 
 REPORT_SET = {
-  'PRE':  PregReport,
-  'REF':  RefReport,
-  'ANC':  ANCReport,
-  'DEP':  DepReport,
-  'RISK': RiskReport,
+  # 'PRE':  PregReport,
+  # 'REF':  RefReport,
+  # 'ANC':  ANCReport,
+  # 'DEP':  DepReport,
+  # 'RISK': RiskReport,
   'RED':  RedReport,
-  'BIR':  BirReport,
-  'CHI':  ChildReport,
-  'DTH':  DeathReport,
-  'RES':  ResultReport,
-  'RAR':  RedResultReport,
-  'NBC':  NBCReport,
-  'CCM':  CCMReport,
-  'CMR':  CMRReport,
-  'CBN':  CBNReport,
-  'PNC':  PNCReport,
+  # 'BIR':  BirReport,
+  # 'CHI':  ChildReport,
+  # 'DTH':  DeathReport,
+  # 'RES':  ResultReport,
+  # 'RAR':  RedResultReport,
+  # 'NBC':  NBCReport,
+  # 'CCM':  CCMReport,
+  # 'CMR':  CMRReport,
+  # 'CBN':  CBNReport,
+  # 'PNC':  PNCReport,
 
-  'TIM':  TimothyReport,
+  # 'TIM':  TimothyReport,
   'REV': RevenceReport,
 }
 
