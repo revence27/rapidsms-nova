@@ -1,6 +1,6 @@
 @import url("http://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Roboto:400,700,900,100|Montserrat:400,700&subset=latin,latin-ext");
 .goodnum {
-  font-family: "Liberation Mono", "Montserrat", "Roboto", "PT Sans", "Open Sans", sans-serif; }
+  font-family: "Montserrat", "Roboto", "PT Sans", "Open Sans", sans-serif; }
 
 body {
   margin: 0;
@@ -133,7 +133,7 @@ a:hover {
   width: 62px;
   height: 28px;
   z-index: 12;
-  font-family: "Liberation Mono", "Montserrat", "Roboto", "PT Sans", "Open Sans", sans-serif, sans-serif;
+  font-family: "Montserrat", "Roboto", "PT Sans", "Open Sans", sans-serif, sans-serif;
   font-size: 30px;
   font-weight: bold; }
 
@@ -157,7 +157,7 @@ a:hover {
   font-size: 20px; }
 
 #risks78 {
-  left: 790px;
+  left: 770px;
   top: 1013px;
   position: absolute;
   width: 40px;
@@ -191,7 +191,7 @@ a:hover {
   font-size: 20px; }
 
 #risks65 {
-  left: 648px;
+  left: 618px;
   top: 990px;
   position: absolute;
   width: 39px;
@@ -340,7 +340,7 @@ a:hover {
     color: black;
     font-weight: normal;
     padding-left: 10px;
-    font-family: "Liberation Mono", "Montserrat", "Roboto", "PT Sans", "Open Sans", sans-serif;
+    font-family: "Montserrat", "Roboto", "PT Sans", "Open Sans", sans-serif;
     font-size: 80%; }
 
 #Layer3 {
@@ -1272,7 +1272,7 @@ a:hover {
   color: #fff; }
 
 #layer_90 {
-  left: 210px;
+  left: 180px;
   top: 1735px;
   position: absolute;
   width: 46px;

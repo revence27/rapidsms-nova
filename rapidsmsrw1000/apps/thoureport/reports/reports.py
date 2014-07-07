@@ -270,7 +270,14 @@ class ThouQuery:
   def query(self):
     qry   = u' FROM %s%s%s' % (self.tablenm, self.assemble_conditions(self.djconds), self.assemble_sort(self.sort))
     cols  = ', '.join(self.kwargs.get('cols', self.active_columns(self.kwargs.get('qid')) or ['*']))
-    annot = ['(SELECT %s%s) AS %s' % (self.annots[k], qry, k) for k in self.annots]
+    annot = []
+    for k in self.annots:
+      it  = self.annots[k]
+      q   = qry
+      if type(it) ==  type(('query', 'conds')):
+        q   = self.assemble_conditions(it[1])
+        it  = it[0]
+      annot.append('(SELECT %s FROM %s%s) AS %s' % (it, self.tablenm, q, k))
     annot.append('%s%s' % (cols, qry))
     qry = ', '.join(annot)
     return ' '.join(['SELECT', qry])
@@ -377,11 +384,15 @@ It is not idempotent at this level; further constraints should be added by inher
   def assemble_conditions(self, conds):
     curz  = postgres.cursor()
     ans   = []
-    neg   = conds.pop('Invert Query', False)
-    for cond in conds:
-      rez = conds[cond]
-      ans.append(curz.mogrify(cond, rez if type(rez) == type((1, 2)) else (rez,)))
-    curz.close()
+    neg   = False
+    if type(conds) in [type(''), type(u'')]:
+      ans = [conds]
+    else:
+      neg   = conds.pop('Invert Query', False)
+      for cond in conds:
+        rez = conds[cond]
+        ans.append(curz.mogrify(cond, rez if type(rez) == type((1, 2)) else (rez,)))
+      curz.close()
     return (' WHERE ' if conds else '') + (('NOT (%s)' if neg else '%s') % (' AND '.join(ans)))
 
   @classmethod

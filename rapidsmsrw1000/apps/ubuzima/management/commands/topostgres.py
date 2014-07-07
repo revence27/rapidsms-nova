@@ -17,6 +17,11 @@ REPORTS_TABLE = __DEFAULTS['REPORTS']
 class Command(BaseCommand):
     help = 'Copy the messages (and reports), with all supporting data (locations, facilities ...), over to the Postgres DB.'
     option_list = BaseCommand.option_list + (
+        make_option('-t', '--type',
+                    # action='store_true',
+                    dest    = 'type',
+                    default = None,
+                    help    = 'Report type ID to privilege.'),
         make_option('-n', '--number',
                     # action='store_true',
                     dest    = 'number',
@@ -83,6 +88,9 @@ class Command(BaseCommand):
       print '... done.'
       curz  = postgres.cursor()
       reps  = Report.objects.exclude(id__in = seen).order_by('-date')
+      gat = options.get('type', None)
+      if gat:
+        reps  = reps.filter(type_id = gat)
       tot   = reps.count()
       if not tot: return False
       cpt   = min(tot, cpt)

@@ -800,22 +800,63 @@ def json_tester(req):
     )
     nat     = ThouReport.query('pre_table',
       {},
-      cols      = ['COUNT(*) AS allpregs']
+      cols      = ['COUNT(*) AS allpregs'],
+      annotate  = {
+        'coughing':('COUNT(*)', 'ch_bool IS NOT NULL'),
+        'diarrhoea':('COUNT(*)', 'di_bool IS NOT NULL'),
+        'fever':('COUNT(*)', 'fe_bool IS NOT NULL'),
+        'oedema':('COUNT(*)', 'oe_bool IS NOT NULL'),
+        'pneumo':('COUNT(*)', 'pc_bool IS NOT NULL'),
+        'disab':('COUNT(*)', 'db_bool IS NOT NULL'),
+        'cordi':('COUNT(*)', 'ci_bool IS NOT NULL'),
+        'necks':('COUNT(*)', 'ns_bool IS NOT NULL'),
+        'malaria':('COUNT(*)', 'ma_bool IS NOT NULL'),
+        'vomiting':('COUNT(*)', 'vo_bool IS NOT NULL'),
+        'stillb':('COUNT(*)', 'sb_bool IS NOT NULL'),
+        'jaun':('COUNT(*)', 'ja_bool IS NOT NULL'),
+        'hypoth':('COUNT(*)', 'hy_bool IS NOT NULL'),
+        'ibibari':('COUNT(*)', 'ib_bool IS NOT NULL')
+      },
+      migrations  = [
+        ('db_bool', False),
+        ('ci_bool', False),
+        ('hy_bool', False),
+        ('ib_bool', False)
+      ]
     )
     toi     = nat.specialise({'to_bool IS NOT NULL':''})
     hnd     = nat.specialise({'hw_bool IS NOT NULL':''})
     weighed = nat.specialise({'mother_height_float > 100.0 AND mother_weight_float > 15.0':''})
     thins   = weighed.specialise({'(mother_weight_float / ((mother_height_float * mother_height_float) / 10000.0)) < %s': BMI_MIN})
     fats    = weighed.specialise({'(mother_weight_float / ((mother_height_float * mother_height_float) / 10000.0)) > %s': BMI_MAX})
+    riskhsh = {'gs_bool IS NOT NULL OR mu_bool IS NOT NULL OR rm_bool IS NOT NULL OR ol_bool IS NOT NULL OR yg_bool IS NOT NULL OR kx_bool IS NOT NULL OR yj_bool IS NOT NULL OR lz_bool IS NOT NULL':''}
+    riskys  = nat.specialise(riskhsh)
+    rezes   = ThouReport.query('res_table',
+      {},
+      cols        = ['COUNT(*) AS allreps'],
+    )
+    recovs  = rezes.specialise({'mw_bool IS NOT NULL':''})
+    aarecov = recovs.specialise({'aa_bool IS NOT NULL':''})
+    prrecov = recovs.specialise({'pr_bool IS NOT NULL':''})
     total   = nat[0]['allpregs']
+    totalf  = float(total)
     toils   = toi[0]['allpregs']
-    toilpc  = (float(toils) / float(total)) * 100.0
+    toilpc  = (float(toils) / totalf) * 100.0
     hands   = hnd[0]['allpregs']
-    handpc  = (float(hands) / float(total)) * 100.0
+    handpc  = (float(hands) / totalf) * 100.0
     thinc   = thins[0]['allpregs']
     fatc    = fats[0]['allpregs']
+    riskc   = riskys[0]['allpregs']
+    riskpc  = (float(riskc) / totalf) * 100.0
+    rez     = rezes[0]['allreps']
+    rezf    = float(rez)
+    rezpc   = (rezf / totalf) * 100.0
+    aac     = aarecov[0]['allreps']
+    aapc    = (float(aac) / rezf) * 100.0
+    prc     = prrecov[0]['allreps']
+    prpc    = (float(prc) / rezf) * 100.0
     # TODO: do optimisations specialise?
-    resp['display'] = {'total':total, 'toilets': toils, 'toilpc':round(toilpc, 2), 'handw':hands, 'handpc':round(handpc, 2), 'thins':thinc, 'fats':fatc}
+    resp['display'] = {'total':total, 'toilets': toils, 'toilpc':round(toilpc, 2), 'handw':hands, 'handpc':round(handpc, 2), 'thins':thinc, 'fats':fatc, 'risks':riskc, 'riskpc':round(riskpc, 2), 'rezes':rez, 'rezpc':round(rezpc, 2), 'aa':aac, 'aapc':int(aapc), 'pr':prc, 'prpc':int(prpc), 'info':nat[0]}
     return render_to_response('novatemplates/charts.html', resp, context_instance = RequestContext(req))
 
 MONTHS  = 12
