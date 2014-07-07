@@ -1,3 +1,15 @@
+@import url('http://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Roboto:400,700,900,100|Montserrat:400,700&subset=latin,latin-ext');
+$font1: "Roboto", "PT Sans", "Open Sans", sans-serif;
+$font2: "Liberation Mono", "Montserrat", $font1;
+$font3: $font2;
+$col1: #f79242;
+$black: #000;
+
+.goodnum
+{
+  font-family: $font2;
+}
+
  body {
 	margin: 0;
 	padding: 0;
@@ -94,7 +106,7 @@
 	 width: 389px;
 	 height: 18px;
 	 z-index:7;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight:lighter;
 	font-size: 20px;
 } 
@@ -107,7 +119,7 @@
 	 width: 359px;
 	 height: 18px;
 	 z-index:8;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight:lighter;
 	font-size: 20px;
 } 
@@ -130,7 +142,7 @@
 	 width: 320px;
 	 height: 53px;
 	 z-index:10;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	
 	font-size: 18px;
 } 
@@ -143,7 +155,7 @@
 	 width: 118px;
 	 height: 44px;
 	 z-index:11;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-size: 18px;
 	color: #f79242;
 } 
@@ -156,7 +168,7 @@
 	 width: 62px;
 	 height: 28px;
 	 z-index:12;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font3, sans-serif;
 	font-size: 30px;
 	font-weight:bold;
 } 
@@ -179,7 +191,7 @@
 	 width: 47px;
 	 height: 18px;
 	 z-index:14;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 20px;
 } 
@@ -192,7 +204,7 @@
 	 width: 40px;
 	 height: 27px;
 	 z-index:15;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 35px;
 	
@@ -207,7 +219,7 @@
 	 width: 494px;
 	 height: 19px;
 	 z-index:16;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 19px;
 	color: #b30000;
@@ -223,7 +235,7 @@
 	 width: 46px;
 	 height: 18px;
 	 z-index:17;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 20px;
 } 
@@ -236,7 +248,7 @@
 	 width: 39px;
 	 height: 28px;
 	 z-index:18;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 35px;
 } 
@@ -249,7 +261,7 @@
 	 width: 348px;
 	 height: 20px;
 	 z-index:19;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 19px;
 	color: #b30000;
@@ -283,7 +295,7 @@
 	 width: 107px;
 	 height: 17px;
 	 z-index:22;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 15px;
 	color: #fff;
@@ -297,7 +309,7 @@
 	 width: 60px;
 	 height: 27px;
 	 z-index:23;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 35px;
 	
@@ -311,7 +323,7 @@
 	 width: 36px;
 	 height: 14px;
 	 z-index:24;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 20px;
 	
@@ -325,7 +337,7 @@
 	 width: 115px;
 	 height: 16px;
 	 z-index:25;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 14px;
 	color: #fff;
@@ -339,7 +351,7 @@
 	 width: 39px;
 	 height: 27px;
 	 z-index:26;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 35px;
 } 
@@ -352,7 +364,7 @@
 	 width: 36px;
 	 height: 14px;
 	 z-index:27;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 20px;
 } 
@@ -385,16 +397,35 @@
 	 width: 326px;
 	 height: 17px;
 	 z-index:30;
+
+   font-family: $font1;
+   font-weight: lighter;
+   font-size: 18px;
+   color: $col1;
 } 
 
- #MonthlyPregnancyAvg9 
+#MonthlyPregnancyAvg9 
 { 
-	 left: 228px; 
+  left: 228px; 
 	 top: 568px; 
 	 position: absolute; 
-	 width: 222px;
+	 width: 272px;
 	 height: 24px;
 	 z-index:31;
+
+   font-family: $font1;
+   font-weight: lighter;
+   font-size: 18px;
+   color: $col1;
+
+  strong
+  {
+    color: $black;  
+    font-weight: normal;
+    padding-left: 10px;
+    font-family: $font2;
+    font-size: 80%;
+  }
 } 
 
  #Layer3 
@@ -545,7 +576,7 @@
 	 width: 63px;
 	 height: 45px;
 	 z-index:46;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 }
@@ -563,7 +594,7 @@
 	 width: 59px;
 	 height: 49px;
 	 z-index:47;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 11px;
 } 
@@ -580,7 +611,7 @@
 	 width: 36px;
 	 height: 49px;
 	 z-index:48;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 }
@@ -598,7 +629,7 @@
 	 width: 53px;
 	 height: 49px;
 	 z-index:49;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 }
@@ -616,7 +647,7 @@
 	 width: 59px;
 	 height: 49px;
 	 z-index:50;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 }
@@ -634,7 +665,7 @@
 	 width: 65px;
 	 height: 48px;
 	 z-index:51;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 }
@@ -652,7 +683,7 @@
 	 width: 42px;
 	 height: 49px;
 	 z-index:52;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 }
@@ -670,7 +701,7 @@
 	 width: 59px;
 	 height: 48px;
 	 z-index:53;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 }
@@ -688,7 +719,7 @@
 	 width: 72px;
 	 height: 48px;
 	 z-index:54;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 10px;
 }
@@ -706,7 +737,7 @@
 	 width: 62px;
 	 height: 48px;
 	 z-index:55;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 }
@@ -724,7 +755,7 @@
 	 width: 63px;
 	 height: 47px;
 	 z-index:56;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 10px;
 }
@@ -742,7 +773,7 @@
 	 width: 35px;
 	 height: 57px;
 	 z-index:57;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 10px;
 }
@@ -760,7 +791,7 @@
 	 width: 46px;
 	 height: 56px;
 	 z-index:58;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size:10px;
 }
@@ -778,7 +809,7 @@
 	 width: 48px;
 	 height: 44px;
 	 z-index:59;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 }
@@ -816,7 +847,7 @@
 	 width: 79px;
 	 height: 17px;
 	 z-index:62;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 } 
@@ -829,7 +860,7 @@
 	 width: 137px;
 	 height: 61px;
 	 z-index:63;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 20px;
 } 
@@ -842,7 +873,7 @@
 	 width: 74px;
 	 height: 13px;
 	 z-index:64;
-		font-family: 'Open Sans', sans-serif;
+		font-family: $font1, sans-serif;
 	font-weight: normal;
 	font-size: 12px;
 } 
@@ -886,7 +917,7 @@
 	 width: 376px;
 	 height: 78px;
 	 z-index:68;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight:lighter;
 	font-size: 20px;
 } 
@@ -931,7 +962,7 @@
 	 width: 36px;
 	 height: 7px;
 	 z-index:72;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight:normal;
 	font-size: 10px;
 } 
@@ -944,7 +975,7 @@
 	 width: 34px;
 	 height: 7px;
 	 z-index:73;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight:normal;
 	font-size: 10px;
 } 
@@ -957,7 +988,7 @@
 	 width: 66px;
 	 height: 7px;
 	 z-index:74;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight:normal;
 	font-size: 10px;
 } 
@@ -1310,7 +1341,7 @@
 	 width: 162px;
 	 height: 170px;
 	 z-index:104;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-size: 11px;
 	
 } 
@@ -1323,7 +1354,7 @@
 	 width: 183px;
 	 height: 59px;
 	 z-index:105;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-size: 11px;
 }
  #ContactUsReachouttou > strong
@@ -1393,7 +1424,7 @@
 	 width: 286px;
 	 height: 25px;
 	 z-index:111;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 20px;
 } 
@@ -1406,7 +1437,7 @@
 	 width: 127px;
 	 height: 31px;
 	 z-index:112;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 18px;
 }
@@ -1424,7 +1455,7 @@
 	 width: 126px;
 	 height: 31px;
 	 z-index:113;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 18px;
 }
@@ -1442,7 +1473,7 @@
 	 width: 214px;
 	 height: 25px;
 	 z-index:114;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: lighter;
 	font-size: 20px;
 } 
@@ -1455,7 +1486,7 @@
 	 width: 213px;
 	 height: 33px;
 	 z-index:115;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight: bold;
 	font-size: 25px;
 } 
@@ -1500,7 +1531,7 @@
 	 width: 112px;
 	 height: 12px;
 	 z-index:119;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-size: 15px;
 	color:#fff;
 } 
@@ -1513,7 +1544,7 @@
 	 width: 40px;
 	 height: 31px;
 	 z-index:120;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight:lighter;
 	font-size: 30px;
 	color:#fff;
@@ -1527,7 +1558,7 @@
 	 width: 101px;
 	 height: 12px;
 	 z-index:121;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-size: 15px;
 	color:#fff;
 } 
@@ -1540,7 +1571,7 @@
 	 width: 46px;
 	 height: 31px;
 	 z-index:122;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight:lighter;
 	font-size: 30px;
 	color:#fff;
@@ -1564,7 +1595,7 @@
 	 width: 275px;
 	 height: 44px;
 	 z-index:124;
-	font-family: 'Open Sans', sans-serif;
+	font-family: $font1, sans-serif;
 	font-weight:lighter;
 	font-size: 15px;
 	

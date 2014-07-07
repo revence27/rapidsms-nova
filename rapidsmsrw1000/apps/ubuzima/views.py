@@ -789,6 +789,8 @@ def our_data_dump(obj):
   return ans
   raise Exception, str(obj)
 
+BMI_MIN = 19
+BMI_MAX = 25
 @permission_required('ubuzima.can_view')
 def json_tester(req):
     resp  = pull_req_with_filters(req,
@@ -802,15 +804,21 @@ def json_tester(req):
     )
     toi     = nat.specialise({'to_bool IS NOT NULL':''})
     hnd     = nat.specialise({'hw_bool IS NOT NULL':''})
+    weighed = nat.specialise({'mother_height_float > 100.0 AND mother_weight_float > 15.0':''})
+    thins   = weighed.specialise({'(mother_weight_float / ((mother_height_float * mother_height_float) / 10000.0)) < %s': BMI_MIN})
+    fats    = weighed.specialise({'(mother_weight_float / ((mother_height_float * mother_height_float) / 10000.0)) > %s': BMI_MAX})
     total   = nat[0]['allpregs']
     toils   = toi[0]['allpregs']
     toilpc  = (float(toils) / float(total)) * 100.0
     hands   = hnd[0]['allpregs']
     handpc  = (float(hands) / float(total)) * 100.0
+    thinc   = thins[0]['allpregs']
+    fatc    = fats[0]['allpregs']
     # TODO: do optimisations specialise?
-    resp['display'] = {'total':total, 'toilets': toils, 'toilpc':round(toilpc, 2), 'handw':hands, 'handpc':round(handpc, 2)}
+    resp['display'] = {'total':total, 'toilets': toils, 'toilpc':round(toilpc, 2), 'handw':hands, 'handpc':round(handpc, 2), 'thins':thinc, 'fats':fatc}
     return render_to_response('novatemplates/charts.html', resp, context_instance = RequestContext(req))
 
+MONTHS  = 12
 @permission_required('ubuzima.can_view')
 def json_api(req):
     resp  = pull_req_with_filters(req,
@@ -818,7 +826,40 @@ def json_api(req):
       district = ReactiveDistricts,
       location = ReactiveHCs
     )
-    ans = {'filters':resp['filters']}
+    qs    = range(MONTHS)
+    for mpos in qs:
+      qs[mpos]  = ThouReport.query('pre_table',
+        {'EXTRACT(MONTH FROM report_date) = %s': mpos + 1},
+        cols  = ['COUNT(*) AS allpregs']
+      )
+    ls    = range(9)
+    for mpos in ls:
+      ls[mpos]  = ThouReport.query('pre_table',
+        {'EXTRACT(MONTH FROM lmp) = (EXTRACT(MONTH FROM NOW()) - %s)': len(ls) - (mpos + 1)},
+        cols  = ['COUNT(*) AS allpregs']
+      )
+    qry   = {
+      'monthavg_graph':qs,
+      'lmp_graph':ls,
+    }.get(req.REQUEST['reqid'], [])
+    ans = {}
+    if qry:
+      tot = 0
+      dem = None
+      cml = None
+      if req.REQUEST.get('reqid') == 'lmp_graph':
+        cml = range(9)
+        for x in cml:
+          dat     = qry[x][0]['allpregs']
+          cml[x]  = dat
+      else:
+        dem = range(MONTHS)
+        for x in dem:
+          dat     = qry[x][0]['allpregs']
+          dem[x]  = dat
+          tot     = tot + dat
+      ans = {'resp': dem, 'tot': tot, 'avg':tot / MONTHS, 'lmps':cml}
+      # raise Exception, str((req.REQUEST.get('reqid'), json.dumps(ans)))
     return HttpResponse(json.dumps(ans, default = our_data_dump), content_type = 'application/json')
 
 @permission_required('ubuzima.can_view')

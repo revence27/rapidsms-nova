@@ -56,10 +56,10 @@
 			
 			<div id="Layer13"><img src="/static/webapp/images/reports/Layer13.png"></div>
 			<div id="Layer14">
-			<input type="text" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;"></input>
+			<input type="date" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;" /></input>
 			</div>
 			<div id="Layer4copy">
-			<input type="text" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;"></input>
+			<input type="date" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;" /></input>
 			</div>
 			<div id="From"><img src="/static/webapp/images/reports/From.png"></div>
 			<div id="Layer15"><img src="/static/webapp/images/reports/Layer15.png"></div>
@@ -92,7 +92,7 @@
 			<div id="Pregnanciesconfirmed_0">
 			Pregnancies Confirmed
 			</div>
-			<div id="layer_150">
+			<div id="layer_150" class="goodnum">
               {{  display.total  }}
 			</div>
 			
@@ -102,8 +102,18 @@
 			</div>
 			<div id="monthlyavggrph">
 			</div>
-			<div id="LMPinrelativetopregn"><img src="/static/webapp/images/reports/LMPinrelativetopregn.png"></div>
-			<div id="MonthlyPregnancyAvg9"><img src="/static/webapp/images/reports/MonthlyPregnancyAvg9.png"></div>
+      <div id="LMPinrelativetopregn">
+
+        <!--  <img src="/static/webapp/images/reports/LMPinrelativetopregn.png">  -->
+        LMP Relative to Pregnancy Confirmation
+      
+      </div>
+      <div id="MonthlyPregnancyAvg9">
+              
+        <!--  <img src="/static/webapp/images/reports/MonthlyPregnancyAvg9.png">  -->
+        Monthly Pregnancy Avg: <strong id="avgdest">92</strong>
+      
+      </div>
 			<!--  -->
 			
 			<!-- Risks -->
@@ -229,10 +239,10 @@
 			Hand Washing Facilities
 			</div>
 			<div id="layer_12289">
-              <strong>{{  display.handw }}</strong>- {{ display.handpc  }}%
+              <strong class="goodnum">{{  display.handw }}</strong>- {{ display.handpc  }}%
 			</div>
 			<div id="layer_10985">
-              <strong>{{  display.toilets }}</strong>- {{ display.toilpc  }}%
+              <strong class="goodnum">{{  display.toilets }}</strong>- {{ display.toilpc  }}%
 			</div>
 			<div id="ToiletFacilities">
 			Toilet Facilities
@@ -248,14 +258,14 @@
 			<div id="MORETHAN25">
 			MORE THAN 25
 			</div>
-			<div id="layer_21">
-			21
+			<div id="layer_21" class="goodnum">
+              {{  display.fats  }}
 			</div>
-			<div id="LESSTHAN19">
+			<div id="LESSTHAN19" class="goodnum">
 			LESS THAN 19
 			</div>
-			<div id="layer_90">
-			90
+			<div id="layer_90" class="goodnum">
+              {{  display.thins  }}
 			</div>
 			<div id="BMI"><img src="/static/webapp/images/reports/BMI.png"></div>
 			<div id="BMIBODYMASSINDEXismo">

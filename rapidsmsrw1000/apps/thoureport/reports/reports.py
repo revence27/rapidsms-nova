@@ -162,7 +162,7 @@ class ThouQuery:
           return self.execute(False)
         raise e
       self.cols               = self.__set_names()
-    stderr.write('>>>\t%s\r\n' % (self.query, ))
+    # stderr.write('>>>\t%s\r\n' % (self.query, ))
     return self
 
   def migrate(self, migs, _):
@@ -486,7 +486,7 @@ It is not idempotent at this level; further constraints should be added by inher
         ans = curz.fetchone()[0]
     else:
       bzt = ('UPDATE %s SET %s WHERE indexcol %s %s;' % (tbl, ', '.join(['%s = %s' % (k, dat[k]) for k in dat]), 'IN' if multid else '=', ('(%s)' % ', '.join(ans)) if multid else curz.mogrify('%s', (ans, ))))
-      stderr.write('>>>\t%s\r\n' % (bzt, ))
+      # stderr.write('>>>\t%s\r\n' % (bzt, ))
       curz.execute(bzt)
     postgres.commit()
     curz.close()
@@ -684,7 +684,8 @@ class OldStyleReport:
     if him.village:
       ans['village_pk']       = him.village.pk
     ans['health_center_pk']   = self.hc.pk
-    ans['district_pk']        = self.district.pk
+    if self.district:
+      ans['district_pk']        = self.district.pk
     if him.sector:
       ans['sector_pk']        = him.sector.pk
     ans['province_pk']        = self.province.pk
