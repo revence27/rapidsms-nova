@@ -789,6 +789,51 @@ def our_data_dump(obj):
   return ans
   raise Exception, str(obj)
 
+@permission_required('ubuzima.can_view')
+def new_export(req):
+  resp  = pull_req_with_filters(req,
+    province = ReactiveLocations,
+    district = ReactiveDistricts,
+    location = ReactiveHCs
+  )
+  per = int(req.REQUEST.get('per', '250'))
+  pos = int(req.REQUEST.get('pos', '0'))
+  cnd = {}
+  qry = ThouReport.query('pre_table',
+    cnd,
+    limit   = per,
+    offset  = pos,
+    sort    = ('created_at', 'DESC')
+  )
+  tot = None
+  if not req.REQUEST.get('tot'):
+    tot = ThouReport.query('pre_table', cnd, cols = ['COUNT(*) AS tot'])[0]['tot']
+  else:
+    tot = int(req.REQUEST.get('tot', per))
+  fin   = tot < pos
+  if fin:
+    return HttpResponse('Check the file in /tmp/export.slk.', content_type = 'text/plain; charset=UTF-8')
+  qry.execute()
+  names = [x.name for x in qry.cursor.description]
+  path  = req.REQUEST.get('path', '/tmp/export.slk')
+  with open(path, 'a') as fch:
+    if not pos:
+      fch.write('ID;P\r\n')
+      prs = 0
+      for nom in names:
+        prs = prs + 1
+        fch.write('C;Y1;X%d;K"%s"\r\n' % (prs, nom))
+    them  = []
+    for row in qry:
+      if not row: break
+      pos = pos + 1
+      prs = 0
+      for nom in names:
+        prs = prs + 1
+        fch.write('C;Y%d;X%d;K"%s"\r\n' % (pos, prs, row[nom] or ''))
+    fch.write('E\r\n')
+  return HttpResponseRedirect('%s?path=%s&per=%d&pos=%d&tot=%d' % (req.path, path, per, pos + 1, tot))
+
 BMI_MIN = 19
 BMI_MAX = 25
 @permission_required('ubuzima.can_view')

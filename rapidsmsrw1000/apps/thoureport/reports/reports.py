@@ -53,7 +53,6 @@ class ThouQuery:
     self.optim    = kwargs.get('optimise', {})
     self.precount = kwargs.get('precount')
     self.flat     = False
-    self.sort     = None
 
   def where(self, k, v):
     self.djconds[k] = v
@@ -71,6 +70,12 @@ class ThouQuery:
 
   def assemble_sort(self, asc):
     return ThouReport.assemble_sort(asc)
+
+  def assemble_order(self, limits):
+    return ThouReport.assemble_order(limits)
+
+  def assemble_limits(self, limits):
+    return ThouReport.assemble_limits(limits)
 
   def assemble_conditions(self, conds):
     return ThouReport.assemble_conditions(conds)
@@ -268,14 +273,14 @@ class ThouQuery:
 
   @property
   def query(self):
-    qry   = u' FROM %s%s%s' % (self.tablenm, self.assemble_conditions(self.djconds), self.assemble_sort(self.sort))
+    qry   = u' FROM %s%s%s%s' % (self.tablenm, self.assemble_conditions(self.djconds), self.assemble_sort(self.kwargs.get('sort', None)), self.assemble_limits(self.kwargs))
     cols  = ', '.join(self.kwargs.get('cols', self.active_columns(self.kwargs.get('qid')) or ['*']))
     annot = []
     for k in self.annots:
       it  = self.annots[k]
       q   = qry
       if type(it) ==  type(('query', 'conds')):
-        q   = self.assemble_conditions(it[1])
+        q   = '%s%s' % (self.assemble_conditions(it[1]), self.assemble_limits(self.kwargs))
         it  = it[0]
       annot.append('(SELECT %s FROM %s%s) AS %s' % (it, self.tablenm, q, k))
     annot.append('%s%s' % (cols, qry))
@@ -381,6 +386,19 @@ It is not idempotent at this level; further constraints should be added by inher
       raise Exception, ('Specify adapter for %s (%s)' % (ok, conds[ok]))
 
   @classmethod
+  def assemble_order(self, order):
+    od  = order.get('order', None)
+    if not od: return ''
+    return ' ORDER BY ' + od
+
+  @classmethod
+  def assemble_limits(self, lims):
+    limits  = lims.get('limit', None)
+    offset  = lims.get('offset', None)
+    if not any([limits, offset]): return ''
+    return '%s%s' % (' LIMIT %d' % (limits, ) if limits else '', ' OFFSET %d' % (offset, ) if offset else '')
+
+  @classmethod
   def assemble_conditions(self, conds):
     curz  = postgres.cursor()
     ans   = []
@@ -399,7 +417,7 @@ It is not idempotent at this level; further constraints should be added by inher
   def assemble_sort(self, dem):
     if not dem: return ''
     cn, dr = dem
-    return ' ORDER BY %s %sENDING' % (cn, 'ASC' if dr else 'DESC')
+    return ' ORDER BY %s %s/*ENDING*/' % (cn, 'ASC' if dr else 'DESC')
 
   seen_actives  = {}
   @classmethod
