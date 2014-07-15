@@ -15,6 +15,7 @@ from StringIO import StringIO
 REPORTS_TABLE = __DEFAULTS['REPORTS']
 
 class ThouRow:
+  '''Wrapper for the tuple (.value) of the row. Allows classes-based responses to Django template protocols (__getitem__).'''
   def __init__(self, query, value = None, **kwargs):
     self.query  = query
     self.hooks  = kwargs.get('hooks', {})
@@ -22,12 +23,28 @@ class ThouRow:
     self.value  = value
 
   def set_row(self, r):
+    '''Imperative style is bad style. But this is Python, anyway.'''
     self.value  = r
 
   def __setitem__(self, k, v):
+    '''Don't use.'''
     raise Exception, 'Read-only, man. :-p'
 
   def __getitem__(self, k):
+    '''Django calls this. Would execute the lazy query.
+Hooks are used thus:
+
+  row = ThouReport.query('pre_table', 'SELECT 70 AS lxx', hooks = {'septuagint':lambda x, y: x['lxx'] + 2})[0]
+  # row.septuagint
+  print 'LXX:', row['septuagint'] # LXX: 72
+  
+x is this row object, and y is the same key at which the callable hos been found.
+If the hook is a {hash:table}, it is considered as a mere lazy specialisation of this same query, permitting things like:
+
+  query.subquery.subsubquery
+
+which are defined declaratively, and delayed in specialisation and execution.
+'''
     try:
       if not self.query.cols:
         self.query.load_description()
@@ -43,7 +60,53 @@ class ThouRow:
       return hk
 
 class ThouQuery:
+  '''Query object. Not to be constructed directly by the user; that's why Java reinvented the FactoryFactoryFactory.factoryFactory()
+'''
   def __init__(self, djconds, tn, **kwargs):
+    '''
+The first arg may be a string (the raw query), or an executable (which, when executed with this ThouQuery, returns the raw query), or a hash of the query conditions as keys with their interpolation data as values.
+The second arg is the table name. The table on which the query operates.
+  
+  q1  = ThouQuery({'weight_float > %s': 50.0}, 'pre_table')
+  # Corresponds to SELECT ... FROM pre_table WHERE weight_float > 50.0
+
+The keyword args are all optional:
+
+  table:
+    replaces the table-name argument (second).
+  cols:
+    the columns to which to limit the query.
+  migrations:
+    description of columns that should be created, if they are missing.
+  annotate:
+    a hash of subqueries that will be returned by the column-name given in their key, being executed with the conditions of the current query.
+      q2  = ThouQuery({'weight_float > %s': 50.0}, 'pre_table', annotate = {'total':'COUNT(*)'})
+      # Corresponds to SELECT (SELECT COUNT(*) FROM pre_table WHERE weight_float > 50.0) AS total, name FROM pre_table WHERE weight_float > 50.0
+    This is meant for use in those cases where such a specialised query is the efficient way to establish record sizes. This may also be needed when named cursors are used.
+  precount:
+    this is the pre-computed number of records returned from this query; we don't ask where you got it.
+  hooks:
+    see ThouRow.__getitem__
+  optimise:
+    a hash that turns on and controls database querying optimisations.
+      q3  = ThouQuery(... optimise = {'name':'optim1'})
+      # q3  is now an optimised query
+    The required name field turns on named cursors. These optimised cursors, however, do not have the count of the results. You could use precount, or pass another field with name, counter.
+    This is the default counter for optimised queries:
+
+      def default_counter(self, qry):
+        nq  = qry.specialise({})
+        nq.names  = ['COUNT(*) AS tot']
+        nq.kwargs.pop('optimise', None)
+        try:
+          return nq[0].value[0]
+        except Exception, e:
+          return 0
+
+      q4  = ThouQuery(... optimise = {'name':'optim2', 'counter':default_counter})
+
+    The results of the counter are checked once and cached. (Even precount is cached.)
+'''
     self.djconds  = djconds
     self.tablenm  = kwargs.get('table', tn)
     self.kwargs   = kwargs
@@ -55,39 +118,50 @@ class ThouQuery:
     self.flat     = False
 
   def where(self, k, v):
+    '''Adds a condition to the ones supplied in the constructor.'''
     self.djconds[k] = v
     return self
 
   def put_names(self, dat):
+    '''Supplies the column names without due consultation. (Be very careful.)'''
     self.names  = dat
 
   def set_names(self, dat):
+    '''Supplies the column names from a hash without due consultation. (Be very careful.)'''
     self.names  = dat.keys()
     self.cols   = dat
 
   def active_columns(self, qid):
+    '''Returns the names of the columns seen for this query (normally info coming from the DB).'''
     return self.names or ThouReport.active_columns(qid)
 
   def assemble_sort(self, asc):
+    '''Assemble into query the parts that sort (ASC/DESC).'''
     return ThouReport.assemble_sort(asc)
 
   def assemble_order(self, limits):
+    '''Assemble into query the parts that order (ORDER BY).'''
     return ThouReport.assemble_order(limits)
 
   def assemble_limits(self, limits):
+    '''Assemble into query the parts that limit sizes (LIMIT).'''
     return ThouReport.assemble_limits(limits)
 
   def assemble_conditions(self, conds):
+    '''Assemble into query the parts that express conditions (WHERE).'''
     return ThouReport.assemble_conditions(conds)
 
-  def specialise(self, kwargs):
+  # TODO: Accept extras?
+  def specialise(self, conds):
+    '''Returns a different copy of this query, with the arguments treated as now conditions.'''
     nova          = copy.copy(self)
     nova.djconds  = copy.copy(self.djconds)
-    for k in kwargs:
-      nova.djconds[k] = kwargs[k]
+    for k in conds:
+      nova.djconds[k] = conds[k]
     return nova
 
   def filter(self, **kwargs):
+    '''Django ORM backward-compatibility. See Django docs.'''
     nova          = copy.copy(self)
     nova.djconds  = copy.copy(self.djconds)
     for k in kwargs:
@@ -96,6 +170,7 @@ class ThouQuery:
 
   # TODO: Make sure this works, if it is necessary in our current DB design.
   def distinct(self, *args, **kwargs):
+    '''Django ORM backward-compatibility. See Django docs.'''
     return self
     raise Exception, str((args, kwargs))
     pass
@@ -103,6 +178,7 @@ class ThouQuery:
   # TODO: Use the flatness in the next call.
   # TODO: This doesn’t work yet.
   def values(self, *vals, **kwargs):
+    '''Django ORM backward-compatibility. See Django docs.'''
     it        = copy.copy(self)
     it.names  = kwargs.get('new', ['orig_%s' % (x,) for x in vals])
     # dem       = it.fetchall()
@@ -112,16 +188,20 @@ class ThouQuery:
 
   # TODO.
   def extra(self, **kwargs):
+    '''Django ORM backward-compatibility. See Django docs.'''
     return self
 
   def exists(self):
+    '''Determines if this query would return anything.'''
     self.execute()
     return max(self.cursor.rowcount, 0) < 1
 
   def annotate(self, **kwargs):
+    '''Django ORM backward-compatibility. See Django docs.'''
     return self.specialise(annotate = kwargs)
 
   def order_by(self, _, cue = ''):
+    '''Django ORM backward-compatibility. See Django docs.'''
     if len(cue) < 1: return self
     asc, gd, etc = False, cue[0], cue[1:]
     if gd != '-':
@@ -132,15 +212,17 @@ class ThouQuery:
     return ans
 
   def hdl_(self, qry):
+    '''Internal optimised query counter implementation.'''
     nq  = qry.specialise({})
     nq.names  = ['COUNT(*) AS tot']
-    nq.kwargs.pop('optims', None)
+    nq.kwargs.pop('optimise', None)
     try:
       return nq[0].value[0]
     except Exception, e:
       return 0
 
   def count(self):
+    '''Number of result rows. It is important to use and respect this, because asking for more rows that we have can return None instead of failing.'''
     if not self.cursor:
       self.execute()
     if not (self.precount is None):
@@ -154,9 +236,11 @@ class ThouQuery:
     return max(minim, self.cursor.rowcount)
 
   def __names(self, curz, dft):
+   '''Get the column names, as declared by the database. This is reliable.'''
    return [x.name for x in curz.description] if curz.description else dft
 
   def execute(self, retries = True):
+    '''Final ultimate execution. If the query fails, it runs migrations.'''
     if not self.cursor:
       try:
         self.names, self.cursor = self.__execute()
@@ -171,24 +255,28 @@ class ThouQuery:
     return self
 
   def migrate(self, migs, _):
+    '''Runs the migrations supplied.'''
     curz = postgres.cursor()
     for mig in migs:
       ThouReport.ensure_column(curz, self.tablenm, *mig)
     curz.close()
 
   def fetchall(self):
+    '''Django ORM backward-compatibility. See Django docs.'''
     if not self.cursor:
       self.execute()
       return self.cursor.fetchall()
     return self.cursor.fetchall()
 
   def fetch(self):
+    '''Django ORM backward-compatibility. See Django docs.'''
     if not self.cursor:
       self.execute()
       return self.fetch()
     return self.fetchone()
 
   def __getitem__(self, them):
+    '''Propagates Django protocols and provides truly subscripted access to query rows, which are returned as ThouRow instances.'''
     if not self.cursor:
       self.execute()
       return self[them]
@@ -221,6 +309,7 @@ class ThouQuery:
       raise NameError, ('No column called "%s" (has: %s).' % (colnm, ', '.join(cols)))
 
   def load_description(self):
+    '''To be called in those times when a database-supplied description of the columns in the query is required.'''
     ans = {}
     nms = []
     pos = 0
@@ -240,6 +329,7 @@ class ThouQuery:
     return (nms, ans)
 
   def __set_names(self):
+    '''This is a helper that records and returns column information.'''
     self.cols   = {}
     notI        = 0
     for x in (self.names or {}):
@@ -249,6 +339,7 @@ class ThouQuery:
 
   # TODO: Work with views to ensure closing of cursors.
   def __execute(self):
+    '''Runs once per query, open the main cursor and fills out last state data.'''
     qry   = self.query
     curz  = None
     optim = self.optim
@@ -262,6 +353,7 @@ class ThouQuery:
     return (cols, curz)
 
   def close(self):
+    '''Should run once per query, and close the main cursor.'''
     if not self.cursor: return
     return self.cursor.close()
 
@@ -273,24 +365,31 @@ class ThouQuery:
 
   @property
   def query(self):
-    qry   = u' FROM %s%s%s%s' % (self.tablenm, self.assemble_conditions(self.djconds), self.assemble_sort(self.kwargs.get('sort', None)), self.assemble_limits(self.kwargs))
-    cols  = ', '.join(self.kwargs.get('cols', self.active_columns(self.kwargs.get('qid')) or ['*']))
+    '''A string of the raw query as it would be executed.'''
+    if type(self.djconds) in [type('str'), type(u'unicode')]:
+      return self.djconds
+    if type(self.djconds) == type(lambda x: x):
+      return self.djconds(self)
+    qry   = u'%s%s%s' % (self.assemble_conditions(self.djconds), self.assemble_sort(self.kwargs.get('sort', None)), self.assemble_limits(self.kwargs))
+    cols  = u', '.join(self.kwargs.get('cols', self.active_columns(self.kwargs.get('qid')) or ['*']))
     annot = []
     for k in self.annots:
       it  = self.annots[k]
       q   = qry
       if type(it) ==  type(('query', 'conds')):
-        q   = '%s%s' % (self.assemble_conditions(it[1]), self.assemble_limits(self.kwargs))
+        q   = u'%s%s' % (self.assemble_conditions(it[1]), self.assemble_limits(self.kwargs))
         it  = it[0]
-      annot.append('(SELECT %s FROM %s%s) AS %s' % (it, self.tablenm, q, k))
-    annot.append('%s%s' % (cols, qry))
-    qry = ', '.join(annot)
-    return ' '.join(['SELECT', qry])
+      annot.append(u'(SELECT %s FROM %s%s) AS %s' % (it, self.tablenm, q, k))
+      # annot.append(u'(SELECT %s %s) AS %s' % (it, q, k))
+    annot.append(u'%s FROM %s%s' % (cols, self.tablenm, qry))
+    qry = u', '.join(annot)
+    return u' '.join([u'SELECT', qry])
 
   def __unicode__(self):
     return self.query
 
 class ThouReportBatch:
+  '''Meant to facilitate batch operations.'''
   def __init__(self):
     self.tables   = {}
 
@@ -368,6 +467,7 @@ It is not idempotent at this level; further constraints should be added by inher
 
   @classmethod
   def alter_condition(self, conds, ok):
+    '''A way to plug new DB layout into the old code's expectation.'''
     if not ok in conds:
       return ok, None
     idem    = lambda x: x
@@ -387,12 +487,14 @@ It is not idempotent at this level; further constraints should be added by inher
 
   @classmethod
   def assemble_order(self, order):
+    '''Assemble into query the parts that order (ORDER BY).'''
     od  = order.get('order', None)
     if not od: return ''
     return ' ORDER BY ' + od
 
   @classmethod
   def assemble_limits(self, lims):
+    '''Assemble into query the parts that limit (LIMIT).'''
     limits  = lims.get('limit', None)
     offset  = lims.get('offset', None)
     if not any([limits, offset]): return ''
@@ -400,6 +502,8 @@ It is not idempotent at this level; further constraints should be added by inher
 
   @classmethod
   def assemble_conditions(self, conds):
+    '''Assemble into query the conditions (WHERE).
+If 'Invert Query' is supplied as one of the condition keys, the entire set of conditions will be negated.'''
     curz  = postgres.cursor()
     ans   = []
     neg   = False
@@ -415,6 +519,7 @@ It is not idempotent at this level; further constraints should be added by inher
 
   @classmethod
   def assemble_sort(self, dem):
+    '''Assemble into query the parts that sort (ORDER BY).'''
     if not dem: return ''
     cn, dr = dem
     return ' ORDER BY %s %s/*ENDING*/' % (cn, 'ASC' if dr else 'DESC')
@@ -422,12 +527,14 @@ It is not idempotent at this level; further constraints should be added by inher
   seen_actives  = {}
   @classmethod
   def active_columns(self, qid = None):
+    '''List of active columns.'''
     if not qid: return qid
     if not qid in self.seen_actives: return None
     return seen_actives[qid]
 
   @classmethod
   def record_activity(self, qid, qnom):
+    '''Facility to cache table-column status.'''
     if not qid in self.seen_actives:
       self.seen_actives[qid] = set()
       return self.record_activity(qid, qnom)
@@ -436,12 +543,26 @@ It is not idempotent at this level; further constraints should be added by inher
     return us
 
   @classmethod
-  def query(self, tn, djconds, **kwargs):
+  def query(self, tn, djconds = {}, **kwargs):
+    '''SELECT * FROM pre_table
+  ThouReport.query('pre_table')
+
+SELECT * FROM pre_table WHERE x > 4
+  ThouReport.query('pre_table', {'x > %s': 4})
+
+SELECT (SELECT COUNT(*) FROM pre_table FROM pre_table WHERE ch_bool) AS total, * FROM pre_table WHERE ch_bool
+  ThouReport.query('pre_table', {'ch_bool':''}, annotate = {'total':'COUNT(*)'})
+
+print ThouReport.query('pre_table', {'created_at > %s':datetime.datetime.today(), 'Invert Query':True}).query
+Prints:
+   u"SELECT * FROM pre_table WHERE NOT (created_at > '1900-07-15T11:15:31.850252'::timestamp)"
+'''
     tbl = self.ensure_table(tn)
     return ThouQuery(djconds, tn, **kwargs)
 
   @classmethod
   def find_matching_type(self, val, ctyp, cn = None):
+    '''Matches sample value `val` to an SQL type (defaulting to `ctyp`). For error-reporting, cn is the name of the column for which this information is being collected.'''
     try:
       return {
         str:                ctyp,
@@ -460,6 +581,8 @@ It is not idempotent at this level; further constraints should be added by inher
 
   @classmethod
   def decide_type(self, vl, cn = None):
+    '''Matches sample value `vl` to an SQL type. For error-reporting, cn is the name of the column for which this information is being collected.
+If `vl` is a hash, then 'type' is the SQL type, 'default' the SQL default, 'null' the nullability of the column, and 'value' would, if provided, be a replacement for `vl`.'''
     ctyp  = 'TEXT DEFAULT NULL'
     dval  = vl
     if type(vl) == type((None, 'INTEGER DEFAULT NULL')):
@@ -477,11 +600,18 @@ It is not idempotent at this level; further constraints should be added by inher
 
   @classmethod
   def batch(self):
+    '''Creates a ThouReportBatch object to facilitate batch-inserts.'''
     btc = ThouReportBatch()
     return btc
 
   @classmethod
   def store(self, tn, dat, **kwargs):
+    '''Stores in the table `tn` (creating it, if necessary) the hash provided in `dat`. The hash keyword item `indexcol` is treated as the ID of the object.
+Keywords:
+  This integer is the ID of the object. Provide it, if you have it.
+batch:
+  The hash of the keywords that turn on and control batch activity.
+'''
     if type(dat) in [type(x) for x in [set(), []]]:
       return [self.store(tn, cv, **kwargs) for cv in dat]
     if not dat: return None
@@ -524,6 +654,7 @@ It is not idempotent at this level; further constraints should be added by inher
   seen_columns  = {}
   @classmethod
   def ensure_column(self, curz, tbl, col, dval, opts = {}):
+    '''Using `curz` as cursor, creates (if necessary) the column `col` in the table `tbl`, using `dval` as the sample value.'''
     sncs  = self.seen_columns.get(tbl, set())
     if not col in sncs:
       curz.execute('SELECT TRUE FROM information_schema.columns WHERE table_name = %s AND column_name = %s', (tbl, col))
@@ -544,6 +675,7 @@ It is not idempotent at this level; further constraints should be added by inher
   seen_tables = set()
   @classmethod
   def ensure_table(self, tbl):
+    '''Creates the table `tbl`, if necessary.'''
     try:
       if tbl in self.seen_tables: return tbl
       curz  = postgres.cursor()
@@ -559,6 +691,7 @@ It is not idempotent at this level; further constraints should be added by inher
 
   @classmethod
   def sparse_matrix_store(self, hsh):
+    '''Stores the hash `hsh` as a sparse matrix in the default table.'''
     tbl = self.ensure_table()
     return self.store(hsh, tbl)
 
@@ -604,6 +737,7 @@ NAME_MATCHING = {
       }
 
 class BasicConverter:
+  '''Object to aid matching old-style report types to names in the new system.'''
   def __init__(self, dft = {}):
     self.types    = ReportType.objects.all()
     self.defaults = dft
@@ -619,6 +753,7 @@ class BasicConverter:
     return self.thash[k]
 
 class OldStyleReport:
+  '''Object to aid in manipulating old-style reports as a single accessible object.'''
   def __init__(self, rep, cur, cvr):
     self.autos  = rep
     self.conver = cvr
@@ -736,4 +871,5 @@ class OldStyleReport:
     return (suc, thr, tbn)
 
   def __str__(self):
+    '''RapidSMS can't code. Probably the funniest Python joke ever replaced.'''
     return '%s ...' % (self.conver[self.autos.type.pk],)

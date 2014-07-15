@@ -581,7 +581,7 @@ def paginated(req, data):
     return data
 
 #Commented because of RHEA group rights
-#@permission_required('ubuzima.can_view')
+# @permission_required('ubuzima.can_view')
 def get_user_location(req):
     req.base_template = "webapp/layout.html"
     uloc = get_object_or_404(UserLocation, user=req.user)
