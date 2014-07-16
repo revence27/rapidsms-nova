@@ -11,6 +11,8 @@ Has the ability to parse itself from a message string, conditionally pulling sev
 It also supplies contextual information about its unsuccessful parsing.'''
   # __metaclass__   = ABCMeta
 
+  column_name = None
+
   @staticmethod
   def pull(self, cod, txt, many = False):
     '''A field will process thestring `txt` to parse of a valid object of its class (passed in as `self` and linked to the SMS code passed in as `cod`).
@@ -108,7 +110,7 @@ TODO: Currently gives no heed to the opinions of the field itself.'''
   @classmethod
   def subname(self):
     'Returns the name of this field as it would be used in composing a column name.'
-    return str(self).split('.')[-1].lower()
+    return self.column_name or str(self).split('.')[-1].lower()
 
   @classmethod
   def display(self):

@@ -435,7 +435,9 @@ class ThouReport:
       curfd = ents[fx]
       if curfd.several_fields:
         for vl in curfd.working_value:
-          cvs[('%s_%s' % (fx, vl)).lower()] = vl
+          # cvs[('%s_%s' % (fx, vl)).lower()] = vl
+          if vl is None: continue
+          cvs[('%s_%s' % (vl, ThouReport.find_matching_type(vl, 'TEXT').split(' ')[0])).lower()] = vl
       else:
         try:
           cvs[fx] = curfd.working_value[0]
@@ -445,6 +447,39 @@ class ThouReport:
 
   # TODO: Consider the message field classes' declared default.
   def save(self):
+    ans                       = {}
+    ans['report_type']        = self.msg.code
+    ans['original_msg']       = None  # TODO
+    ans['reporter_pk']        = None  # TODO
+    ans['reporter_phone']     = None  # TODO
+    ans['patient_id']         = self.get('patient_id')
+    ans['patient_pk']         = None  # TODO
+    ans['report_date']        = datetime.datetime.today()
+    ans['village_pk']         = None  # TODO
+    ans['health_center_pk']   = None  # TODO
+    ans['district_pk']        = None  # TODO
+    ans['sector_pk']          = None  # TODO
+    ans['province_pk']        = None  # TODO
+    ans['cell_pk']            = None  # TODO
+    ans['nation_pk']          = None  # TODO
+    ans['lmp']                = self.get('lmp')
+    logid   = ThouReport.store(REPORTS_TABLE, ans)
+    spctbl  = 'pre_table' # Choose by good methods. TODO.
+    stash   = self.__insertables()
+    part.update(stash)
+    return ThouReport.store(spctbl, part)
+
+  def get(self, who, dft = None):
+    return self.msg.entries.get(who, dft)
+
+  def storable_hash(self, skip = set()):
+    ans = {}
+    for fld in self.msg.entries:
+      if fld in skip: continue
+      ans['%s_bool' % (fld, )] =  str(fld)
+    return ans
+
+  def previous_save(self):
     return self.__class__.sparse_matrix(self)
 
   def old_save(self):
@@ -693,7 +728,7 @@ batch:
   def sparse_matrix_store(self, hsh):
     '''Stores the hash `hsh` as a sparse matrix in the default table.'''
     tbl = self.ensure_table()
-    return self.store(hsh, tbl)
+    return self.store(tbl, hsh)
 
   @classmethod
   def sparse_matrix(self, tn, cvs = None, prep = None):

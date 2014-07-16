@@ -15,6 +15,8 @@ def first_cap(s):
 
 class IDField(ThouField):
   'The commonly-used ID field.'
+
+  column_name = 'patient_id'
   @classmethod
   def is_legal(self, ans):
     'For now, checks are limited to length assurance.'
@@ -22,6 +24,8 @@ class IDField(ThouField):
 
 class DateField(ThouField):
   'The descriptor for valid message fields.'
+
+  column_name = 'lmp'
   @classmethod
   def is_legal(self, fld):
     ans = re.match(r'(\d{2})\.(\d{2})\.(\d{4})')
@@ -31,6 +35,8 @@ class DateField(ThouField):
 
 class NumberField(ThouField):
   'The descriptor for number fields.'
+
+  column_name = 'number'
   @classmethod
   def is_legal(self, fld):
     'Basically a regex.'
@@ -38,17 +44,23 @@ class NumberField(ThouField):
 
 class CodeField(ThouField):
   'This should match basically any simple code, plain and numbered.'
+
+  column_name = 'code'
   @classmethod
   def is_legal(self, fld):
     'Basically a simple regex.'
     return [] if re.match(r'\w+', fld) else 'what_code'
 
 class GravidityField(NumberField):
-  'Gravity is a number.'
+  'Gravidity is a number.'
+
+  column_name = 'gravity_float' # (sic.)
   pass
 
 class ParityField(NumberField):
   'Parity is a number.'
+
+  column_name = 'parity_float'
   pass
 
 class PregCodeField(CodeField):
@@ -231,7 +243,7 @@ class DeathField(CodeField):
     return ['ND', 'CD', 'MD']
 
 class ThouMsgError:
-  'Unused.'
+  'Small exception class.'
   def __init__(self, errors):
     self.errors     = errors
 
@@ -346,22 +358,13 @@ class ThouMessage:
   def __init__(self, cod, fobs, errs):
     self.code     = cod
     self.errors   = errs
+    if self.errors: raise ThouMsgError(self.errors)
+    semerrors     = self.semantics_check()
+    if semerrors: raise ThouMsgError(semerrors)
     def as_hash(p, n):
       p[n.__class__.subname()] = n
       return p
     self.entries  = reduce(as_hash, fobs, {})
-
-  def __enter__(self):
-    self.errors = self.errors.extend(self.semantics_check())
-    if self.errors:
-      raise ThouMsgError(self.errors)
-    return self
-
-  def __exit__(self, tp, val, tb):
-    if tp:
-      pass  # TODO: Record the error.
-    else:
-      pass  # TODO: Record the success.
 
   @abstractmethod
   def semantics_check(self):
