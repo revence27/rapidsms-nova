@@ -334,7 +334,7 @@ The keyword args are all optional:
     '''Runs once per query, open the main cursor and fills out last state data.'''
     qry   = self.query
     curz  = None
-    optim = self.kwargs.get('optimise')
+    optim = self.kwargs.get('optimise', {})
     if optim:
       curn  = optim['name']
       curz  = self.postgres.cursor(curn)
@@ -511,7 +511,7 @@ Prints:
    u"SELECT * FROM pre_table WHERE NOT (created_at > '1900-07-15T11:15:31.850252'::timestamp)"
 '''
     tbl = self.ensure_table(tn)
-    return Query(djconds, tn, **kwargs)
+    return Query(self.postgres, djconds, tn, **kwargs)
 
   @classmethod
   def find_matching_type(self, val, ctyp, cn = None):
