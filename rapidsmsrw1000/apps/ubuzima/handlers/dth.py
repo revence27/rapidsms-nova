@@ -15,6 +15,7 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
 DEATH_CODE_PATTERN = "md|nd|cd"
 DEATH_LOCATION_PATTERN = "ho|cl|hp|or"
@@ -200,7 +201,8 @@ class DeathRecord(object):
             raise Exception(_("Death Code Is missing! Please be sure that you have entered the appropriate Death Code. It should be MD, CD, or ND."))
 
 
-class DthHandler (KeywordHandler):
+# class DthHandler (KeywordHandler):
+class DthHandler (NovaHandler):
     """
     Death REGISTRATION
     """
@@ -214,7 +216,7 @@ class DthHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: DTH MOTHER_ID CHILD_NUMBER DATE_OF_BIRTH DEATH_CODE")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.death(self.msg)
         self.respond(text)

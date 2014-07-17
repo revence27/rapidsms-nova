@@ -15,9 +15,11 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
 
-class ResHandler (KeywordHandler):
+# class ResHandler (KeywordHandler):
+class ResHandler (NovaHandler):
     """
     Risk Result report REGISTRATION
     """
@@ -31,7 +33,7 @@ class ResHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: RES MOTHER_ID REPORTED_SYMPTOMS LOCATION_CODE INTERVENTION_CODE MOTHER_STATUS CHILD_STATUS")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.res(self.msg)
         self.respond(text)

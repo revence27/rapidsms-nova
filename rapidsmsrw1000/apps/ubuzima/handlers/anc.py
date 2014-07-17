@@ -15,9 +15,11 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
 
-class AncHandler (KeywordHandler):
+# class AncHandler (KeywordHandler):
+class AncHandler (NovaHandler):
     """
     ANC REGISTRATION
     """
@@ -31,7 +33,7 @@ class AncHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: ANC MOTHER_ID VISIT_DATE ANC_ROUND ACTION_CODE LOCATION_CODE MOTHER_WEIGHT")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.anc(self.msg)
         self.respond(text)

@@ -15,9 +15,11 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
 
-class BirHandler (KeywordHandler):
+# class BirHandler (KeywordHandler):
+class BirHandler (NovaHandler):
     """
     BIRTH REGISTRATION
     """
@@ -31,7 +33,7 @@ class BirHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: BIR MOTHER_ID CHILD_NUM DOB SEX ACTION_CODE LOCATION_CODE BREASTFEEDING CHILD_WEIGHT")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.birth(self.msg)
         self.respond(text)

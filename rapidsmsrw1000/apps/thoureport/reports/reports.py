@@ -5,11 +5,11 @@ from datetime import datetime, date, time
 from rapidsmsrw1000.apps.ubuzima.models import *
 from rapidsmsrw1000.apps.orm.orm import *
 from ..messages.parser import *
-from ....settings import __DEFAULTS, THE_DATABASE as postgres
+from ....settings import __DEFAULTS, THE_DATABASE
 import re
 
 REPORTS_TABLE = __DEFAULTS['REPORTS']
-ORM.postgres  = postgres
+ORM.postgres  = THE_DATABASE
 
 class ThouReport(ORM):
   'The base class for all "RapidSMS 1000 Days" reports.'
@@ -20,7 +20,7 @@ class ThouReport(ORM):
     'Initialised with the Message object to which it is coupled.'
     self.msg  = msg
 
-  def __insertables(self, fds):
+  def __insertables(self):
     '''Returns a hash of all the columns that will be affected by an insertion of this report into the database. The column name is the key, with its value.'''
     cvs   = {}
     ents  = self.msg.entries
@@ -38,29 +38,20 @@ class ThouReport(ORM):
           raise Exception, ('No value supplied for column \'%s\' (%s)' % (fx, str(curfd)))
     return cvs
 
-  # TODO: Consider the message field classes' declared default.
-  def save(self):
-    ans                       = {}
-    ans['report_type']        = self.msg.code
-    ans['original_msg']       = None  # TODO
-    ans['reporter_pk']        = None  # TODO
-    ans['reporter_phone']     = None  # TODO
-    ans['patient_id']         = self.get('patient_id')
-    ans['patient_pk']         = None  # TODO
-    ans['report_date']        = datetime.datetime.today()
-    ans['village_pk']         = None  # TODO
-    ans['health_center_pk']   = None  # TODO
-    ans['district_pk']        = None  # TODO
-    ans['sector_pk']          = None  # TODO
-    ans['province_pk']        = None  # TODO
-    ans['cell_pk']            = None  # TODO
-    ans['nation_pk']          = None  # TODO
-    ans['lmp']                = self.get('lmp')
+  def save(self, tbl = None, **kwargs):
+    ans                       = {
+      'report_type'        : self.msg.code,
+      'original_msg'       : self.msg.text,
+      'patient_id'         : self.get('patient_id'),
+      'report_date'        : datetime.datetime.today(),
+      'lmp'                : self.get('lmp'),
+      'nation_pk'          : 1
+    }
+    ans.update(kwargs)
     logid   = ThouReport.store(REPORTS_TABLE, ans)
-    spctbl  = 'pre_table' # Choose by good methods. TODO.
     stash   = self.__insertables()
-    part.update(stash)
-    return ThouReport.store(spctbl, part)
+    ans.update(stash)
+    return ThouReport.store(tbl or REPORTS_TABLE, ans)
 
   def get(self, who, dft = None):
     return self.msg.entries.get(who, dft)
@@ -164,14 +155,6 @@ class OldStyleReport:
   def nation(self):
     return self.autos.location.nation
 
-  # TODO:
-  # 1.  The reports. With types. With fields.
-  # 2.  Facilities.
-  # 3.  Health workers
-  # 4.  Locations
-  # 5.  Reports.
-  # 6.  Messages
-  # 7.  Patients
   def __gather_fields(self, hsh = {}):
     fds = Field.objects.filter(report = self.autos)
     prp = self.db_prepend

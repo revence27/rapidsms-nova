@@ -15,8 +15,10 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
-class PreHandler (KeywordHandler):
+# class PreHandler (KeywordHandler):
+class PreHandler (NovaHandler):
     """
     PREGNANCY REGISTRATION
     """
@@ -30,7 +32,7 @@ class PreHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: PRE MOTHER_ID LAST_MENSES NEXT_VISIT PREVIOUS_RISK CURRENT_RISK LOCATION_CODE MOTHER_WEIGHT MOTHER_HEIGHT SANITATION TELEPHONE")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.pregnancy(self.msg)
         self.respond(text)

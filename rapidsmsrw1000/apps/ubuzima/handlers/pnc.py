@@ -15,9 +15,11 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
 
-class PncHandler (KeywordHandler):
+# class PncHandler (KeywordHandler):
+class PncHandler (NovaHandler):
     """
     Post Natal Care report REGISTRATION
     """
@@ -31,7 +33,7 @@ class PncHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: PNC MOTHER_ID PNC_ROUND DOB SYMPTOMS INTERVENTION CHILD_STATUS")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.pnc(self.msg)
         self.respond(text)

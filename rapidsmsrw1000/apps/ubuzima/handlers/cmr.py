@@ -15,9 +15,11 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
 
 class CmrHandler (KeywordHandler):
+# class CmrHandler (KeywordHandler):
     """
     CMR REGISTRATION
     """
@@ -31,7 +33,7 @@ class CmrHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: CMR MOTHER_ID CHILD_NUM DOB SYMPTOMS INTERVENTION MOTHER_STATUS CHILD_STATUS")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.cmr(self.msg)
         self.respond(text)

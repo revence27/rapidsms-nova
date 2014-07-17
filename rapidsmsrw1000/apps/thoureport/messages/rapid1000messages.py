@@ -3,6 +3,7 @@
 
 #This is a comment. Push it, push it. Harder now!
 from abc import ABCMeta, abstractmethod
+import copy
 import re
 from ..messages.parser import *
 from rapidsmsrw1000.settings import THE_DATABASE as db
@@ -353,11 +354,13 @@ class ThouMessage:
         errors.append((str(err), fld))
     if etc.strip():
       errors.append('Superfluous text: "%s"' % (etc.strip(),))
-    return klass(cod, fobs, errors)
+    return klass(cod, msg, fobs, errors)
 
-  def __init__(self, cod, fobs, errs):
+  def __init__(self, cod, txt, fobs, errs):
     self.code     = cod
     self.errors   = errs
+    self.text     = txt
+    self.fields   = fobs
     if self.errors: raise ThouMsgError(self.errors)
     semerrors     = self.semantics_check()
     if semerrors: raise ThouMsgError(semerrors)
@@ -368,7 +371,7 @@ class ThouMessage:
 
   @abstractmethod
   def semantics_check(self):
-    return ['Ariko Didier! I told you ThouMessage#semantics_check is abstract.']  # Hey, why doesn’t 'abstract' scream out? TODO.
+    return ['Extend semantics_check.']  # Hey, why doesn’t 'abstract' scream out? TODO.
 
 class UnknownMessage(ThouMessage):
   '''To the Unknown Message.
@@ -458,6 +461,17 @@ class TextField(ThouField):
 class RevMessage(ThouMessage):
   'Testing message. Takes any number of legal fields.'
   fields  = [(TextField, True)]
+
+  def semantics_check(self):
+    order = ['Revence', 'Kato', 'Kalibwani']
+    for fld in self.fields:
+      for it in range(len(fld.working_value)):
+        if it > len(order):
+          break
+        if fld.working_value[it].lower() != order[it].lower():
+          # return [('"%s" in position %d? The order is %s.' % (fld.working_value[it], it + 1, ', then '.join(['"%s"' % (x, ) for x in order])), fld)]
+          return [('rev_wrong_name_order', fld)]
+    return []
 
 MSG_ASSOC = {
   'PRE':  PregMessage,

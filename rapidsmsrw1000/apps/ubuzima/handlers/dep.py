@@ -15,9 +15,11 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
 
-class DepHandler (KeywordHandler):
+# class DepHandler (KeywordHandler):
+class DepHandler (NovaHandler):
     """
     Departure REGISTRATION
     """
@@ -31,7 +33,7 @@ class DepHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: DEP MOTHER_ID_OR_YOUR_PHONE_NUMBER_DATE_AS_DD_MM_YY  CHILD_NUMBER DOB")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.dep(self.msg)
         self.respond(text)

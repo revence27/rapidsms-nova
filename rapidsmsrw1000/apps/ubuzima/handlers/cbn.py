@@ -15,9 +15,11 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
 
-class CbnHandler (KeywordHandler):
+# class CbnHandler (KeywordHandler):
+class CbnHandler (NovaHandler):
     """
     CBN REGISTRATION
     """
@@ -31,7 +33,7 @@ class CbnHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: CBN MOTHER_ID CHILD_NUM DOB CHILD_HEIGHT CHILD_WEIGHT")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.cbn(self.msg)
         self.respond(text)

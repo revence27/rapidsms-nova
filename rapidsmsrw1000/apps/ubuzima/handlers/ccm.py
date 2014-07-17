@@ -15,9 +15,11 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
 
-class CcmHandler (KeywordHandler):
+# class CcmHandler (KeywordHandler):
+class CcmHandler (NovaHandler):
     """
     CCM REGISTRATION
     """
@@ -31,7 +33,7 @@ class CcmHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: CCM MOTHER_ID CHILD_NUM DOB SYMPTOMS INTERVENTION")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.ccm(self.msg)
         self.respond(text)

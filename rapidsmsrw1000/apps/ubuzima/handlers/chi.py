@@ -15,9 +15,11 @@ from django.db.models import Q
 ###DEVELOPED APPS
 from rapidsmsrw1000.apps.ubuzima.reports.utils import *
 from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
+from novahandlers import *
 
 
-class ChiHandler (KeywordHandler):
+# class ChiHandler (KeywordHandler):
+class ChiHandler (NovaHandler):
     """
     Child health Report REGISTRATION
     """
@@ -31,7 +33,7 @@ class ChiHandler (KeywordHandler):
     def help(self):
         self.respond("The correct format message is: CHI MOTHER_ID CHILD_NUM DOB VACCINS VACCIN_SERIE ACTION_CODE LOCATION_CODE CHILD_WEIGHT MUAC")
 
-    def handle(self, text):
+    def classic_handle(self, text):
         #print self.msg.text
         return self.child(self.msg)
         self.respond(text)
