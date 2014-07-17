@@ -260,6 +260,7 @@ The keyword args are all optional:
     for mig in migs:
       ThouReport.ensure_column(curz, self.tablenm, *mig)
     curz.close()
+    postgres.commit()
 
   def fetchall(self):
     '''Django ORM backward-compatibility. See Django docs.'''
