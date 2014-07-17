@@ -57,6 +57,7 @@ class Command(BaseCommand):
         {'NOT transferred' : ('',)},
         cols        = ['former_pk', 'indexcol'],
         migrations  = [
+          ('former_pk', 0),
           ('transferred', (True, 'BOOLEAN NOT NULL DEFAULT FALSE'))
         ]
       )

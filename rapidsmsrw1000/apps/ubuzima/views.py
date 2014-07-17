@@ -864,8 +864,28 @@ def json_tester(req):
       },
       migrations  = [
         ('db_bool', False),
+        ('fe_bool', False),
+        ('ma_bool', False),
+        ('to_bool', False),
+        ('ch_bool', False),
+        ('vo_bool', False),
+        ('ja_bool', False),
+        ('ns_bool', False),
+        ('pc_bool', False),
         ('ci_bool', False),
+        ('oe_bool', False),
+        ('di_bool', False),
+        ('sb_bool', False),
         ('hy_bool', False),
+        ('hw_bool', False),
+        ('gs_bool', False),
+        ('mu_bool', False),
+        ('rm_bool', False),
+        ('ol_bool', False),
+        ('yg_bool', False),
+        ('kx_bool', False),
+        ('yj_bool', False),
+        ('lz_bool', False),
         ('ib_bool', False)
       ]
     )
@@ -886,9 +906,14 @@ def json_tester(req):
     total   = nat[0]['allpregs']
     totalf  = float(total)
     toils   = toi[0]['allpregs']
-    toilpc  = (float(toils) / totalf) * 100.0
     hands   = hnd[0]['allpregs']
-    handpc  = (float(hands) / totalf) * 100.0
+    toilpc  = 0.0
+    handpc  = 0.0
+    try:
+      toilpc  = (float(toils) / totalf) * 100.0
+      handpc  = (float(hands) / totalf) * 100.0
+    except ZeroDivisionError, zde:
+      pass
     thinc   = thins[0]['allpregs']
     fatc    = fats[0]['allpregs']
     riskc   = riskys[0]['allpregs']
