@@ -5,11 +5,11 @@ from datetime import datetime, date, time
 from rapidsmsrw1000.apps.ubuzima.models import *
 from rapidsmsrw1000.apps.orm.orm import *
 from ..messages.parser import *
-from ....settings import __DEFAULTS, THE_DATABASE
+from ....settings import NOVA_DEFAULTS, NOVA_DATABASE
 import re
 
-REPORTS_TABLE = __DEFAULTS['REPORTS']
-ORM.postgres  = THE_DATABASE
+REPORTS_TABLE = NOVA_DEFAULTS['REPORTS']
+ORM.postgres  = NOVA_DATABASE
 
 class ThouReport(ORM):
   'The base class for all "RapidSMS 1000 Days" reports.'

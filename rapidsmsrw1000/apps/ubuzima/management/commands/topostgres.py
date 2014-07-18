@@ -11,9 +11,6 @@ import datetime
 import re, sys, os
 from optparse import make_option
 from rapidsmsrw1000.apps.thoureport.reports.reports import *
-from rapidsmsrw1000.settings import THE_DATABASE as postgres, __DEFAULTS
-
-REPORTS_TABLE = __DEFAULTS['REPORTS']
 
 class Command(BaseCommand):
     help = 'Copy the messages (and reports), with all supporting data (locations, facilities ...), over to the Postgres DB.'
@@ -52,22 +49,32 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
       def gun():
+        from rapidsmsrw1000.settings import NOVA_DEFAULTS
+        REPORTS_TABLE = NOVA_DEFAULTS['REPORTS']
+        postgres  = psycopg2.connect(
+            database = NOVA_DEFAULTS['NAME'],
+                user = NOVA_DEFAULTS['USER'],
+            password = NOVA_DEFAULTS['PASSWORD'],
+                host = NOVA_DEFAULTS['HOST']
+        )
+        ThouReport.postgres = postgres
         once  = True
         while once:
-          once  = self.single_handle(*args, **options) and options.get('repeat', not once)
+          once  = self.single_handle(REPORTS_TABLE, postgres, *args, **options) and options.get('repeat', not once)
         postgres.close()
       if options.get('background'):
         chp = os.fork()
         if chp:
           print 'Background:', chp
-          gun()
-        return
-      gun()
+          return
+        gun()
+      else:
+        gun()
 
-    def single_handle(self, *args, **options):
+    def single_handle(self, tbn, pgc, *args, **options):
       cpt   = int(options.get('number', 5000))
       force = options.get('force', False)
-      qry   = ThouReport.query(REPORTS_TABLE,
+      qry   = ThouReport.query(tbn,
         {'NOT transferred' : ('',)},
         cols        = ['former_pk', 'indexcol'],
         migrations  = [
@@ -97,11 +104,11 @@ class Command(BaseCommand):
         sys.stdout.flush()
         seen.add(ixnum)
       # print 'Updating deletion status ...',
-      ThouReport.store(REPORTS_TABLE,
+      ThouReport.store(tbn,
         {'indexcol': upds, 'transferred': True}
       )
       # print '... done.'
-      curz  = postgres.cursor()
+      curz  = pgc.cursor()
       reps  = Report.objects.exclude(id__in = seen).order_by('-date')
       gat = options.get('type', None)
       if gat:
@@ -128,9 +135,10 @@ class Command(BaseCommand):
         eta = datetime.datetime.now() + dlt
         pad = ((' %s ' % (str(dlt), )) + (' ' * maxw))
         osp = OldStyleReport(rep, curz, convr)
-        rsp = ('%d %s%3.1f%%%s' % (pos + 1, gap, pct, pad))
-        sys.stdout.write('\r' + rsp[0:maxw])
-        sys.stdout.flush()
+        if not options.get('background'):
+          rsp = ('%d %s%3.1f%%%s' % (pos + 1, gap, pct, pad))
+          sys.stdout.write('\r' + rsp[0:maxw])
+          sys.stdout.flush()
         # gat             = osp.convert(batch = batch)
         gat             = osp.convert()
         suc, thid, tbn  = gat
@@ -140,12 +148,12 @@ class Command(BaseCommand):
           rep.delete()
         stbs.add(tbn)
         pos = pos + 1
-        postgres.commit()
+        pgc.commit()
       batch.run()
       # print 'Done converting ...'
       # print 'List of secondary tables:'
       # for tbn in stbs:
       #   print tbn
       curz.close()
-      postgres.commit()
+      pgc.commit()
       return True

@@ -15,7 +15,7 @@ from rapidsmsrw1000.apps.ubuzima.models import *
 from rapidsmsrw1000.apps.thoureport.reports.reports import *
 from rapidsmsrw1000.apps.enum import *
 # from rapidsmsrw1000.settings import THE_DATABASE as postgres
-from rapidsmsrw1000.settings import __DEFAULTS
+from rapidsmsrw1000.settings import NOVA_DEFAULTS
 import calendar
 import json
 from django.utils.safestring import SafeString
@@ -24,7 +24,7 @@ from random import randint
 import xlsxwriter
 import re
 
-REPORTS_TABLE = __DEFAULTS['REPORTS']
+REPORTS_TABLE = NOVA_DEFAULTS['REPORTS']
 
 #wbk = xlwt.Workbook()
 #sheet.write(0,0,"ReportID")
