@@ -58,8 +58,9 @@ class Command(BaseCommand):
         postgres.close()
       if options.get('background'):
         with daemon.DaemonContext():
-          return gun()
-      gun()
+          gun()
+      else:
+        gun()
 
     def single_handle(self, *args, **options):
       cpt   = int(options.get('number', 5000))
