@@ -9,28 +9,6 @@ from rapidsmsrw1000.apps.thoureport.reports.rapid1000reports import *
 from rapidsmsrw1000.apps.thoureport.reports.reports import *
 from .models import *
 
-REPORT_SET = {
-  # 'PRE':  PregReport,
-  # 'REF':  RefReport,
-  # 'ANC':  ANCReport,
-  # 'DEP':  DepReport,
-  # 'RISK': RiskReport,
-  'RED':  RedReport,
-  # 'BIR':  BirReport,
-  # 'CHI':  ChildReport,
-  # 'DTH':  DeathReport,
-  # 'RES':  ResultReport,
-  # 'RAR':  RedResultReport,
-  # 'NBC':  NBCReport,
-  # 'CCM':  CCMReport,
-  # 'CMR':  CMRReport,
-  # 'CBN':  CBNReport,
-  # 'PNC':  PNCReport,
-
-  # 'TIM':  TimothyReport,
-  'REV': RevenceReport,
-}
-
 TRANSFORMATIONS = {
   '[!!!]' : (
     'Expected codes',

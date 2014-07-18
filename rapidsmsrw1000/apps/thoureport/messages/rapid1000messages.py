@@ -6,7 +6,7 @@ from abc import ABCMeta, abstractmethod
 import copy
 import re
 from ..messages.parser import *
-from rapidsmsrw1000.settings import THE_DATABASE as db
+from rapidsmsrw1000.settings import NOVA_DATABASE as db
 # from .reports.reports import THE_DATABASE as db
 
 def first_cap(s):
