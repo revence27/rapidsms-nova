@@ -8,7 +8,7 @@ from django.conf import settings
 import urllib2
 import time as times
 import datetime
-import re, sys, daemon
+import re, sys, os
 from optparse import make_option
 from rapidsmsrw1000.apps.thoureport.reports.reports import *
 from rapidsmsrw1000.settings import THE_DATABASE as postgres, __DEFAULTS
@@ -57,10 +57,12 @@ class Command(BaseCommand):
           once  = self.single_handle(*args, **options) and options.get('repeat', not once)
         postgres.close()
       if options.get('background'):
-        with daemon.DaemonContext():
+        chp = os.fork()
+        if chp:
+          print 'Background:', chp
           gun()
-      else:
-        gun()
+        return
+      gun()
 
     def single_handle(self, *args, **options):
       cpt   = int(options.get('number', 5000))
