@@ -554,7 +554,7 @@ If `vl` is a hash, then 'type' is the SQL type, 'default' the SQL default, 'null
   @classmethod
   def batch(self):
     '''Creates a ORMBatch object to facilitate batch-inserts.'''
-    btc = ORMBatch()
+    btc = ORMBatch(self.postgres)
     return btc
 
   @classmethod

@@ -1,3 +1,4 @@
+# encoding: UTF-8
 from django.core.management.base import BaseCommand
 # from ubuzima.models import Report, Reminder, ReminderType, TriggeredAlert
 # from ubuzima.models import *
@@ -7,7 +8,7 @@ from django.conf import settings
 import urllib2
 import time as times
 import datetime
-import re, sys
+import re, sys, daemon
 from optparse import make_option
 from rapidsmsrw1000.apps.thoureport.reports.reports import *
 from rapidsmsrw1000.settings import THE_DATABASE as postgres, __DEFAULTS
@@ -27,6 +28,11 @@ class Command(BaseCommand):
                     dest    = 'number',
                     default = 5000,
                     help    = 'Number of reports to transfer.'),
+        make_option('-b', '--background',
+                    action='store_true',
+                    dest    = 'background',
+                    default = False,
+                    help    = u'Dæmonise.'),
         make_option('-r', '--repeat',
                     action='store_true',
                     dest    = 'repeat',
@@ -45,10 +51,15 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-      once  = True
-      while once:
-        once  = self.single_handle(*args, **options) and options.get('repeat', not once)
-      postgres.close()
+      def gun():
+        once  = True
+        while once:
+          once  = self.single_handle(*args, **options) and options.get('repeat', not once)
+        postgres.close()
+      if options.get('background'):
+        with daemon.DaemonContext():
+          return gun()
+      gun()
 
     def single_handle(self, *args, **options):
       cpt   = int(options.get('number', 5000))
@@ -82,11 +93,11 @@ class Command(BaseCommand):
         act   = 'Deleted'
         sys.stdout.flush()
         seen.add(ixnum)
-      print 'Updating deletion status ...',
+      # print 'Updating deletion status ...',
       ThouReport.store(REPORTS_TABLE,
         {'indexcol': upds, 'transferred': True}
       )
-      print '... done.'
+      # print '... done.'
       curz  = postgres.cursor()
       reps  = Report.objects.exclude(id__in = seen).order_by('-date')
       gat = options.get('type', None)
@@ -96,7 +107,7 @@ class Command(BaseCommand):
       if not tot: return False
       cpt   = min(tot, cpt)
       reps  = reps[0:cpt]
-      print ('Already got %d of %d, now moving %d ...' % (len(seen), tot, cpt))
+      # print ('Already got %d of %d, now moving %d ...' % (len(seen), tot, cpt))
       convr = BasicConverter({'transferred':True} if deler and force else {})
       cpt   = float(cpt)
       pos   = 0
@@ -128,10 +139,10 @@ class Command(BaseCommand):
         pos = pos + 1
         postgres.commit()
       batch.run()
-      print 'Done converting ...'
-      print 'List of secondary tables:'
-      for tbn in stbs:
-        print tbn
+      # print 'Done converting ...'
+      # print 'List of secondary tables:'
+      # for tbn in stbs:
+      #   print tbn
       curz.close()
       postgres.commit()
       return True

@@ -12,9 +12,7 @@ class NovaHandler(KeywordHandler):
   # 1.  Facilities.
   # 2.  Health workers
   # 3.  Locations
-  # 4.  Reports.
-  # 5.  Messages
-  # 6.  Patients
+  # 4.  Patients
   def handle(self, text):
     try:
       rep = ThouMessage.parse(text)
