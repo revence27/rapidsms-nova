@@ -103,11 +103,11 @@ class Command(BaseCommand):
         act   = 'Deleted'
         sys.stdout.flush()
         seen.add(ixnum)
-      # print 'Updating deletion status ...',
+      print 'Updating deletion status ...',
       ThouReport.store(tbn,
         {'indexcol': upds, 'transferred': True}
       )
-      # print '... done.'
+      print '... done.'
       curz  = pgc.cursor()
       reps  = Report.objects.exclude(id__in = seen).order_by('-date')
       gat = options.get('type', None)
@@ -117,7 +117,7 @@ class Command(BaseCommand):
       if not tot: return False
       cpt   = min(tot, cpt)
       reps  = reps[0:cpt]
-      # print ('Already got %d of %d, now moving %d ...' % (len(seen), tot, cpt))
+      print ('Already got %d of %d, now moving %d ...' % (len(seen), tot, cpt))
       convr = BasicConverter({'transferred':True} if deler and force else {})
       cpt   = float(cpt)
       pos   = 0
@@ -150,10 +150,10 @@ class Command(BaseCommand):
         pos = pos + 1
         pgc.commit()
       batch.run()
-      # print 'Done converting ...'
-      # print 'List of secondary tables:'
-      # for tbn in stbs:
-      #   print tbn
+      print 'Done converting ...'
+      print 'List of secondary tables:'
+      for tbn in stbs:
+        print tbn
       curz.close()
       pgc.commit()
       return True
