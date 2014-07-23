@@ -844,7 +844,6 @@ def json_tester(req):
       location = ReactiveHCs
     )
     nat     = ThouReport.query('pre_table',
-      {},
       cols      = ['COUNT(*) AS allpregs'],
       annotate  = {
         'coughing':('COUNT(*)', 'ch_bool IS NOT NULL'),

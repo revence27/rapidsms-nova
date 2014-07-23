@@ -212,10 +212,6 @@ The keyword args are all optional:
     except Exception, e:
       return 0
 
-  def list(self):
-    for it in range(self.count()):
-      yield self[it]
-
   def count(self):
     '''Number of result rows. It is important to use and respect this, because asking for more rows that we have can return None instead of failing.'''
     if not self.cursor:
