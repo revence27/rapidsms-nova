@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # vim: ai ts=4 sts=4 et sw=4
 
-
 ##DJANGO LIBRARY
 from django.utils.translation import ugettext as _
 from django.utils.translation import activate, get_language

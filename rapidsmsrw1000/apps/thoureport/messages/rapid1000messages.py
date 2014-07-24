@@ -34,6 +34,9 @@ class DateField(ThouField):
     gps = ans.groups()
     return [] # Check that it is a valid date. TODO. Move to semantics part?
 
+class ANCDateField(DateField):
+  column_name = 'anc'
+
 class NumberField(ThouField):
   'The descriptor for number fields.'
 
@@ -76,7 +79,7 @@ class PrevPregField(PregCodeField):
   @classmethod
   def expectations(self):
     'Codes associated with previous pregnancy.'
-    return ['GS', 'MU', 'HD', 'RM']
+     return ['GS', 'MU', 'HD', 'RM', 'OL', 'YG', 'NR', 'TO', 'HW', 'NT', 'NT', 'NH', 'KX', 'YJ', 'LZ']
 
 class SymptomCodeField(CodeField):
   'Field for codes associated with symptoms.'
@@ -92,6 +95,41 @@ class RedSymptomCodeField(SymptomCodeField):
   def expectations(self):
     'These are the codes in red alerts.'
     return ['AP', 'CO', 'HE', 'LA', 'MC', 'PA', 'PS', 'SC', 'SL', 'UN']
+
+class RiskSymptomCodeField(SymptomCodeField):
+  @classmethod
+  def expectations(self):
+    return ['VO', 'PC', 'OE', 'NS', 'MA', 'JA', 'FP', 'FE', 'DS', 'DI', 'SA', 'RB', 'HY', 'CH', 'AF']
+
+class ANCSymptomCodeField(SymptomCodeField):
+  @classmethod
+  def expectations(self):
+    return ['VO', 'PC', 'OE', 'NS', 'MA', 'JA', 'FP', 'FE', 'DS', 'DI', 'SA', 'RB','NP', 'HY', 'CH', 'AF']
+
+class ChiSymptomCodeField(SymptomCodeField):
+  @classmethod
+  def expectations(self):
+    return ['NP', 'IB', 'DB']
+
+class BirSymptomCodeField(SymptomCodeField):
+  @classmethod
+  def expectations(self):
+    return ['SB', 'RB', 'NP', 'AF', 'CI', 'CM', 'IB', 'DB', 'PM']
+
+class PNCSymptomCodeField(ANCSymptomCodeField):
+  pass
+
+class NBCSymptomCodeField(BirSymptomCodeField):
+  pass
+
+class CCMSymptomCodeField(SymptomCodeField):
+  @classmethod
+  def expectations(self):
+    return ['DI', 'MA', 'PC', 'OI', 'NP', 'IB', 'DB', 'NV']
+
+class CMRSymptomCodeField(CCMSymptomCodeField):
+  pass
+
 
 class LocationField(CodeField):
   'Field for codes that communicate locations.'
@@ -114,7 +152,7 @@ class NumberedField(CodeField):
     'Basically a regex.'
     return [] if re.match(r'\w+\d+', fld) else 'bad_numbered_field'
 
-class HeightField(NumberedField):
+class HeightField(FloatedField):
   'Field for height codes.'
   pass
 
@@ -184,6 +222,16 @@ class BreastFeedField(NBCField):
     'The accepted codes. May be booleanisable.'
     return ['EBF', 'NB']
 
+class NBCBreastFeedField(BreastFeedField):
+  @classmethod
+  def expectations(self):
+    return ['EBF', 'NB']
+
+class CBNBreastFeedField(BreastFeedField):
+  @classmethod
+  def expectations(self):
+    return ['EBF','CBF', 'NB']
+
 class InterventionField(CodeField):
   'Field for general interventions.'
   @classmethod
@@ -191,8 +239,28 @@ class InterventionField(CodeField):
     'Intervention codes.'
     return ['PR', 'AA', 'AL', 'AT', 'NA']
 
-class NBCInterventionField(InterventionField):
-  'New-born care intervention field.'
+class RiskInterventionField(InterventionField):
+  @classmethod
+  def expectations(self):
+    return ['PR', 'AA']
+
+class RedInterventionField(InterventionField):
+  @classmethod
+  def expectations(self):
+    return ['AL', 'AT', 'NA']
+
+class NBCInterventionField(RiskInterventionField):
+  pass
+
+class PNCInterventionField(RiskInterventionField):
+  pass
+
+class CCMInterventionField(InterventionField):
+  @classmethod
+  def expectations(self):
+    return ['PT', 'PR', 'TR', 'AA']
+
+class CMRInterventionField(CCMInterventionField):
   pass
 
 class HealthStatusField(CodeField):
@@ -207,6 +275,9 @@ class NewbornHealthStatusField(HealthStatusField):
   def expectations(self):
     'New born health status codes.'
     return ['CW', 'CS']
+
+class ChildStatusField(NewbornHealthStatusField):
+  pass
 
 class MotherHealthStatusField(HealthStatusField):
   'Mother health status fields.'
@@ -380,7 +451,7 @@ Since every message has to be successfully parsed as a Message object, this is t
 
 class PregMessage(ThouMessage):
   'Pregnancy message.'
-  fields  = [IDField, DateField, DateField, GravidityField, ParityField,
+  fields  = [IDField, DateField, ANCDateField, GravidityField, ParityField,
               (PregCodeField, True),
               (SymptomCodeField, True),
              LocationField, WeightField, ToiletField, HandwashField]
@@ -391,8 +462,8 @@ class RefMessage(ThouMessage):
 
 class ANCMessage(ThouMessage):
   'Ante-natal care visit message.'
-  fields  = [IDField, DateField, ANCField,
-             (SymptomCodeField, True),
+  fields  = [IDField, ANCDateField, ANCField,
+             (ANCSymptomCodeField, True),
              LocationField, WeightField]
 
 class DepMessage(ThouMessage):
@@ -402,7 +473,7 @@ class DepMessage(ThouMessage):
 class RiskMessage(ThouMessage):
   'Risk report message.'
   fields  = [IDField,
-             (SymptomCodeField, True),
+             (RiskSymptomCodeField, True),
              LocationField, WeightField]
 
 class RedMessage(ThouMessage):
@@ -412,13 +483,13 @@ class RedMessage(ThouMessage):
 class BirMessage(ThouMessage):
   'Birth message.'
   fields  = [IDField, NumberField, DateField, GenderField,
-             (SymptomCodeField, True),
+             (BirSymptomCodeField, True),
              LocationField, BreastFeedField, WeightField]
 
 class ChildMessage(ThouMessage):
   'Child message.'
   fields  = [IDField, NumberField, DateField, VaccinationField, VaccinationCompletionField,
-             (SymptomCodeField, True),
+             (ChiSymptomCodeField, True),
              LocationField, WeightField, MUACField]
 
 class DeathMessage(ThouMessage):
@@ -428,26 +499,41 @@ class DeathMessage(ThouMessage):
 class ResultMessage(ThouMessage):
   'Result message.'
   fields  = [IDField,
-             (SymptomCodeField, True),
-             LocationField, InterventionField, MotherHealthStatusField]
+             (RiskSymptomCodeField, True),
+             LocationField, RiskInterventionField, MotherHealthStatusField]
 
 class RedResultMessage(ThouMessage):
   'Red alert result message.'
   fields  = [IDField, DateField,
-             (SymptomCodeField, True),
-             LocationField, InterventionField, MotherHealthStatusField]
+             (RedSymptomCodeField, True),
+             LocationField, RedInterventionField, MotherHealthStatusField]
 
 class NBCMessage(ThouMessage):
   'New-born care message.'
   fields  = [IDField, NumberField, NBCField, DateField,
-             (SymptomCodeField, True),
+             (NBCSymptomCodeField, True),
              BreastFeedField, NBCInterventionField, NewbornHealthStatusField]
+
+class CBNMessage(ThouMessage):
+  fields  = [IDField, NumberField, DateField,
+             CBNBreastFeedField, HeightField, WeightField, MUACField]
+
+class CCMMessage(ThouMessage):
+  fields  = [IDField, NumberField, DateField,
+             (CCMSymptomCodeField, True),
+             CCMInterventionField, MUACField]
+
+class CMRMessage(ThouMessage):
+  fields  = [IDField, NumberField, DateField,
+             (CMRSymptomCodeField, True),
+             CMRInterventionField, ChildStatusField]
+
 
 class PNCMessage(ThouMessage):
   'Post-natal care message.'
   fields  = [IDField, PNCField, DateField,
-             (SymptomCodeField, True),
-             InterventionField, MotherHealthStatusField]
+             (PNCSymptomCodeField, True),
+             PNCInterventionField, MotherHealthStatusField]
 
 # Testing field. Takes any of my names.
 class TextField(ThouField):
@@ -486,6 +572,9 @@ MSG_ASSOC = {
   'RES':  ResultMessage,
   'RAR':  RedResultMessage,
   'NBC':  NBCMessage,
+  'CBN':  CBNMessage,
+  'CCM':  CCMMessage,
+  'CMR':  CMRMessage,
   'PNC':  PNCMessage,
 
   'REV':  RevMessage,
