@@ -72,14 +72,14 @@ class PregCodeField(CodeField):
   @classmethod
   def expectations(self):
     'These are all the codes related to pregnancy.'
-    return ['GS', 'MU', 'HD', 'RM', 'OL', 'YG', 'NR', 'TO', 'HW', 'NT', 'NT', 'NH', 'KX', 'YJ', 'LZ']
+    return ['GS', 'MU', 'HD', 'RM', 'OL', 'YG', 'NR', 'KX', 'YJ', 'LZ']
 
 class PrevPregField(PregCodeField):
   'Field for Previous pregnancy codes.'
   @classmethod
   def expectations(self):
     'Codes associated with previous pregnancy.'
-     return ['GS', 'MU', 'HD', 'RM', 'OL', 'YG', 'NR', 'TO', 'HW', 'NT', 'NT', 'NH', 'KX', 'YJ', 'LZ']
+     return ['GS', 'MU', 'HD', 'RM', 'OL', 'YG', 'NR', 'KX', 'YJ', 'LZ']
 
 class SymptomCodeField(CodeField):
   'Field for codes associated with symptoms.'
