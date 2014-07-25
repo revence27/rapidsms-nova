@@ -6,6 +6,7 @@ from rapidsms.contrib.handlers.handlers.keyword import KeywordHandler
 
 class NovaHandler(KeywordHandler):
   """Intercepting the normal handler, cleanly."""
+  keyword = ''
 
   def is_fine(msg, rep):
     msg = self.msg
