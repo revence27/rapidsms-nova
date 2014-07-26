@@ -13,29 +13,29 @@ There is something wrong with too much SQL. (It is “liturgical”; its use sho
 Examples
 --------
 
-  from orm import *
-  from os import getenv
+    from orm import *
+    from os import getenv
+    
+    ORM.connect(dbname = 'postgres', user = 'postgres')
+    for run in range(int(getenv('ORMTIMES', '5'))):
+      print 'Stored Item ID:', ORM.store('them', {'title':'In the Silence', 'artist':'Hillsong United', 'album':'People Just Like Us'})
   
-  ORM.connect(dbname = 'postgres', user = 'postgres')
-  for run in range(int(getenv('ORMTIMES', '5'))):
-    print 'Stored Item ID:', ORM.store('them', {'title':'In the Silence', 'artist':'Hillsong United', 'album':'People Just Like Us'})
-  
-  them  = ORM.query('them',
-    hooks = {'describe': lambda x, _: '"%s", from \'%s\' by %s' % (x['title'], x['album'], x['artist'])}
-)
-  print them.query
-  for it in them.list():
-    print ('%2d' % (it['indexcol'], )), it['describe']
+    them  = ORM.query('them',
+      hooks = {'describe': lambda x, _: '"%s", from \'%s\' by %s' % (x['title'], x['album'], x['artist'])}
+    )
+    print them.query
+    for it in them.list():
+      print ('%2d' % (it['indexcol'], )), it['describe']
 
 The above can be executed thus:
 
-  $ env ORMTIMES=1 python test.py
+    $ env ORMTIMES=1 python test.py
 
 It prints this:
 
-  Item ID: 1
-  SELECT * FROM them
-   1 "In the Silence", from 'People Just Like Us' by Hillsong United
+    Item ID: 1
+    SELECT * FROM them
+     1 "In the Silence", from 'People Just Like Us' by Hillsong United
 
 Features
 --------
@@ -51,7 +51,7 @@ Features
 - Purely-functional query interface. (Not very Pythonic; but then, neither is civilised DB access.)
 - Data access hooks enable simple templates (and correspondingly more-complex views—as it should be).
 - Independence between code structure and database structure (unlike Django and ActiveRecord, for example).
-- Support for Django ORM’s data access protocol (`\_\_getitem\_\_`).
+- Support for Django ORM’s data access protocol (`__getitem__`).
 - Support for named (“server-side”) cursors and query-optimisation hooks.
 - Batch inserts (`COPY FROM`, `COPY TO`) with extensible interface.
 

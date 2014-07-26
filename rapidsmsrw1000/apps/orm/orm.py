@@ -213,6 +213,7 @@ The keyword args are all optional:
       return 0
 
   def list(self):
+    '''Returns a generator over the rows.'''
     for it in range(self.count()):
       yield self[it]
 
@@ -587,7 +588,7 @@ batch:
       col   = self.ensure_column(curz, tbl, col, dval)
       self.postgres.commit()
       elval = curz.mogrify('%s', (dval, ))
-      if len(ans) > 0:
+      if hasattr(ans, '__iter__') and len(ans) > 0:
         dat[col]  = elval
       else:
         if btc and hasattr(dval, '__getitem__'):
@@ -597,11 +598,11 @@ batch:
       if btc:
         ans = btc.append(tbl, cols, vals)
       else:
-        qry = ('INSERT INTO %s (%s) VALUES (%s) RETURNING indexcol;' % (tbl, ', '.join(cols), ', '.join(vals)))
+        qry = (u'INSERT INTO %s (%s) VALUES (%s) RETURNING indexcol;' % (tbl, ', '.join(cols), ', '.join(vals)))
         curz.execute(qry)
         ans = curz.fetchone()[0]
     else:
-      bzt = ('UPDATE %s SET %s WHERE indexcol %s %s;' % (tbl, ', '.join(['%s = %s' % (k, dat[k]) for k in dat]), 'IN' if multid else '=', ('(%s)' % ', '.join(ans)) if multid else curz.mogrify('%s', (ans, ))))
+      bzt = (u'UPDATE %s SET %s WHERE indexcol %s %s;' % (tbl, ', '.join(['%s = %s' % (k, dat[k]) for k in dat]), 'IN' if multid else '=', ('(%s)' % ', '.join(ans)) if multid else curz.mogrify('%s', (ans, ))))
       # stderr.write('>>>\t%s\r\n' % (bzt, ))
       curz.execute(bzt)
     self.postgres.commit()
