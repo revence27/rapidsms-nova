@@ -157,14 +157,14 @@ class ThousandCharts(ThousandDays):
     # TODO: do optimisations specialise?
     return self.dynamised(mapping = [
       ('#layer_150 a', nat[0]['allpregs']),
-      ('#risks69', round(prpc, 2)),
-      ('#risks66', round(aapc, 2)),
+      ('#risks69', ('%.1f%%' % (prpc, ))),
+      ('#risks66', ('%.1f%%' % (aapc, ))),
       ('#risks65', aac),
       ('#risks78', prc),
       ('#layer_129', riskc),
-      ('#layer_89', round(riskpc, 2)),
+      ('#layer_89', ('%.1f%%' % (riskpc, ))),
       ('#layer_89_0', rez),
-      ('#layer_75', round(rezpc, 2)),
+      ('#layer_75', ('%.1f%%' % (rezpc, ))),
       ('#COUGHING24 strong', nat[0]['coughing']),
       ('#DIARRHEA33 strong', nat[0]['diarrhoea']),
       ('#FEVER12 strong', nat[0]['fever']),
