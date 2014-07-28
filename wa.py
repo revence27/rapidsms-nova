@@ -156,34 +156,45 @@ class ThousandCharts(ThousandDays):
     prpc    = (float(prc) / rezf) * 100.0
     # TODO: do optimisations specialise?
     return self.dynamised(mapping = [
-      ('#layer_150 a', nat[0]['allpregs']),
+      ('#layer_150 a', neat_numbers(nat[0]['allpregs'])),
       ('#risks69', ('%.1f%%' % (prpc, ))),
       ('#risks66', ('%.1f%%' % (aapc, ))),
-      ('#risks65', aac),
-      ('#risks78', prc),
-      ('#layer_129', riskc),
+      ('#risks65', neat_numbers(aac)),
+      ('#risks78', neat_numbers(prc)),
+      ('#layer_129', neat_numbers(riskc)),
       ('#layer_89', ('%.1f%%' % (riskpc, ))),
-      ('#layer_89_0', rez),
+      ('#layer_89_0', neat_numbers(rez)),
       ('#layer_75', ('%.1f%%' % (rezpc, ))),
-      ('#COUGHING24 strong', nat[0]['coughing']),
-      ('#DIARRHEA33 strong', nat[0]['diarrhoea']),
-      ('#FEVER12 strong', nat[0]['fever']),
-      ('#MALARIA09 strong', nat[0]['malaria']),
-      ('#VOMITING18 strong', nat[0]['vomiting']),
-      ('#STILLBORN21 strong', nat[0]['stillb']),
-      ('#EDEMA13 strong', nat[0]['oedema']),
-      ('#JAUNDICE09 strong', nat[0]['jaun']),
-      ('#PNEUMONIA21 strong', nat[0]['pneumo']),
-      ('#DISABILITY21 strong', nat[0]['disab']),
-      ('#HYPOTHEMIA21 strong', nat[0]['hypoth']),
-      ('#CLEFTPALATE21 strong', nat[0]['ibibari']),
-      ('#CORDINFECTION strong', nat[0]['cordi']),
-      ('#NECKSTIFFNESS strong', nat[0]['necks']),
-      ('#layer_12289 strong', hands),
-      ('#layer_10985 strong', toils),
-      ('#layer_21', fatc),
-      ('#layer_90', thinc),
+      ('#COUGHING24 strong', neat_numbers(nat[0]['coughing'])),
+      ('#DIARRHEA33 strong', neat_numbers(nat[0]['diarrhoea'])),
+      ('#FEVER12 strong', neat_numbers(nat[0]['fever'])),
+      ('#MALARIA09 strong', neat_numbers(nat[0]['malaria'])),
+      ('#VOMITING18 strong', neat_numbers(nat[0]['vomiting'])),
+      ('#STILLBORN21 strong', neat_numbers(nat[0]['stillb'])),
+      ('#EDEMA13 strong', neat_numbers(nat[0]['oedema'])),
+      ('#JAUNDICE09 strong', neat_numbers(nat[0]['jaun'])),
+      ('#PNEUMONIA21 strong', neat_numbers(nat[0]['pneumo'])),
+      ('#DISABILITY21 strong', neat_numbers(nat[0]['disab'])),
+      ('#HYPOTHEMIA21 strong', neat_numbers(nat[0]['hypoth'])),
+      ('#CLEFTPALATE21 strong', neat_numbers(nat[0]['ibibari'])),
+      ('#CORDINFECTION strong', neat_numbers(nat[0]['cordi'])),
+      ('#NECKSTIFFNESS strong', neat_numbers(nat[0]['necks'])),
+      ('#layer_12289 strong', neat_numbers(hands)),
+      ('#layer_10985 strong', neat_numbers(toils)),
+      ('#layer_21', neat_numbers(fatc)),
+      ('#layer_90', neat_numbers(thinc)),
     ])
+
+def neat_numbers(num):
+  pcs = divided_num(str(num), 3)
+  return ','.join(pcs)
+
+def divided_num(num, mx = 3):
+  if len(num) < (mx + 1):
+    return [num]
+  lft = num[0:-3]
+  rgt = num[-3:]
+  return divided_num(lft) + [rgt]
 
 class ChartMethods(cherrypy.dispatch.Dispatcher):
   def __call__(self, pth):
