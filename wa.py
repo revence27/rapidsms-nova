@@ -199,7 +199,9 @@ def wmain(argv):
   hst, prt  = argv[2].split(':', 2)
   pth       = os.path.abspath(argv[1])
   thousand  = ThousandCharts(pth) # ThousandDays(pth)
-  def launch(*args):
+  def launch(hst, prt, *args):
+    cherrypy.server.socket_host = hst
+    cherrypy.server.socket_port = prt
     cherrypy.quickstart(thousand, '/', {
       '/':  {
         'request.dispatch': ChartMethods(),
@@ -211,7 +213,7 @@ def wmain(argv):
       }
     })
   # thd       = thread.start_new_thread(launch, (None, ))
-  launch()
+  launch(hst, int(prt))
   apres     = os.getenv('POST_THOUSAND', 'exit;')
   subprocess.call([apres, 'http://%s/' % (argv[2], )])
 
