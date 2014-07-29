@@ -18,7 +18,7 @@ class ThousandDays:
 
   @cherrypy.expose
   def index(self):
-    return ':o)'
+    return file(os.path.join(self.path, 'html', 'index.html'))
 
 class ThousandCharts(ThousandDays):
   @cherrypy.expose
