@@ -69,7 +69,26 @@ class ThousandCharts(ThousandDays):
 
   @cherrypy.expose
   def nutrition(self):
-    return self.dynamised('nutrition')
+    nut = orm.ORM.query('cbn_table',
+      cols      = ['COUNT(*) AS allnuts'],
+      annotate  = {
+        'notbreast':('COUNT(*)', 'nb_bool IS NOT NULL'),
+        'breast':('COUNT(*)', 'ebf_bool IS NOT NULL OR cbf_bool IS NOT NULL'),
+        'unknown':('COUNT(*)', 'cbf_bool IS NULL AND ebf_bool IS NULL AND nb_bool IS NULL')
+      }
+    )
+    bir = orm.ORM.query('bir_table',
+      cols      = ['COUNT(*) AS allbirs'],
+      annotate  = {
+        'hour1':('COUNT(*)', 'bf1_bool IS NOT NULL'),
+      }
+    )
+    return self.dynamised('nutrition', mapping = [
+      ('#layer_118', neat_numbers(nut[0]['breast'])),
+      ('#layer_34', neat_numbers(nut[0]['notbreast'])),
+      ('#layer_1121', neat_numbers(nut[0]['unknown'])),
+      ('#layer_108', neat_numbers(bir[0]['hour1']))
+    ])
 
   @cherrypy.expose
   def pregnancy(self):
