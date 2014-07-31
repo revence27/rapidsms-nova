@@ -77,17 +77,29 @@ class ThousandCharts(ThousandDays):
         'unknown':('COUNT(*)', 'cbf_bool IS NULL AND ebf_bool IS NULL AND nb_bool IS NULL')
       }
     )
+    weighed = orm.ORM.query('pre_table', {
+      'mother_height_float > 100.0 AND mother_weight_float > 15.0':''
+      },
+      cols      = ['COUNT(*) AS mums'],
+      annotate  = {
+        'short':('COUNT(*)', 'mother_height_float < 150.0'),
+      }
+    )
+    thins   = weighed.specialise({'(mother_weight_float / ((mother_height_float * mother_height_float) / 10000.0)) < %s': BMI_MIN})
+    fats    = weighed.specialise({'(mother_weight_float / ((mother_height_float * mother_height_float) / 10000.0)) > %s': BMI_MAX})
     bir = orm.ORM.query('bir_table',
       cols      = ['COUNT(*) AS allbirs'],
       annotate  = {
-        'hour1':('COUNT(*)', 'bf1_bool IS NOT NULL'),
+        'hour1':('COUNT(*)', 'bf1_bool IS NOT NULL')
       }
     )
     return self.dynamised('nutrition', mapping = [
       ('#layer_118', neat_numbers(nut[0]['breast'])),
       ('#layer_34', neat_numbers(nut[0]['notbreast'])),
       ('#layer_1121', neat_numbers(nut[0]['unknown'])),
-      ('#layer_108', neat_numbers(bir[0]['hour1']))
+      ('#layer_108', neat_numbers(bir[0]['hour1'])),
+      # ('#layer_79', neat_numbers(bir[0]['hour1'])),
+      ('#layer_152', '%.2f%%' % ((weighed[0]['short'] / weighed[0]['mums']) * 100.0, ))
     ])
 
   @cherrypy.expose
