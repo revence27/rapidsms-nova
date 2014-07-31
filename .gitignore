@@ -1,5 +1,6 @@
 *.py[co]
 dashboards/
+library/
 .project
 .pydevproject
 *~
