@@ -4,7 +4,9 @@
   <link rel="stylesheet" href="/static/webapp/stylesheets/thoureports.css" />
 {%  endblock  %}
 {%  block jslibs  %}
-  <script src="/static/webapp/javascripts/jquery-1.11.1.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css" />
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
 {%  endblock %}
 {%  block javascripts %}
   <script src="/static/webapp/javascripts/thoureports.js"></script>
@@ -38,10 +40,10 @@
         {% endif %}
       </th>
       <th>
-        <input value="{{  date1 }}" id="startdate" type="date" />
+        <input value="{{  date1 }}" id="startdate" class="activedate" type="date" />
       </th>
       <th>
-        <input value="{{  date2 }}" id="enddate" type="date" />
+        <input value="{{  date2 }}" id="enddate" class="activedate" type="date" />
       </th>
       <th>
         <input id="run" type="button" value="Update" />

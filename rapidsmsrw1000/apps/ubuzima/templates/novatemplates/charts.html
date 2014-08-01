@@ -4,7 +4,9 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>Pregnancies Confirmed</title>
 		<link href="/static/webapp/stylesheets/thoureports.css" rel="stylesheet" type="text/css">
-		<script src="/static/webapp/javascripts/jquery-1.11.1.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
 		<script src="/static/webapp/javascripts/highcharts.js"></script>
 		<script src="/static/webapp/javascripts/thoureports.js"></script>
 		<script src="/static/webapp/javascripts/graphs.js"></script>
@@ -56,10 +58,10 @@
 			
 			<div id="Layer13"><img src="/static/webapp/images/reports/Layer13.png"></div>
 			<div id="Layer14">
-			<input type="date" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;" /></input>
+			<input class="activedate" type="date" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;" /></input>
 			</div>
 			<div id="Layer4copy">
-			<input type="date" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;" /></input>
+			<input class="activedate" type="date" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;" /></input>
 			</div>
 			<div id="From"><img src="/static/webapp/images/reports/From.png"></div>
 			<div id="Layer15"><img src="/static/webapp/images/reports/Layer15.png"></div>
@@ -278,7 +280,7 @@
 			<div id="Layer16"><img src="/static/webapp/images/reports/Layer16.png"></div>
 			<div id="ContactUsReachouttou">
 			<strong>Contact Us</strong>
-			<br></>Reach out to us if you have any 
+			<br/>Reach out to us if you have any 
 			questions or queries regarding 
 			information on rapid SMS 
 			contact us using the information

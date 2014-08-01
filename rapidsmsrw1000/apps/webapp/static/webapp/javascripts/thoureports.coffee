@@ -1,3 +1,7 @@
+$(() ->
+  $('.activedate').datepicker()
+)
+
 class ThousandQueries
   constructor: (@reqdata) ->
 
