@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Pregnancies Confirmed</title>
+		<link href="{{ static_path }}/stylesheets/thoureports.css" rel="stylesheet" type="text/css">
+    <script src="{{ static_path }}/javascripts/jquery-1.11.1.min.js"></script>
+    <script src="{{ static_path }}/javascripts/jqui/jquery-ui.min.js"></script>
+    <script src="{{ static_path }}/javascripts/highcharts.js"></script>
+    <script src="{{  static_path }}/javascripts/thoureports.js"></script>
+    <script src="{{ static_path }}/javascripts/graphs.js"></script>
+	</head>
+	<body>
+		
+			<!-- top and Language -->
+      <div id="Layer18copy8"><img src="{{ static_path }}/images/reports/Layer18copy8.png"></div>
+      <div id="Layer19copy8"><img src="{{ static_path }}/images/reports/Layer19copy8.png"></div>
+			<div id="ENGLISH"><a href="">ENGLISH</a></div>
+			<div id="FRENCH"><a href="">FRENCH</a></div>
+			<div id="KINYARWANDA"><a href="">KINYARWANDA</a></div>
+			<!--  -->
+			
+			<!-- menu -->
+			
+			<div id="Layer8"></div>
+			<div id="Layer1copy18"><img src="{{ static_path }}/images/reports/Layer1copy18.png"></div>
+			<div id="PregnanciesNewBornCh"><img src="{{ static_path }}/images/reports/PregnanciesNewBornCh.png"></div>
+			<div id="Layer2copy8"></div>
+			<div id="Layer2copy12"></div>
+			<div id="Layer2copy14"></div>
+			<div id="Layer2copy13"></div>
+			<div id="Layer2copy11"></div>
+			<div id="Layer2copy9"></div>
+			<div id="Layer2copy10"></div>
+			<!--  -->
+			
+			<!-- banner -->
+			<div id="Layer1copy_2"></div>
+			<div id="Layer5"><img src="{{ static_path }}/images/reports/Layer5.png"></div>
+			<div id="Preventingthedeathso">
+			<strong>Preventing</strong> the deaths of <strong>Pregnant Mothers</strong> and <strong>New Borns</strong> &amp; Improving <strong>Child Nutrition</strong>
+			</div>
+			<div id="Layer6"><img src="{{ static_path }}/images/reports/Layer6.png"></div>
+			<div id="Layer7"><img src="{{ static_path }}/images/reports/Layer7.png"></div>
+			<!--  -->
+			
+			<!-- filter -->
+			<div id="Layer10"><img src="{{ static_path }}/images/reports/Layer10.png"></div>
+			<div id="Layer11">
+			<select name="source" id="source" >
+        {%  for area in filters.child_areas  %}
+          <option name="link" value="{{  area.own_link }}">{{ area.name }}</option>
+        {%  endfor %}
+			</select>
+			</div>
+			
+			<div id="Layer13"><img src="{{ static_path }}/images/reports/Layer13.png"></div>
+			<div id="Layer14">
+			<input class="activedate" type="date" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;" /></input>
+			</div>
+			<div id="Layer4copy">
+			<input class="activedate" type="date" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;" /></input>
+			</div>
+			<div id="From"><img src="{{ static_path }}/images/reports/From.png"></div>
+			<div id="Layer15"><img src="{{ static_path }}/images/reports/Layer15.png"></div>
+			<div id="To"><img src="{{ static_path }}/images/reports/To.png"></div>
+			<!--  -->
+      {%  block bodycontent %}{%  endblock  %}
+			<!-- footer -->
+			<div id="Layer16"><img src="{{ static_path }}/images/reports/Layer16.png"></div>
+			<div id="ContactUsReachouttou">
+			<strong>Contact Us</strong>
+			<br/>Reach out to us if you have any 
+			questions or queries regarding 
+			information on rapid SMS 
+			contact us using the information
+			below:
+			<br><br>
+			+250 78123456<br>
+			+250 73123456
+			<br><br>
+			info@rapidsms.gov.rw
+			rapidsms@unicef.com
+			</div>
+			<div id="FollowusonSocialNetw">
+			<strong>Follow us</strong>
+			<br></>Follow us on our soical networks and comment, interact and socailise with our community
+			</div>
+			<div id="Layer17"><img src="{{ static_path }}/images/reports/Layer17.png"></div>
+			<div id="Layer18"><img src="{{ static_path }}/images/reports/Layer18.png"></div>
+			<div id="Layer19"><img src="{{ static_path }}/images/reports/Layer19.png"></div>
+			<div id="Layer20"><img src="{{ static_path }}/images/reports/Layer20.png"></div>
+			<!--  -->
+			
+		</div>
+		</div>
+ </body>
+ </html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<!--
+TODO:
+====
+1.  Language links.
+2.  JS client library.
+3.  Exporter
+4.  Vacc, CCM, Preg, Deliv, Nut ...
+5.  HTML5, jQuery UI
+6.  Date ranges
+7.  Exporting
+8.  Locations
+9.  Data-access ACLs
+10. Front page
+-->
+<html>
+  <head>
+    <title>{% block title %}No Mothers Should Die{% endblock title %} • RapidSMS 1,000 Days</title>  
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" href="{{ css_path  }}/thousanddays.css" />
+  </head>
+  <body>
+    <div id="main">
+      <div class="langs">
+        French, Kinyarwanda, English
+      </div>
+      <div class="navstrip">
+        <form action="GET" id="navtop">
+          <fieldset class="dateset">
+            <div class="navgap">
+              <legend>From</legend>
+              <input type="date" name="start" />
+            </div>
+            <div class="navgap">
+              <legend>To</legend>
+              <input type="date" name="fin" />
+            </div>
+          </fieldset>
+          <fieldset class="loxset">
+            <select name="location">
+            {%  for loc in filters.child_areas  %}
+              <option value="{{ loc.id  }}">{{  loc.name  }}</option>
+            {%  endfor  %}
+            </select>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+    <div id="trunk">
+    </div>
+    <div id="footer">
+      &copy; 2014, Pivot Access
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
+    <script src="{{ static_path  }}/clientside.js"></script>
+  </body>
+</html>

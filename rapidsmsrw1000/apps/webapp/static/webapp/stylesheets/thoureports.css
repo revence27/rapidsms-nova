@@ -26,7 +26,7 @@ a:hover {
   z-index: 0; }
 
 #Background {
-  background: url("/static/webapp/images/reports/Background.png") repeat-x;
+  background: url("../images/reports/Background.png") repeat-x;
   left: 0px;
   top: 0px;
   position: absolute;
@@ -59,7 +59,7 @@ a:hover {
   z-index: 4; }
 
 #Layer1copy {
-  background: url("/static/webapp/images/reports/Layer1copy.png") repeat-x;
+  background: url("../images/reports/Layer1copy.png") repeat-x;
   left: 0px;
   top: 251px;
   position: absolute;
@@ -723,7 +723,7 @@ a:hover {
   z-index: 65; }
 
 #Layer1copy_2 {
-  background: url("/static/webapp/images/reports/banner_background.png") repeat-x;
+  background: url("../images/reports/banner_background.png") repeat-x;
   left: 0px;
   top: 0px;
   position: absolute;
@@ -759,7 +759,7 @@ a:hover {
   z-index: 69; }
 
 #Layer18copy8 {
-  background: url("/static/webapp/images/reports/Layer18copy8.png") repeat-x;
+  background: url("../images/reports/Layer18copy8.png") repeat-x;
   left: 0px;
   top: 0px;
   position: absolute;
@@ -768,7 +768,7 @@ a:hover {
   z-index: 70; }
 
 #Layer19copy8 {
-  background: url("/static/webapp/images/reports/Layer19copy8.png") repeat-x;
+  background: url("../images/reports/Layer19copy8.png") repeat-x;
   left: 0px;
   top: 3px;
   position: absolute;
@@ -996,7 +996,7 @@ a:hover {
   cursor: pointer; }
 
 #Layer10 {
-  background: url("/static/webapp/images/reports/Layer10.png") repeat-x;
+  background: url("../images/reports/Layer10.png") repeat-x;
   left: 0px;
   top: 189px;
   position: absolute;

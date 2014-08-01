@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Pregnancies Confirmed</title>
+		<link href="/static/webapp/stylesheets/thoureports.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+		<script src="/static/webapp/javascripts/highcharts.js"></script>
+		<script src="/static/webapp/javascripts/thoureports.js"></script>
+		<script src="/static/webapp/javascripts/graphs.js"></script>
+		
+	</head>
+	<body>
+		
+			<!-- top and Language -->
+			<div id="Layer18copy8"><img src="/static/webapp/images/reports/Layer18copy8.png"></div>
+			<div id="Layer19copy8"><img src="/static/webapp/images/reports/Layer19copy8.png"></div>
+			<div id="ENGLISH"><a href="">ENGLISH</a></div>
+			<div id="FRENCH"><a href="">FRENCH</a></div>
+			<div id="KINYARWANDA"><a href="">KINYARWANDA</a></div>
+			<!--  -->
+			
+			<!-- menu -->
+			
+			<div id="Layer8"></div>
+			<div id="Layer1copy18"><img src="/static/webapp/images/reports/Layer1copy18.png"></div>
+			<div id="PregnanciesNewBornCh"><img src="/static/webapp/images/reports/PregnanciesNewBornCh.png"></div>
+			<div id="Layer2copy8"></div>
+			<div id="Layer2copy12"></div>
+			<div id="Layer2copy14"></div>
+			<div id="Layer2copy13"></div>
+			<div id="Layer2copy11"></div>
+			<div id="Layer2copy9"></div>
+			<div id="Layer2copy10"></div>
+			<!--  -->
+			
+			<!-- banner -->
+			<div id="Layer1copy_2"></div>
+			<div id="Layer5"><img src="/static/webapp/images/reports/Layer5.png"></div>
+			<div id="Preventingthedeathso">
+			<strong>Preventing</strong> the deaths of <strong>Pregnant Mothers</strong> and <strong>New Borns</strong> & Improving <strong>Child Nutrition</strong>
+			</div>
+			<div id="Layer6"><img src="/static/webapp/images/reports/Layer6.png"></div>
+			<div id="Layer7"><img src="/static/webapp/images/reports/Layer7.png"></div>
+			<!--  -->
+			
+			<!-- filter -->
+			<div id="Layer10"><img src="/static/webapp/images/reports/Layer10.png"></div>
+			<div id="Layer11">
+			<select name="source" id="source" >
+        {%  for area in filters.child_areas  %}
+          <option name="link" value="{{  area.own_link }}">{{ area.name }}</option>
+        {%  endfor %}
+			</select>
+			</div>
+			
+			<div id="Layer13"><img src="/static/webapp/images/reports/Layer13.png"></div>
+			<div id="Layer14">
+			<input class="activedate" type="date" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;" /></input>
+			</div>
+			<div id="Layer4copy">
+			<input class="activedate" type="date" name="name" id="name" style="border: 1px #000;border-radius:10px;font-size:16px;" /></input>
+			</div>
+			<div id="From"><img src="/static/webapp/images/reports/From.png"></div>
+			<div id="Layer15"><img src="/static/webapp/images/reports/Layer15.png"></div>
+			<div id="To"><img src="/static/webapp/images/reports/To.png"></div>
+			<!--  -->
+			
+			<!-- tab -->
+			<div id="Layer1copy"><img src="/static/webapp/images/reports/Layer1copy.png"></div>
+			<div id="Layer1"><img src="/static/webapp/images/reports/Layer1.png"></div>
+			<div id="PregnanciesConfirmed">Pregnancies Confirmed</div>
+			<div id="ExpectedDeliveries"><a>Expected Deliveries</a></div>
+			<!--  -->
+			
+			
+			
+			<div id="Background">
+		<div id="background">
+			
+				
+			
+			<div id="Layer7copy"><img src="/static/webapp/images/reports/Layer7copy.png"></div>
+			<div id="Layer7copy_0"><img src="/static/webapp/images/reports/Layer7copy_0.png"></div>
+			<div id="Layer7copy_1"><img src="/static/webapp/images/reports/Layer7copy_1.png"></div>
+			
+			<div id="pregnancies"><img src="/static/webapp/images/reports/pregnancies.png"></div>
+			<div id="Pregnanciesconfirmed">
+			Pregnancies Confirmed and Expected deliveries are gathered nation
+			wide by the community health workers using rapid SMS system
+			</div>
+			<div id="Pregnanciesconfirmed_0">
+			Pregnancies Confirmed
+			</div>
+			<div id="layer_150" class="goodnum">
+              {{  display.total  }}
+			</div>
+			
+				
+			<!-- Graphs -->
+			<div id="lmpgraph">
+			</div>
+			<div id="monthlyavggrph">
+			</div>
+      <div id="LMPinrelativetopregn">
+
+        <!--  <img src="/static/webapp/images/reports/LMPinrelativetopregn.png">  -->
+        LMP Relative to Pregnancy Confirmation
+      
+      </div>
+      <div id="MonthlyPregnancyAvg9">
+              
+        <!--  <img src="/static/webapp/images/reports/MonthlyPregnancyAvg9.png">  -->
+        Monthly Pregnancy Avg: <strong id="avgdest">&#133;</strong>
+      
+      </div>
+			<!--  -->
+			
+			<!-- Risks -->
+			<div id="VectorSmartObject"><img src="/static/webapp/images/reports/VectorSmartObject.png"></div>
+			<div id="risks69">
+              {{  display.prpc  }}%
+			</div>
+			<div id="risks78">
+              {{  display.pr  }}
+			</div>
+			<div id="numberofmotherpr">
+			Number of Mothers well by PR(Patient Directly Referred):
+			</div>
+			<div id="risks66">
+              {{  display.aapc  }}%
+			</div>
+			<div id="risks65">
+              {{  display.aa  }}
+			</div>
+			<div id="numberofmotherswell">
+			Number of Mothers well by AA(ASM):
+			</div>
+			<div id="Layer2"><img src="/static/webapp/images/reports/Layer2.png"></div>
+			<div id="Layer1copy_0"><img src="/static/webapp/images/reports/Layer1copy_0.png"></div>
+			<div id="ReportedRisks">
+			Reported Risks
+			</div>
+			<div class="goodnum" id="layer_129">
+              {{  display.risks }}
+			</div>
+			<div id="layer_89">
+              {{  display.riskpc  }}%
+			</div>
+			<div id="ResultsReported">
+			Results Reported
+			</div>
+			<div id="layer_89_0">
+              {{  display.rezes }}
+			</div>
+			<div id="layer_75">
+              {{  display.rezpc }}%
+			</div>
+			<!--  -->
+			<!-- Symptoms -->
+			<div id="Layer3"><img src="/static/webapp/images/reports/Layer3.png"></div>
+			<div id="Layer1copy_1"><img src="/static/webapp/images/reports/Layer1copy_1.png"></div>
+			<div id="Layer1copy2"><img src="/static/webapp/images/reports/Layer1copy2.png"></div>
+			<div id="Layer1copy6"><img src="/static/webapp/images/reports/Layer1copy6.png"></div>
+			<div id="Layer1copy7"><img src="/static/webapp/images/reports/Layer1copy7.png"></div>
+			<div id="Layer1copy8"><img src="/static/webapp/images/reports/Layer1copy8.png"></div>
+			<div id="Layer1copy3"><img src="/static/webapp/images/reports/Layer1copy3.png"></div>
+			<div id="Layer1copy4"><img src="/static/webapp/images/reports/Layer1copy4.png"></div>
+			<div id="Layer1copy5"><img src="/static/webapp/images/reports/Layer1copy5.png"></div>
+			<div id="Layer1copy9"><img src="/static/webapp/images/reports/Layer1copy9.png"></div>
+			<div id="Layer1copy10"><img src="/static/webapp/images/reports/Layer1copy10.png"></div>
+			<div id="Layer1copy11"><img src="/static/webapp/images/reports/Layer1copy11.png"></div>
+			<div id="Layer1copy12"><img src="/static/webapp/images/reports/Layer1copy12.png"></div>
+			<div id="Layer1copy13"><img src="/static/webapp/images/reports/Layer1copy13.png"></div>
+			<div id="COUGHING24">
+        COUGHING <br><br><strong>{{ display.info.coughing }}</strong>
+			</div>
+			<div id="DIARRHEA33">
+        DIARRHEA33<br><br><strong>{{  display.info.diarrhoea  }}</strong>
+			</div>
+			<div id="FEVER12">
+        FEVER<br><br><strong>{{ display.info.fever  }}</strong>
+			</div>
+			<div id="MALARIA09">
+        MALARIA<br><br><strong>{{ display.info.malaria  }}</strong>
+			</div>
+			<div id="VOMITING18">
+        VOMITING<br><br><strong>{{  display.info.vomiting  }}</strong>
+			</div>
+			<div id="STILLBORN21">
+        STILLBORN<br><br><strong>{{ display.info.stillb  }}</strong>
+			</div>
+			<div id="EDEMA13">
+        EDEMA<br><br><strong>{{ display.info.oedema  }}</strong>
+			</div>
+			<div id="JAUNDICE09">
+        JAUNDICE<br><br><strong>{{  display.info.jaun  }}</strong>
+			</div>
+			<div id="PNEUMONIA21">
+        PNEUMONIAM<br><br><strong>{{  display.info.pneumo  }}</strong>
+			</div>
+			<div id="DISABILITY21">
+        DISABILITY<br><br><strong>{{  display.info.disab  }}</strong>
+			</div>
+			<div id="HYPOTHEMIA21">
+        HYPOTHEMIA<br><br><strong>{{  display.info.hypoth  }}</strong>
+			</div>
+			<div id="CLEFTPALATE21">
+        CLEFTPALATE<br><br><strong>{{ display.info.ibibari  }}</strong>
+			</div>
+			<div id="CORDINFECTION">
+        CORD<br></>INFECTION<br><br><strong>{{  display.info.cordi  }}</strong>
+			</div>
+			<div id="NECKSTIFFNESS">
+        NECK<br>STIFFNESS<br><strong>{{ display.info.necks  }}</strong>
+			</div>
+			<div id="motherssympotmpic">
+			<img src="/static/webapp/images/reports/motherssympotmpic.png">
+			</div>
+			<div id="highriskpic">
+			<img src="/static/webapp/images/reports/highriskpic.png">
+			</div>
+			<div id="HighRisks">
+			High Risks
+			</div>
+			<div id="MothersSymptoms">
+			Mothers' symptoms
+			</div>
+			<div id="LowRisks">
+			Low Risks
+			</div>
+			<!--  -->
+			
+			
+			
+			<!-- handwash Toilet -->
+			<div id="handwashpic"><img src="/static/webapp/images/reports/handwashpic.png"></div>
+			<div id="handwashfacilities">
+			Hand Washing Facilities
+			</div>
+			<div id="layer_12289">
+              <strong class="goodnum">{{  display.handw }}</strong>- {{ display.handpc  }}%
+			</div>
+			<div id="layer_10985">
+              <strong class="goodnum">{{  display.toilets }}</strong>- {{ display.toilpc  }}%
+			</div>
+			<div id="ToiletFacilities">
+			Toilet Facilities
+			</div>
+			<div id="Availabilityof">
+			Availability of:</div>
+			<div id="toiletpic"><img src="/static/webapp/images/reports/toiletpic.png"></div>
+			<!--  -->
+			
+			<!-- bmi -->
+			<div id="LESSTHAN1990"><img src="/static/webapp/images/reports/LESSTHAN1990.png"></div>
+			<div id="MORETHE2521"><img src="/static/webapp/images/reports/MORETHE2521.png"></div>
+			<div id="MORETHAN25">
+			MORE THAN 25
+			</div>
+			<div id="layer_21" class="goodnum">
+              {{  display.fats  }}
+			</div>
+			<div id="LESSTHAN19" class="goodnum">
+			LESS THAN 19
+			</div>
+			<div id="layer_90" class="goodnum">
+              {{  display.thins  }}
+			</div>
+			<div id="BMI"><img src="/static/webapp/images/reports/BMI.png"></div>
+			<div id="BMIBODYMASSINDEXismo">
+			<strong>BMI</strong> (Body Mass Index) is monitored in mothers to avoid complications pregnancies Healthy BMI is 
+			considers from 19 - 25
+			</div>
+			<!--  -->
+			
+			<!-- footer -->
+			<div id="Layer16"><img src="/static/webapp/images/reports/Layer16.png"></div>
+			<div id="ContactUsReachouttou">
+			<strong>Contact Us</strong>
+			<br/>Reach out to us if you have any 
+			questions or queries regarding 
+			information on rapid SMS 
+			contact us using the information
+			below:
+			<br><br>
+			+250 78123456<br>
+			+250 73123456
+			<br><br>
+			info@rapidsms.gov.rw
+			rapidsms@unicef.com
+			</div>
+			<div id="FollowusonSocialNetw">
+			<strong>Follow us</strong>
+			<br></>Follow us on our soical networks and comment, interact and socailise with our community
+			</div>
+			<div id="Layer17"><img src="/static/webapp/images/reports/Layer17.png"></div>
+			<div id="Layer18"><img src="/static/webapp/images/reports/Layer18.png"></div>
+			<div id="Layer19"><img src="/static/webapp/images/reports/Layer19.png"></div>
+			<div id="Layer20"><img src="/static/webapp/images/reports/Layer20.png"></div>
+			<!--  -->
+			
+		</div>
+		</div>
+ </body>
+ </html>

@@ -1,0 +1,5 @@
+@import url("http://fonts.googleapis.com/css?family=Montserrat:400,700|Oxygen:400,300,700|Righteous|Playfair+Display:400,400italic,700,700italic,900,900italic|Playfair+Display+SC:400,400italic,700,700italic,900,900italic&subset=latin,latin-ext");
+body {
+  font-family: "Playfair Display";
+  font-variant-settings: "dlig", "diag";
+  font-size: 15pt; }
