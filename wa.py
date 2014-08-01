@@ -1,63 +1,71 @@
 #!  /usr/bin/env python
 
 import cherrypy
-from lxml import html as templates
+from jinja2 import Environment, FileSystemLoader
 import os, sys, thread
 from rapidsmsrw1000.apps.orm import orm
 import re
+import settings
 import subprocess
-import web
 
 BMI_MIN = 19
 BMI_MAX = 25
 orm.ORM.connect(dbname  = 'thousanddays', user = 'thousanddays', host = 'localhost', password = 'thousanddays')
 
 class ThousandDays:
-  def __init__(self, pth):
-    self.path = pth
+  def __init__(self, pth, bst, stt):
+    self.path   = pth
+    self.jinja  = Environment(loader = FileSystemLoader(pth))
+    self.base   = bst
+    self.static = stt
 
   @cherrypy.expose
   def index(self):
-    return file(os.path.join(self.path, 'html', 'index.html'))
+    return self.jinja.get_template('index.html').render()
 
 class ThousandCharts(ThousandDays):
   @cherrypy.expose
   def charts(self):
     return ':-\\'
 
-  def process_template(self, pth, mapping, query):
-    ans = ''
-    with file(pth) as f:
-      doc = templates.fromstring(f.read())  # TODO: cache templates
-      for cle, val in mapping:
-        fin = doc
-        dem = cle
-        dat = val
-        if not hasattr(cle, '__iter__'):
-          dem = [cle]
-        for prc in dem:
-          if hasattr(prc, '__call__'):
-            fin = prc(fin)
-          else:
-            fin = fin.cssselect(prc)
-            if type(fin) == type([]):
-              try:
-                fin = fin[0]
-              except IndexError:
-                raise Exception, (u'No children in "%s" over %d.' % (prc, len(fin)))
-        if not (type(dat) in [type(x) for x in ['', u'', 0, 0L, 1.6182]]):
-          if type(dat) == type((object, 'method', ['args'])):
-            dat = getattr(dat[0], dat[1])(*dat[2:])
-          else:
-            raise Exception, ('How to process "%s" (%s) of "%s"?' % (dat, type(dat), cle))
-        for pc in (fin if type(fin) == type([]) else [fin]):
-          pc.text  = unicode(dat)
-      ans = templates.tostring(doc)
-    return ans
-
   @cherrypy.expose
-  def dynamised(self, chart = 'pregnancy', mapping = [], query = None):
-    return self.process_template(os.path.join(self.path, 'html', '%s.html' % (chart, )), mapping, query)
+  def dynamised(self, mapping = {}, chart = 'pregnancy', *args, **kw):
+    ff  = settings.FF(None, None)
+    for k in mapping:
+      kw[k] = mapping[k]
+    try:
+      kw['base_template'] = self.base
+      kw['static_path']   = self.static
+      kw['fiters']        = self.base
+      kw['display']       = {
+        'total': ff['total'],
+        'info' : ff,
+        'toilets' : ff['toilets'],
+        'toilpc' : ff['toilpc'],
+        'handw' : ff['handw'],
+        'handpc' : ff['handpc'],
+        'fats' : ff['fats'],
+        'thins' : ff['thins'],
+        'pr' : ff['pr'],
+        'prpc' : ff['prpc'],
+        'aa' : ff['aa'],
+        'aapc' : ff['aapc'],
+        'risks' : ff['risks'],
+        'riskpc' : ff['riskpc'],
+        'rezes' : ff['rezes'],
+        'rezpc' : ff['rezpc'],
+      }
+      kw['base_template'] = settings.BASE_TEMPLATE
+      kw['static_path']   = settings.STATIC_PATH
+      kw['css_path']      = settings.CSS_STATIC_PATH
+      kw['filters']       = {
+        'child_areas' : [
+          {'name': 'Kigali City', 'id': 1, 'own_link': '?location=kigali'}
+        ]
+      }
+    except Exception, e:
+      raise e
+    return self.jinja.get_template('%s.html' % (chart, )).render(*args, **kw)
 
   @cherrypy.expose
   def delivery(self):
@@ -93,14 +101,10 @@ class ThousandCharts(ThousandDays):
         'hour1':('COUNT(*)', 'bf1_bool IS NOT NULL')
       }
     )
-    return self.dynamised('nutrition', mapping = [
-      ('#layer_118', neat_numbers(nut[0]['breast'])),
-      ('#layer_34', neat_numbers(nut[0]['notbreast'])),
-      ('#layer_1121', neat_numbers(nut[0]['unknown'])),
-      ('#layer_108', neat_numbers(bir[0]['hour1'])),
-      # ('#layer_79', neat_numbers(bir[0]['hour1'])),
-      ('#layer_152', '%.2f%%' % ((weighed[0]['short'] / weighed[0]['mums']) * 100.0, ))
-    ])
+    return self.dynamised('nutrition', mapping = {
+            'nutrition':nut[0],
+            'weighed':weighed[0]
+    })
 
   @cherrypy.expose
   def pregnancy(self):
@@ -186,6 +190,9 @@ class ThousandCharts(ThousandDays):
     prc     = prrecov[0]['allreps']
     prpc    = (float(prc) / rezf) * 100.0
     # TODO: do optimisations specialise?
+    return self.dynamised(mapping = {
+            'mothers':nat[0]
+    })
     return self.dynamised(mapping = [
       ('#layer_150 a', neat_numbers(nat[0]['allpregs'])),
       ('#risks69', ('%.1f%%' % (prpc, ))),
@@ -237,10 +244,16 @@ class ChartMethods(cherrypy.dispatch.Dispatcher):
 
 def wmain(argv):
   if len(argv) < 3:
-    return wmain(argv + ['0.0.0.0:8081'])
-  hst, prt  = argv[2].split(':', 2)
+    sys.stderr.write('%s templatedir staticdir\r\n' % (argv[0], ))
+    return 1
   pth       = os.path.abspath(argv[1])
-  thousand  = ThousandCharts(pth) # ThousandDays(pth)
+  bst       = 'base.html'
+  stt       = argv[2]
+  try:
+    bst = settings.BASE_TEMPLATE
+  except Exception, e:
+    pass
+  thousand  = ThousandCharts(pth, bst, stt)
   def launch(hst, prt, *args):
     cherrypy.server.socket_host = hst
     cherrypy.server.socket_port = prt
@@ -248,16 +261,16 @@ def wmain(argv):
       '/':  {
         'request.dispatch': ChartMethods(),
         'tools.sessions.on':    True,
+      },
+      '/static':{
         'tools.staticdir.on':   True,
-        # 'tools.staticdir.root': os.path.join(os.path.abspath(argv[1]), 'static'),
-        'tools.staticdir.root': pth,
+        'tools.staticdir.root': os.path.abspath(stt),
+        # 'tools.staticdir.root': pth,
         'tools.staticdir.dir':  ''
       }
     })
   # thd       = thread.start_new_thread(launch, (None, ))
-  launch(hst, int(prt))
-  apres     = os.getenv('POST_THOUSAND', 'exit;')
-  subprocess.call([apres, 'http://%s/' % (argv[2], )])
+  launch('0.0.0.0', 8081)
 
 if __name__ == '__main__':
   bottom  = sys.exit(wmain(sys.argv))
