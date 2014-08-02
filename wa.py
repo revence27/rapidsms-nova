@@ -11,61 +11,39 @@ import subprocess
 BMI_MIN = 19
 BMI_MAX = 25
 orm.ORM.connect(dbname  = 'thousanddays', user = 'thousanddays', host = 'localhost', password = 'thousanddays')
+APP_DATA  = {
+}
 
 class ThousandDays:
-  def __init__(self, pth, bst, stt):
+  def __init__(self, pth, bst, stp):
     self.path   = pth
     self.jinja  = Environment(loader = FileSystemLoader(pth))
     self.base   = bst
-    self.static = stt
+    self.static = stp
 
   @cherrypy.expose
   def index(self):
-    return self.jinja.get_template('index.html').render()
+    return self.dynamised('index')
+
+  def app_data(self):
+    return APP_DATA
+
+  @cherrypy.expose
+  def dynamised(self, chart, mapping = {}, *args, **kw):
+    info  = {}
+    info.update({
+      'base_template' : self.base,
+      'static_path'   : self.static
+    })
+    info.update(self.app_data())
+    info.update(kw)
+    info.update(mapping)
+    return self.jinja.get_template('%s.html' % (chart, )).render(*args, **info)
 
 class ThousandCharts(ThousandDays):
   @cherrypy.expose
   def charts(self):
     return ':-\\'
-
-  @cherrypy.expose
-  def dynamised(self, mapping = {}, chart = 'pregnancy', *args, **kw):
-    ff  = settings.FF(None, None)
-    for k in mapping:
-      kw[k] = mapping[k]
-    try:
-      kw['base_template'] = self.base
-      kw['static_path']   = self.static
-      kw['fiters']        = self.base
-      kw['display']       = {
-        'total': ff['total'],
-        'info' : ff,
-        'toilets' : ff['toilets'],
-        'toilpc' : ff['toilpc'],
-        'handw' : ff['handw'],
-        'handpc' : ff['handpc'],
-        'fats' : ff['fats'],
-        'thins' : ff['thins'],
-        'pr' : ff['pr'],
-        'prpc' : ff['prpc'],
-        'aa' : ff['aa'],
-        'aapc' : ff['aapc'],
-        'risks' : ff['risks'],
-        'riskpc' : ff['riskpc'],
-        'rezes' : ff['rezes'],
-        'rezpc' : ff['rezpc'],
-      }
-      kw['base_template'] = settings.BASE_TEMPLATE
-      kw['static_path']   = settings.STATIC_PATH
-      kw['css_path']      = settings.CSS_STATIC_PATH
-      kw['filters']       = {
-        'child_areas' : [
-          {'name': 'Kigali City', 'id': 1, 'own_link': '?location=kigali'}
-        ]
-      }
-    except Exception, e:
-      raise e
-    return self.jinja.get_template('%s.html' % (chart, )).render(*args, **kw)
 
   @cherrypy.expose
   def delivery(self):
@@ -190,38 +168,7 @@ class ThousandCharts(ThousandDays):
     prc     = prrecov[0]['allreps']
     prpc    = (float(prc) / rezf) * 100.0
     # TODO: do optimisations specialise?
-    return self.dynamised(mapping = {
-            'mothers':nat[0]
-    })
-    return self.dynamised(mapping = [
-      ('#layer_150 a', neat_numbers(nat[0]['allpregs'])),
-      ('#risks69', ('%.1f%%' % (prpc, ))),
-      ('#risks66', ('%.1f%%' % (aapc, ))),
-      ('#risks65', neat_numbers(aac)),
-      ('#risks78', neat_numbers(prc)),
-      ('#layer_129', neat_numbers(riskc)),
-      ('#layer_89', ('%.1f%%' % (riskpc, ))),
-      ('#layer_89_0', neat_numbers(rez)),
-      ('#layer_75', ('%.1f%%' % (rezpc, ))),
-      ('#COUGHING24 strong', neat_numbers(nat[0]['coughing'])),
-      ('#DIARRHEA33 strong', neat_numbers(nat[0]['diarrhoea'])),
-      ('#FEVER12 strong', neat_numbers(nat[0]['fever'])),
-      ('#MALARIA09 strong', neat_numbers(nat[0]['malaria'])),
-      ('#VOMITING18 strong', neat_numbers(nat[0]['vomiting'])),
-      ('#STILLBORN21 strong', neat_numbers(nat[0]['stillb'])),
-      ('#EDEMA13 strong', neat_numbers(nat[0]['oedema'])),
-      ('#JAUNDICE09 strong', neat_numbers(nat[0]['jaun'])),
-      ('#PNEUMONIA21 strong', neat_numbers(nat[0]['pneumo'])),
-      ('#DISABILITY21 strong', neat_numbers(nat[0]['disab'])),
-      ('#HYPOTHEMIA21 strong', neat_numbers(nat[0]['hypoth'])),
-      ('#CLEFTPALATE21 strong', neat_numbers(nat[0]['ibibari'])),
-      ('#CORDINFECTION strong', neat_numbers(nat[0]['cordi'])),
-      ('#NECKSTIFFNESS strong', neat_numbers(nat[0]['necks'])),
-      ('#layer_12289 strong', neat_numbers(hands)),
-      ('#layer_10985 strong', neat_numbers(toils)),
-      ('#layer_21', neat_numbers(fatc)),
-      ('#layer_90', neat_numbers(thinc)),
-    ])
+    return self.dynamised('pregnancy', mapping = globals())
 
 def neat_numbers(num):
   pcs = divided_num(str(num), 3)
@@ -243,17 +190,26 @@ class ChartMethods(cherrypy.dispatch.Dispatcher):
     return super(ChartMethods, self).__call__(pth.lower())
 
 def wmain(argv):
-  if len(argv) < 3:
-    sys.stderr.write('%s templatedir staticdir\r\n' % (argv[0], ))
+  if len(argv) < 4:
+    sys.stderr.write('%s templatedir staticdir staticpath\r\n' % (argv[0], ))
     return 1
   pth       = os.path.abspath(argv[1])
   bst       = 'base.html'
   stt       = argv[2]
+  stp       = argv[3]
   try:
-    bst = settings.BASE_TEMPLATE
+    APP_DATA  = settings.APP_DATA
   except Exception, e:
     pass
-  thousand  = ThousandCharts(pth, bst, stt)
+  try:
+    stp       = settings.STATIC_PATH
+  except Exception, e:
+    pass
+  try:
+    bst       = settings.BASE_TEMPLATE
+  except Exception, e:
+    pass
+  thousand  = ThousandCharts(pth, bst, stp)
   def launch(hst, prt, *args):
     cherrypy.server.socket_host = hst
     cherrypy.server.socket_port = prt
@@ -262,7 +218,8 @@ def wmain(argv):
         'request.dispatch': ChartMethods(),
         'tools.sessions.on':    True,
       },
-      '/static':{
+      # '/static':{
+      stp:{
         'tools.staticdir.on':   True,
         'tools.staticdir.root': os.path.abspath(stt),
         # 'tools.staticdir.root': pth,
