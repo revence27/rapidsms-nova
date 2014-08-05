@@ -146,13 +146,13 @@ The keyword args are all optional:
     '''Assemble into query the parts that express conditions (WHERE).'''
     return ORM.assemble_conditions(conds)
 
-  def specialise(self, conds, **kwargs):
-    '''Returns a different copy of this query, with the arguments treated as now conditions.'''
+  def specialise(self, djconds, **kwargs):
+    '''Returns a different copy of this query, with the arguments treated as new conditions.'''
     nova          = copy.copy(self)
     nova.djconds  = copy.copy(self.djconds)
-    for k in conds:
-      nova.djconds[k] = conds[k]
-    nova.kwargs   = kwargs
+    nova.kwargs   = copy.copy(self.kwargs)
+    nova.djconds.update(djconds)
+    nova.kwargs.update(kwargs)
     return nova
 
   def filter(self, **kwargs):
