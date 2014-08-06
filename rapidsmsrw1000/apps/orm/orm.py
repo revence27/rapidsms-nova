@@ -470,8 +470,18 @@ If 'Invert Query' is supplied as one of the condition keys, the entire set of co
     else:
       neg   = conds.pop('Invert Query', False)
       for cond in conds:
+        dat = None
         rez = conds[cond]
-        ans.append(curz.mogrify(cond, rez if type(rez) == type((1, 2)) else (rez,)))
+        if type(rez)  ==  type((1, 2)):
+          dat = curz.mogrify(cond, rez)
+        else:
+          if hasattr(rez, '__iter__'):
+            # dat = curz.mogrify(cond, (rez,))
+            dat = '(%s)' % ((', '.join([curz.mogrify('%s', (it, )) for it in rez])), )
+            dat = cond % (dat, )
+          else:
+            dat = curz.mogrify(cond, (rez, ))
+        ans.append('(%s)' % (dat, ))
       curz.close()
     return (' WHERE ' if conds else '') + (('NOT (%s)' if neg else '%s') % (' AND '.join(ans)))
 
