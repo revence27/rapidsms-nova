@@ -104,13 +104,29 @@ The keyword args are all optional:
 '''
     self.postgres = pg
     self.djconds  = djconds
-    self.tablenm  = kwargs.get('table', tn)
     self.kwargs   = kwargs
+    self.tn       = tn
     self.cursor   = None
-    self.names    = kwargs.get('cols', [])
-    self.annots   = kwargs.get('annotate', {})
-    self.precount = kwargs.get('precount')
-    self.flat     = False
+
+  @property
+  def tablenm(self):
+    return self.kwargs.get('table', self.tn)
+
+  @property
+  def precount(self):
+    return self.kwargs.get('precount')
+
+  @property
+  def extended(self):
+    return self.kwargs.get('extended', {})
+
+  @property
+  def annots(self):
+    return self.kwargs.get('annotate', {})
+
+  @property
+  def names(self):
+    return self.kwargs.get('cols', [])
 
   def where(self, k, v):
     '''Adds a condition to the ones supplied in the constructor.'''
@@ -360,6 +376,15 @@ The keyword args are all optional:
   def __exit__(self, *args):
     self.close()
 
+  def __apply_extensions(self):
+    them  = self.extended
+    cnds  = self.djconds.items()
+    rez   = {}
+    for k in them:
+      q, c    = them[k]
+      rez[k]  = (q, dict(cnds + [(c, '')]))
+    return rez
+
   @property
   def query(self):
     '''A string of the raw query as it would be executed.'''
@@ -370,8 +395,10 @@ The keyword args are all optional:
     qry   = u'%s%s%s' % (self.assemble_conditions(self.djconds), self.assemble_sort(self.kwargs.get('sort', None)), self.assemble_limits(self.kwargs))
     cols  = u', '.join(self.kwargs.get('cols', self.active_columns(self.kwargs.get('qid')) or ['*']))
     annot = []
-    for k in self.annots:
-      it  = self.annots[k]
+    parts = copy.copy(self.annots)
+    parts.update(self.__apply_extensions())
+    for k in parts:
+      it  = parts[k]
       q   = qry
       if type(it) ==  type(('query', 'conds')):
         q   = u'%s%s' % (self.assemble_conditions(it[1]), self.assemble_limits(self.kwargs))

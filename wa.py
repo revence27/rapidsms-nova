@@ -110,40 +110,36 @@ class ThousandCharts(ThousandDays):
   def delivery(self, *args, **kw):
     navb    = ThousandNavigation(*args, **kw)
     cnds    = navb.conditions('report_date')
-    cits    = cnds.items()
     pcnds   = copy.copy(cnds)
     pcnds[("lmp + ('%d DAYS' :: INTERVAL)" % (settings.GESTATION, )) + ' <= %s']  = navb.finish
     delivs  = orm.ORM.query('bir_table', cnds,
-      annotate  = {
-        'allbirs'   : 'COUNT(*)',
+      extended  = {
         'home'      : ('COUNT(*)', 'ho_bool IS NOT NULL'),
         'clinic'    : ('COUNT(*)', 'cl_bool IS NOT NULL'),
         'hospital'  : ('COUNT(*)', 'hp_bool IS NOT NULL'),
+        'allbirs'  : ('COUNT(*)', 'TRUE'),
         'enroute'   : ('COUNT(*)', 'or_bool IS NOT NULL')
       },
-      cols  = ['patient_id']
+      cols  = ['patient_id']  # , 'COUNT(*) AS allbirs']
     )
     congs     = []
     for mum in delivs.list():
       congs.append(mum['patient_id'])
     exped   = orm.ORM.query('pre_table', pcnds,
-      annotate  = {
-        'alldelivs' : 'COUNT(*)',
+      extended  = {
+        # 'alldelivs' : 'COUNT(*)',
         'untracked' : (
           'COUNT(*)', 
-          dict(pcnds.items()
-            + [('RANDOM() <= 0.5', '')]
-            # + [('delivered', '')]
-            # + [('patient_id NOT IN %s', congs)]
+            'RANDOM() <= 0.5'
+            # 'delivered'
+            #'patient_id NOT IN %s'
           )
-        )
-      }
-      # cols  = ['COUNT(*) AS alldelivs'],
+      },
+      cols  = ['COUNT(*) AS alldelivs']
     )
-    ttl       = orm.ORM.query('anc_table',
-      cnds,
+    ttl       = orm.ORM.query('anc_table', cnds,
       cols      = ['COUNT(*) AS allancs'],
-      annotate  = {
+      extended  = {
         'anc1' : ('COUNT(*)', 'anc_bool IS NOT NULL'),
         'anc2' : ('COUNT(*)', 'anc2_bool IS NOT NULL'),
         'anc3' : ('COUNT(*)', 'anc3_bool IS NOT NULL'),
@@ -189,10 +185,9 @@ class ThousandCharts(ThousandDays):
   def vaccination(self, *args, **kw):
     navb    = ThousandNavigation(*args, **kw)
     cnds    = navb.conditions('report_date')
-    cits    = cnds.items()
     vacced  = orm.ORM.query('chi_table', cnds,
       cols  = ['COUNT(*) AS allkids'],
-      annotate  = {
+      extended  = {
         'v1'      : ('COUNT(*)', 'v1_bool IS NOT NULL'),
         'v2'      : ('COUNT(*)', 'v2_bool IS NOT NULL'),
         'v3'      : ('COUNT(*)', 'v3_bool IS NOT NULL'),
@@ -239,7 +234,7 @@ class ThousandCharts(ThousandDays):
   def nutrition(self, *args, **kw):
     nut = orm.ORM.query('cbn_table',
       cols      = ['COUNT(*) AS allnuts'],
-      annotate  = {
+      extended  = {
         'notbreast':('COUNT(*)', 'nb_bool IS NOT NULL'),
         'breast':('COUNT(*)', 'ebf_bool IS NOT NULL OR cbf_bool IS NOT NULL'),
         'unknown':('COUNT(*)', 'cbf_bool IS NULL AND ebf_bool IS NULL AND nb_bool IS NULL')
@@ -249,7 +244,7 @@ class ThousandCharts(ThousandDays):
       'mother_height_float > 100.0 AND mother_weight_float > 15.0':''
       },
       cols      = ['COUNT(*) AS mums'],
-      annotate  = {
+      extended  = {
         'short':('COUNT(*)', 'mother_height_float < 150.0'),
       }
     )
@@ -257,7 +252,7 @@ class ThousandCharts(ThousandDays):
     fats    = weighed.specialise({'(mother_weight_float / ((mother_height_float * mother_height_float) / 10000.0)) > %s': settings.BMI_MAX})
     bir = orm.ORM.query('bir_table',
       cols      = ['COUNT(*) AS allbirs'],
-      annotate  = {
+      extended  = {
         'hour1':('COUNT(*)', 'bf1_bool IS NOT NULL')
       }
     )
@@ -267,24 +262,23 @@ class ThousandCharts(ThousandDays):
   def pregnancy(self, *args, **kw):
     navb    = ThousandNavigation(*args, **kw)
     cnds    = navb.conditions('report_date')
-    cits    = cnds.items()
     nat     = orm.ORM.query('pre_table', cnds,
       cols      = ['COUNT(*) AS allpregs'],
-      annotate  = {
-        'coughing':('COUNT(*)', dict([('ch_bool IS NOT NULL', '')] + cits)),
-        'diarrhoea':('COUNT(*)',  dict([('di_bool IS NOT NULL', '')] + cits)),
-        'fever':('COUNT(*)',  dict([('fe_bool IS NOT NULL', '')] + cits)),
-        'oedema':('COUNT(*)',  dict([('oe_bool IS NOT NULL', '')] + cits)),
-        'pneumo':('COUNT(*)',  dict([('pc_bool IS NOT NULL', '')] + cits)),
-        'disab':('COUNT(*)',  dict([('db_bool IS NOT NULL', '')] + cits)),
-        'cordi':('COUNT(*)',  dict([('ci_bool IS NOT NULL', '')] + cits)),
-        'necks':('COUNT(*)',  dict([('ns_bool IS NOT NULL', '')] + cits)),
-        'malaria':('COUNT(*)',  dict([('ma_bool IS NOT NULL', '')] + cits)),
-        'vomiting':('COUNT(*)',  dict([('vo_bool IS NOT NULL', '')] + cits)),
-        'stillb':('COUNT(*)',  dict([('sb_bool IS NOT NULL', '')] + cits)),
-        'jaun':('COUNT(*)',  dict([('ja_bool IS NOT NULL', '')] + cits)),
-        'hypoth':('COUNT(*)',  dict([('hy_bool IS NOT NULL', '')] + cits)),
-        'ibibari':('COUNT(*)',  dict([('ib_bool IS NOT NULL', '')] + cits))
+      extended  = {
+        'coughing':('COUNT(*)', 'ch_bool IS NOT NULL'),
+        'diarrhoea':('COUNT(*)',  'di_bool IS NOT NULL'),
+        'fever':('COUNT(*)',  'fe_bool IS NOT NULL'),
+        'oedema':('COUNT(*)',  'oe_bool IS NOT NULL'),
+        'pneumo':('COUNT(*)',  'pc_bool IS NOT NULL'),
+        'disab':('COUNT(*)',  'db_bool IS NOT NULL'),
+        'cordi':('COUNT(*)',  'ci_bool IS NOT NULL'),
+        'necks':('COUNT(*)',  'ns_bool IS NOT NULL'),
+        'malaria':('COUNT(*)',  'ma_bool IS NOT NULL'),
+        'vomiting':('COUNT(*)',  'vo_bool IS NOT NULL'),
+        'stillb':('COUNT(*)',  'sb_bool IS NOT NULL'),
+        'jaun':('COUNT(*)',  'ja_bool IS NOT NULL'),
+        'hypoth':('COUNT(*)',  'hy_bool IS NOT NULL'),
+        'ibibari':('COUNT(*)',  'ib_bool IS NOT NULL')
       },
       migrations  = [
         ('db_bool', False),
@@ -358,6 +352,7 @@ class ThousandCharts(ThousandDays):
     qs    = range(12)
     tot   = 0
     dmax  = 0
+    cits  = cnds.items()
     for mpos in qs:
       got = orm.ORM.query('pre_table', dict(cits + [('EXTRACT(MONTH FROM report_date) = %s', mpos + 1)]), cols = ['COUNT(*) AS allpregs'])[0]['allpregs']
       qs[mpos]  = got
@@ -396,8 +391,9 @@ class ChartMethods(cherrypy.dispatch.Dispatcher):
     return super(ChartMethods, self).__call__(pth.lower())
 
 def wmain(argv):
-  if len(argv) < 4:
-    sys.stderr.write('%s templatedir staticdir staticpath\r\n' % (argv[0], ))
+  larg  = len(argv)
+  if larg < 4:
+    sys.stderr.write('%s templatedir staticdir staticpath [port] [host]\r\n' % (argv[0], ))
     return 1
   pth       = os.path.abspath(argv[1])
   bst       = 'base.html'
@@ -431,7 +427,13 @@ def wmain(argv):
       }
     })
   # thd       = thread.start_new_thread(launch, (None, ))
-  launch('0.0.0.0', 8081)
+  hst = '0.0.0.0'
+  prt = '8081'
+  if larg == 5:
+    prt = argv[4]
+  if larg == 6:
+    hst = argv[5]
+  return launch(hst, int(prt))
 
 if __name__ == '__main__':
   bottom  = sys.exit(wmain(sys.argv))
