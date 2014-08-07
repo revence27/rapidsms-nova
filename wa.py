@@ -118,10 +118,11 @@ class ThousandCharts(ThousandDays):
         'hospital'  : ('COUNT(*)', 'hp_bool IS NOT NULL'),
         'allbirs'   : ('COUNT(*)', 'TRUE'),
         'enroute'   : ('COUNT(*)', 'or_bool IS NOT NULL'),
-        'boys'      : ('COUNT(*)', 'bo_bool IS NOT NULL'),
-        'girls'     : ('COUNT(*)', 'gi_bool IS NOT NULL'),
+        'boys'      : ('COUNT(*)', 'bo_bool IS NOT NULL AND gi_bool IS NULL'),
+        'girls'     : ('COUNT(*)', 'gi_bool IS NOT NULL AND bo_bool IS NULL'),
         'prema'     : ('COUNT(*)', 'pm_bool IS NOT NULL'),
-        'bfeed'     : ('COUNT(*)', 'bf1_bool IS NOT NULL')
+        'bfeed'     : ('COUNT(*)', 'bf1_bool IS NOT NULL'),
+        'nbfeed'    : ('COUNT(*)', 'nb_bool IS NOT NULL')
       },
       cols  = ['patient_id']  # , 'COUNT(*) AS allbirs']
     )
