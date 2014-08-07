@@ -106,8 +106,7 @@ class ThousandCharts(ThousandDays):
   def ccm(self, *args, **kw):
     return self.dynamised('ccm', *args, **kw)
 
-  @cherrypy.expose
-  def delivery(self, *args, **kw):
+  def locals_for_births(self, *args, **kw):
     navb    = ThousandNavigation(*args, **kw)
     cnds    = navb.conditions('report_date')
     pcnds   = copy.copy(cnds)
@@ -117,8 +116,12 @@ class ThousandCharts(ThousandDays):
         'home'      : ('COUNT(*)', 'ho_bool IS NOT NULL'),
         'clinic'    : ('COUNT(*)', 'cl_bool IS NOT NULL'),
         'hospital'  : ('COUNT(*)', 'hp_bool IS NOT NULL'),
-        'allbirs'  : ('COUNT(*)', 'TRUE'),
-        'enroute'   : ('COUNT(*)', 'or_bool IS NOT NULL')
+        'allbirs'   : ('COUNT(*)', 'TRUE'),
+        'enroute'   : ('COUNT(*)', 'or_bool IS NOT NULL'),
+        'boys'      : ('COUNT(*)', 'bo_bool IS NOT NULL'),
+        'girls'     : ('COUNT(*)', 'gi_bool IS NOT NULL'),
+        'prema'     : ('COUNT(*)', 'pm_bool IS NOT NULL'),
+        'bfeed'     : ('COUNT(*)', 'bf1_bool IS NOT NULL')
       },
       cols  = ['patient_id']  # , 'COUNT(*) AS allbirs']
     )
@@ -140,10 +143,10 @@ class ThousandCharts(ThousandDays):
     ttl       = orm.ORM.query('anc_table', cnds,
       cols      = ['COUNT(*) AS allancs'],
       extended  = {
-        'anc1' : ('COUNT(*)', 'anc_bool IS NOT NULL'),
-        'anc2' : ('COUNT(*)', 'anc2_bool IS NOT NULL'),
-        'anc3' : ('COUNT(*)', 'anc3_bool IS NOT NULL'),
-        'anc4' : ('COUNT(*)', 'anc4_bool IS NOT NULL'),
+        'anc1'    : ('COUNT(*)', 'anc_bool IS NOT NULL'),
+        'anc2'    : ('COUNT(*)', 'anc2_bool IS NOT NULL'),
+        'anc3'    : ('COUNT(*)', 'anc3_bool IS NOT NULL'),
+        'anc4'    : ('COUNT(*)', 'anc4_bool IS NOT NULL')
       }
     )[0]
     ancs      = range(4)
@@ -162,6 +165,13 @@ class ThousandCharts(ThousandDays):
     expected  = exped[0]['alldelivs']
     births    = delivs[0]['allbirs']
     unknowns  = exped[0]['untracked']
+    boys      = delivs[0]['boys']
+    girls     = delivs[0]['girls']
+    boyspc    = 0.0
+    girlspc   = 0.0
+    if births > 0:
+      boyspc  = (float(boys) / float(births)) * 100.0
+      girlspc = (float(girls) / float(births)) * 100.0
     locations = delivs[0]
     plain     = orm.ORM.query('pre_table', pcnds,
       cols  = ['COUNT(*) AS allpregs']
@@ -179,7 +189,15 @@ class ThousandCharts(ThousandDays):
       fatpc   = (float(fats) / expf) * 100.0
       thinpc  = (float(thins)  / expf) * 100.0
       midpc   = (float(midweight)  / expf) * 100.0
-    return self.dynamised('delivery', mapping = locals(), *args, **kw)
+    return locals()
+
+  @cherrypy.expose
+  def birthreport(self, *args, **kw):
+    return self.dynamised('birthreport', mapping = self.locals_for_births(*args, **kw), *args, **kw)
+
+  @cherrypy.expose
+  def delivery(self, *args, **kw):
+    return self.dynamised('delivery', mapping = self.locals_for_births(*args, **kw), *args, **kw)
 
   @cherrypy.expose
   def vaccination(self, *args, **kw):
