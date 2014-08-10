@@ -197,6 +197,14 @@ class ThousandCharts(ThousandDays):
     return self.dynamised('birthreport', mapping = self.locals_for_births(*args, **kw), *args, **kw)
 
   @cherrypy.expose
+  def childhealth(self, *args, **kw):
+    return self.dynamised('childhealth', mapping = self.locals_for_births(*args, **kw), *args, **kw)
+
+  @cherrypy.expose
+  def nbc(self, *args, **kw):
+    return self.dynamised('nbc', mapping = self.locals_for_births(*args, **kw), *args, **kw)
+
+  @cherrypy.expose
   def delivery(self, *args, **kw):
     return self.dynamised('delivery', mapping = self.locals_for_births(*args, **kw), *args, **kw)
 
