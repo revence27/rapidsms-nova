@@ -25,3 +25,4 @@ public/static/
 public/media/
 *.xls*
 logs
+rapidsmsrw1000/settings.py
